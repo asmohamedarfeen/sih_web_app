@@ -1,0 +1,32 @@
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  COMMANDER = 'COMMANDER',
+  WELFARE_OFFICER = 'WELFARE_OFFICER',
+  HR_OFFICER = 'HR_OFFICER',
+  PSYCHOLOGIST = 'PSYCHOLOGIST',
+  MEDICAL_OFFICER = 'MEDICAL_OFFICER',
+  PERSONNEL = 'PERSONNEL',
+}
+
+export enum RiskLevel {
+  LOW = 'LOW',
+  MODERATE = 'MODERATE',
+  HIGH = 'HIGH',
+  CRITICAL = 'CRITICAL',
+}
+
+export enum InterventionStatus {
+  PENDING = 'PENDING',
+  ASSIGNED = 'ASSIGNED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  ESCALATED = 'ESCALATED',
+  CLOSED = 'CLOSED',
+}
+
+export enum AlertSeverity {
+  INFO = 'INFO',
+  WARNING = 'WARNING',
+  HIGH = 'HIGH',
+  CRITICAL = 'CRITICAL',
+}
