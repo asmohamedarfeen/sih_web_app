@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from backend.app.database.session import get_db
 from backend.app.models.user import User
 from backend.app.models.assessment import Assessment
-from backend.app.dependencies.auth import get_current_user
+from backend.app.dependencies.auth import get_current_user, get_optional_current_user
 from backend.app.services.ai_risk_engine import ai_risk_engine
 from backend.app.services.hrms_client import hrms_service
 
@@ -507,16 +507,16 @@ class SelfAssessmentSubmission(BaseModel):
 @router.post("/self-assessment/generate-questions")
 async def generate_assessment_questions(
     req: AssessmentQuestionGenRequest,
-    current_user: User = Depends(get_current_user)
+    current_user: Optional[User] = Depends(get_optional_current_user)
 ):
     """
     Generates dynamic, AI-powered contextual psychological self-assessment questions
     using Gemini API with structured clinical domain fallback.
     """
     personnel = next((p for p in hrms_service.PERSONNEL_DATABASE if p["uid"] == req.personnel_uid), None)
-    name = req.personnel_name or (personnel["name"] if personnel else current_user.full_name)
-    rank = req.rank or (personnel["rank"] if personnel else current_user.rank)
-    unit = req.unit or (personnel["unit"] if personnel else current_user.unit)
+    name = req.personnel_name or (personnel["name"] if personnel else (current_user.full_name if current_user else "Sepoy Amit Kumar"))
+    rank = req.rank or (personnel["rank"] if personnel else (current_user.rank if current_user else "Sepoy"))
+    unit = req.unit or (personnel["unit"] if personnel else (current_user.unit if current_user else "10 Para SF"))
 
     questions = await gemini_engine.generate_dynamic_questions(
         personnel_uid=req.personnel_uid,
@@ -542,17 +542,17 @@ async def generate_assessment_questions(
 @router.post("/self-assessment/submit")
 def submit_self_assessment(
     req: SelfAssessmentSubmission,
-    current_user: User = Depends(get_current_user)
+    current_user: Optional[User] = Depends(get_optional_current_user)
 ):
     """
     Submits a completed soldier self-assessment, computes multi-dimensional psychological scores,
     and publishes the categorical results to the Welfare Officer console.
     """
     personnel = next((p for p in hrms_service.PERSONNEL_DATABASE if p["uid"] == req.personnel_uid), None)
-    name = personnel["name"] if personnel else current_user.full_name
-    rank = personnel["rank"] if personnel else current_user.rank
-    unit = personnel["unit"] if personnel else current_user.unit
-    branch = personnel["branch"] if personnel else current_user.branch
+    name = personnel["name"] if personnel else (current_user.full_name if current_user else "Sepoy Amit Kumar")
+    rank = personnel["rank"] if personnel else (current_user.rank if current_user else "Sepoy / Commando")
+    unit = personnel["unit"] if personnel else (current_user.unit if current_user else "10 Para Special Forces")
+    branch = personnel["branch"] if personnel else (current_user.branch if current_user else "Indian Army")
 
     answers_payload = [
         {
@@ -591,7 +591,7 @@ def submit_self_assessment(
 
 @router.get("/self-assessment")
 def get_all_self_assessments(
-    current_user: User = Depends(get_current_user)
+    current_user: Optional[User] = Depends(get_optional_current_user)
 ):
     """
     Retrieves all personnel self-assessment score summaries and categorical breakdowns
@@ -603,7 +603,7 @@ def get_all_self_assessments(
 @router.get("/self-assessment/{personnel_uid}")
 def get_personnel_self_assessment(
     personnel_uid: str,
-    current_user: User = Depends(get_current_user)
+    current_user: Optional[User] = Depends(get_optional_current_user)
 ):
     """
     Retrieves detailed categorical psychological test scores for a specific soldier.

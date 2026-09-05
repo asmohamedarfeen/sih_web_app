@@ -1,0 +1,126 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/services/auth_service.dart';
+import '../../core/theme/app_theme.dart';
+import 'soldier/soldier_dashboard_screen.dart';
+import 'soldier/wellness_checkin_screen.dart';
+import 'soldier/soldier_dossier_screen.dart';
+import 'welfare/welfare_dashboard_screen.dart';
+import 'commander/commander_dashboard_screen.dart';
+import 'admin/admin_dashboard_screen.dart';
+import 'auth/login_screen.dart';
+
+import 'soldier/screen_time_screen.dart';
+
+class MainNavigationScreen extends StatefulWidget {
+  const MainNavigationScreen({super.key});
+
+  @override
+  State<MainNavigationScreen> createState() => _MainNavigationScreenState();
+}
+
+class _MainNavigationScreenState extends State<MainNavigationScreen> {
+  int _currentIndex = 0;
+
+  Widget _getPrimaryRoleDashboard(AuthService auth) {
+    final user = auth.currentUser;
+    if (user == null) return const SoldierDashboardScreen();
+
+    if (user.isWelfareOfficer) {
+      return const WelfareDashboardScreen();
+    } else if (user.isCommander) {
+      return const CommanderDashboardScreen();
+    } else if (user.isAdmin) {
+      return const AdminDashboardScreen();
+    } else {
+      return const SoldierDashboardScreen();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = Provider.of<AuthService>(context);
+    final user = auth.currentUser;
+
+    final List<Widget> pages = [
+      _getPrimaryRoleDashboard(auth),
+      const WellnessCheckinScreen(),
+      const ScreenTimeScreen(),
+      const SoldierDossierScreen(),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          children: [
+            const Icon(Icons.shield_outlined, color: AppColors.accent, size: 22),
+            const SizedBox(width: 8),
+            Text(
+              user?.role == 'SOLDIER'
+                  ? 'SOLDIER PULSE'
+                  : user?.role == 'WELFARE_OFFICER'
+                      ? 'WELFARE HUB'
+                      : user?.role == 'COMMANDER'
+                          ? 'COMMAND RADAR'
+                          : 'HR FORCE DIRECTORY',
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            tooltip: 'Logout',
+            icon: const Icon(Icons.logout, size: 20),
+            onPressed: () async {
+              final nav = Navigator.of(context);
+              await auth.logout();
+              nav.pushReplacement(
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+              );
+            },
+          ),
+        ],
+      ),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: pages,
+      ),
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          border: Border(top: BorderSide(color: AppColors.cardBorder, width: 1)),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (idx) => setState(() => _currentIndex = idx),
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: AppColors.accent,
+          unselectedItemColor: AppColors.textSecondary,
+          selectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800),
+          unselectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard_outlined),
+              activeIcon: Icon(Icons.dashboard),
+              label: 'Dashboard',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.monitor_heart_outlined),
+              activeIcon: Icon(Icons.monitor_heart),
+              label: 'Check-in',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.phonelink_ring_outlined),
+              activeIcon: Icon(Icons.phonelink_ring),
+              label: 'Screen Time',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: 'Dossier',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

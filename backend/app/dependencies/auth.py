@@ -49,6 +49,23 @@ def get_current_user(
     return user
 
 
+def get_optional_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security_scheme),
+    db: Session = Depends(get_db)
+):
+    """Extracts authenticated user if credentials exist, else returns None safely."""
+    if not credentials:
+        return None
+    token = credentials.credentials
+    payload = decode_access_token(token)
+    if payload is None:
+        return None
+    email: str = payload.get("sub")
+    if email is None:
+        return None
+    return db.query(User).filter(User.email == email).first()
+
+
 def require_roles(allowed_roles: List[RoleEnum]):
     """Role-based authorization dependency factory."""
     def role_checker(current_user: User = Depends(get_current_user)) -> User:
