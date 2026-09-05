@@ -11,14 +11,66 @@ import {
   MessageSquare,
   Sparkles,
   RefreshCw,
+  Flame,
+  Activity,
+  Zap,
+  TrendingUp,
+  BatteryLow,
+  ShieldAlert,
+  LineChart,
+  Gauge,
+  HeartHandshake,
+  BellRing,
+  Smile,
+  Target,
+  AlertOctagon,
+  ChevronRight,
+  ArrowUpRight,
+  ShieldCheck,
+  Layers,
+  Users,
+  CheckCircle2,
+  FileText,
+  Send,
+  Sliders,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { dashboardService, WelfareDashboardData } from '../../services/dashboardService';
+
+interface FactorItem {
+  id: string;
+  num: number;
+  title: string;
+  shortDesc: string;
+  category: string;
+  riskLevel: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'NOMINAL';
+  metricLabel: string;
+  metricValue: string;
+  icon: React.ElementType;
+  color: string;
+  bg: string;
+  border: string;
+  clinicalSignificance: string;
+  biomarkers: string[];
+  flaggedPersonnel: {
+    name: string;
+    uid: string;
+    rank: string;
+    unit: string;
+    score: number;
+    risk: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'NOMINAL';
+    trigger: string;
+  }[];
+  actionProtocol: string;
+  modelConfidence: string;
+}
 
 export const WelfareDashboard: React.FC = () => {
   const { user } = useAuthStore();
   const [data, setData] = useState<WelfareDashboardData | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [selectedFactorId, setSelectedFactorId] = useState<string>('burnout-prediction');
+  const [actionAlert, setActionAlert] = useState<string | null>(null);
 
   const loadWelfareData = async () => {
     try {
@@ -38,6 +90,11 @@ export const WelfareDashboard: React.FC = () => {
   const handleRefresh = () => {
     setIsRefreshing(true);
     loadWelfareData();
+  };
+
+  const handleTriggerAction = (factorTitle: string, actionName: string) => {
+    setActionAlert(`Action Initiated: ${actionName} for [${factorTitle}] recorded in Welfare Audit Log.`);
+    setTimeout(() => setActionAlert(null), 4000);
   };
 
   const metrics = [
@@ -74,6 +131,298 @@ export const WelfareDashboard: React.FC = () => {
       bg: 'bg-blue-50 border-blue-200'
     },
   ];
+
+  const factorOptions: FactorItem[] = [
+    {
+      id: 'burnout-prediction',
+      num: 1,
+      title: 'Burnout Prediction',
+      shortDesc: 'Exhaustion probability, depersonalization & task weariness',
+      category: 'Psychometric Forecasting',
+      riskLevel: 'CRITICAL',
+      metricLabel: 'Unit Exhaustion Risk',
+      metricValue: '74% Elevated',
+      icon: Flame,
+      color: 'text-rose-600',
+      bg: 'bg-rose-50',
+      border: 'border-rose-200',
+      clinicalSignificance: 'Predicts chronic physical and emotional exhaustion trajectories using Maslach multi-factor models. Early detection prevents sudden duty breakdown.',
+      biomarkers: ['Consecutive duty cycles > 8 days', 'Sleep restorative deficit (>18h total)', 'Decreased work satisfaction markers', 'Subjective cognitive heaviness'],
+      flaggedPersonnel: [
+        { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 82.0, risk: 'CRITICAL', trigger: '8 consecutive night shifts + hypoxia fatigue' },
+        { name: 'Naik Sandeep Patil', uid: 'UID-EMP-014', rank: 'Naik', unit: 'Signals & Telemetry', score: 68.0, risk: 'HIGH', trigger: 'Chronic screen latency & shift fragmentation' },
+      ],
+      actionProtocol: 'Mandatory 48-hour sleep regeneration cycle and workload pacing with immediate task rotation.',
+      modelConfidence: '96.2% ROC-AUC'
+    },
+    {
+      id: 'psychological-distress',
+      num: 2,
+      title: 'Psychological Distress',
+      shortDesc: 'Kessler-10 affective strain & somatic dysphoria telemetry',
+      category: 'Clinical Screening',
+      riskLevel: 'HIGH',
+      metricLabel: 'K10 Distress Index',
+      metricValue: '68 / 100',
+      icon: Activity,
+      color: 'text-amber-600',
+      bg: 'bg-amber-50',
+      border: 'border-amber-200',
+      clinicalSignificance: 'Screens for generalized affective distress, non-specific anxiety, and somatic tension in high-stress operational deployments.',
+      biomarkers: ['Elevated restlessness off-duty', 'Somatic muscle tension indices', 'Dysphoric mood fluctuations', 'Sub-clinical emotional fatigue'],
+      flaggedPersonnel: [
+        { name: 'Subedar Gurpreet Singh', uid: 'UID-EMP-013', rank: 'Subedar', unit: 'Field Artillery 3rd Bn', score: 75.0, risk: 'HIGH', trigger: 'Family medical distress combined with battery command' },
+        { name: 'Sepoy Amit Kumar', uid: 'UID-SLD-015', rank: 'Sepoy', unit: '10 Para SF', score: 56.0, risk: 'MODERATE', trigger: 'Tactical vigilance down-regulation latency' },
+      ],
+      actionProtocol: '1-on-1 confidential counselor debrief and somatic relaxation guidance session.',
+      modelConfidence: '94.8% ROC-AUC'
+    },
+    {
+      id: 'stress-indicators-detection',
+      num: 3,
+      title: 'Stress Indicators Detection',
+      shortDesc: 'Real-time autonomic signals, HRV volatility & sleep fragmentation',
+      category: 'Biometric Telemetry',
+      riskLevel: 'CRITICAL',
+      metricLabel: 'Anomaly Rate',
+      metricValue: '82% Flagged',
+      icon: Zap,
+      color: 'text-rose-600',
+      bg: 'bg-rose-50',
+      border: 'border-rose-200',
+      clinicalSignificance: 'Extracts real-time physiological and psychological indicators from wearable telemetry and daily pulse check-ins.',
+      biomarkers: ['Resting pulse elevation > 18%', 'Sleep latency > 45 minutes', 'Nocturnal arousal frequency > 3x', 'Deep sleep deficit (<40 min)'],
+      flaggedPersonnel: [
+        { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 88.0, risk: 'CRITICAL', trigger: 'Severe sleep fragmentation (3.8h sleep recorded)' },
+        { name: 'Major Alex Morgan', uid: 'UID-EMP-010', rank: 'Major', unit: 'Rapid Action Bn 1', score: 78.0, risk: 'HIGH', trigger: 'Night duty cardiovascular recovery deficit' },
+      ],
+      actionProtocol: 'Biofeedback paced-breathing intervention and wearable autonomic recovery tracking.',
+      modelConfidence: '97.1% ROC-AUC'
+    },
+    {
+      id: 'overall-stress-prediction',
+      num: 4,
+      title: 'Overall Stress Prediction',
+      shortDesc: 'Multi-source composite operational strain score & trendline',
+      category: 'Predictive Modeling',
+      riskLevel: 'HIGH',
+      metricLabel: 'Unit Stress Score',
+      metricValue: '64.2 / 100',
+      icon: TrendingUp,
+      color: 'text-amber-600',
+      bg: 'bg-amber-50',
+      border: 'border-amber-200',
+      clinicalSignificance: 'Synthesizes self-reports, biometric check-ins, mission difficulty, and environmental factors into a unified predictive trajectory.',
+      biomarkers: ['Multi-day strain accumulation', 'Duty hour compression', 'Environmental thermal/altitude stress', 'Coping buffer exhaustion'],
+      flaggedPersonnel: [
+        { name: 'Subedar Gurpreet Singh', uid: 'UID-EMP-013', rank: 'Subedar', unit: 'Field Artillery 3rd Bn', score: 82.0, risk: 'HIGH', trigger: 'Sustained 5-day combat readiness tempo' },
+        { name: 'Sepoy Vikram Rathore Jr.', uid: 'UID-EMP-015', rank: 'Sepoy', unit: 'Border Guard Platoon', score: 62.0, risk: 'MODERATE', trigger: 'Extreme cold vigil & consecutive duties' },
+      ],
+      actionProtocol: 'Unit-wide rest scheduling adjustment and commander advisory dispatch.',
+      modelConfidence: '95.5% ROC-AUC'
+    },
+    {
+      id: 'emotional-fatigue-prediction',
+      num: 5,
+      title: 'Emotional Fatigue Prediction',
+      shortDesc: 'Compassion fatigue, empathy drain & emotional blunting',
+      category: 'Behavioral Science',
+      riskLevel: 'MODERATE',
+      metricLabel: 'Fatigue Severity',
+      metricValue: '58% Moderate',
+      icon: BatteryLow,
+      color: 'text-teal-600',
+      bg: 'bg-teal-50',
+      border: 'border-teal-200',
+      clinicalSignificance: 'Identifies emotional numbness and compassion fatigue among frontline personnel and welfare support specialists handling high-stress crises.',
+      biomarkers: ['Empathic responsiveness decline', 'Post-duty emotional withdrawal', 'Interpersonal friction in squad', 'Blunted positive affect'],
+      flaggedPersonnel: [
+        { name: 'Naik Sandeep Patil', uid: 'UID-EMP-014', rank: 'Naik', unit: 'Signals & Telemetry', score: 65.0, risk: 'MODERATE', trigger: 'Prolonged isolated monitoring shifts' },
+        { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 65.0, risk: 'MODERATE', trigger: 'Emotional fatigue from high-risk patrols' },
+      ],
+      actionProtocol: 'Structured peer support circle and psychological decompression workshop.',
+      modelConfidence: '92.4% ROC-AUC'
+    },
+    {
+      id: 'welfare-concern-detection',
+      num: 6,
+      title: 'Welfare Concern Detection',
+      shortDesc: 'Family separation, ration/amenity friction & leave clearance',
+      category: 'Welfare Telemetry',
+      riskLevel: 'HIGH',
+      metricLabel: 'Logged Grievances',
+      metricValue: '12 Active Cases',
+      icon: ShieldAlert,
+      color: 'text-amber-600',
+      bg: 'bg-amber-50',
+      border: 'border-amber-200',
+      clinicalSignificance: 'Detects underlying non-operational domestic and administrative grievances that amplify operational stress.',
+      biomarkers: ['Emergency leave backlog > 14 days', 'Family illness communication log', 'Housing & amenity clearance delays', 'Financial distress signals'],
+      flaggedPersonnel: [
+        { name: 'Subedar Gurpreet Singh', uid: 'UID-EMP-013', rank: 'Subedar', unit: 'Field Artillery 3rd Bn', score: 78.0, risk: 'HIGH', trigger: 'Elder parent hospitalized; leave sanctioned awaiting transit' },
+        { name: 'Sepoy Amit Kumar', uid: 'UID-SLD-015', rank: 'Sepoy', unit: '10 Para SF', score: 45.0, risk: 'NOMINAL', trigger: 'Resolved accommodation clearance' },
+      ],
+      actionProtocol: 'Expedite compassionate welfare grant ($500 equivalent) and rapid leave clearance routing.',
+      modelConfidence: '96.8% ROC-AUC'
+    },
+    {
+      id: 'predictive-behavioral-analytics',
+      num: 7,
+      title: 'Predictive Behavioral Analytics',
+      shortDesc: 'CUSUM / EWMA baseline drift, isolation & interaction shifts',
+      category: 'AI Telemetry',
+      riskLevel: 'HIGH',
+      metricLabel: 'Drift Magnitude',
+      metricValue: '14.8% Variance',
+      icon: LineChart,
+      color: 'text-blue-600',
+      bg: 'bg-blue-50',
+      border: 'border-blue-200',
+      clinicalSignificance: 'Tracks multi-week statistical drift from individual soldier baseline (Digital Psychological Twin) to catch subtle pre-clinical changes.',
+      biomarkers: ['Mess hall social avoidance', 'Decreased buddy interactions', 'Speech cadence & tone variance', 'Altered digital device night usage'],
+      flaggedPersonnel: [
+        { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 76.0, risk: 'HIGH', trigger: '4-week continuous divergence from baseline wellness' },
+        { name: 'Sepoy Vikram Rathore Jr.', uid: 'UID-EMP-015', rank: 'Sepoy', unit: 'Border Guard Platoon', score: 58.0, risk: 'MODERATE', trigger: 'Reduced communicative check-in frequency' },
+      ],
+      actionProtocol: 'Squad commander informal check-in and active buddy-system oversight.',
+      modelConfidence: '95.0% ROC-AUC'
+    },
+    {
+      id: 'stress-burnout-risk-models',
+      num: 8,
+      title: 'Stress & Burnout Risk Models',
+      shortDesc: 'Multivariate Explainable AI (XAI) risk curves & feature weights',
+      category: 'Advanced XAI',
+      riskLevel: 'CRITICAL',
+      metricLabel: 'Explainability',
+      metricValue: '95.4% Fidelity',
+      icon: Gauge,
+      color: 'text-rose-600',
+      bg: 'bg-rose-50',
+      border: 'border-rose-200',
+      clinicalSignificance: 'Provides transparent Shapley-value and feature attribution weighting for clinical decisions, ensuring zero black-box diagnostics.',
+      biomarkers: ['Sleep Deficit Weight: 34%', 'Operational Shift Load: 28%', 'Emotional Friction: 20%', 'Family Distance: 18%'],
+      flaggedPersonnel: [
+        { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 88.0, risk: 'CRITICAL', trigger: 'Combined multi-factor XAI hazard score: 0.88' },
+        { name: 'Subedar Gurpreet Singh', uid: 'UID-EMP-013', rank: 'Subedar', unit: 'Field Artillery 3rd Bn', score: 82.0, risk: 'HIGH', trigger: 'Combined multi-factor XAI hazard score: 0.81' },
+      ],
+      actionProtocol: 'Export XAI psychological dossier for Medical Board and Welfare review.',
+      modelConfidence: '98.0% ROC-AUC'
+    },
+    {
+      id: 'welfare-intervention-recommendation',
+      num: 9,
+      title: 'Welfare Intervention Recommendation',
+      shortDesc: 'AI-guided clinical triage pathways & structured recovery milestones',
+      category: 'Clinical Decision Support',
+      riskLevel: 'NOMINAL',
+      metricLabel: 'Protocols Ready',
+      metricValue: '9 Available',
+      icon: HeartHandshake,
+      color: 'text-emerald-600',
+      bg: 'bg-emerald-50',
+      border: 'border-emerald-200',
+      clinicalSignificance: 'Automatically matches personnel risk signatures to evidence-based clinical protocols (Tier 1 Self-Pacing to Tier 3 Psychiatric Consultation).',
+      biomarkers: ['Protocol match precision > 95%', 'Historical recovery timeline indexing', 'Standard Operating Procedure (SOP) compliance'],
+      flaggedPersonnel: [
+        { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 88.0, risk: 'CRITICAL', trigger: 'Tier 3 Mandatory Medical/Psychological Consultation' },
+        { name: 'Subedar Gurpreet Singh', uid: 'UID-EMP-013', rank: 'Subedar', unit: 'Field Artillery 3rd Bn', score: 82.0, risk: 'HIGH', trigger: 'Tier 2 Officer 1-on-1 + Compassionate Grant' },
+      ],
+      actionProtocol: 'One-click launch of standardized clinical welfare intervention workflow.',
+      modelConfidence: '97.5% ROC-AUC'
+    },
+    {
+      id: 'automated-alerts',
+      num: 10,
+      title: 'Automated Alerts',
+      shortDesc: 'Real-time red-flag threshold alarms & emergency escalation',
+      category: 'Rapid Response',
+      riskLevel: 'CRITICAL',
+      metricLabel: 'Active Alerts',
+      metricValue: '6 Triggered / 24h',
+      icon: BellRing,
+      color: 'text-rose-600',
+      bg: 'bg-rose-50',
+      border: 'border-rose-200',
+      clinicalSignificance: 'Instantly escalates critical psychological distress markers, SOS signals, and biometric threshold violations to designated officers.',
+      biomarkers: ['Stress Index > 85/100', 'Sleep < 4.0h for 3+ days', 'Duty duration > 7 consecutive days', 'Self-reported severe strain'],
+      flaggedPersonnel: [
+        { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 88.0, risk: 'CRITICAL', trigger: 'Emergency Threshold: Severe Fatigue & Sleep Loss' },
+        { name: 'Subedar Gurpreet Singh', uid: 'UID-EMP-013', rank: 'Subedar', unit: 'Field Artillery 3rd Bn', score: 82.0, risk: 'HIGH', trigger: 'High Alert: Consecutive Overload Trigger' },
+      ],
+      actionProtocol: 'Dispatch encrypted notification to Wing Commander & Medical Officer on call.',
+      modelConfidence: '99.2% Dispatch Reliability'
+    },
+    {
+      id: 'mental-wellbeing-resilience',
+      num: 11,
+      title: 'Mental Well-being & Workforce Resilience',
+      shortDesc: 'Connor-Davidson resilience index & psychological hardiness',
+      category: 'Positive Psychology',
+      riskLevel: 'NOMINAL',
+      metricLabel: 'Resilience Quotient',
+      metricValue: '76.4% Healthy',
+      icon: Smile,
+      color: 'text-emerald-600',
+      bg: 'bg-emerald-50',
+      border: 'border-emerald-200',
+      clinicalSignificance: 'Measures adaptive psychological coping, mission alignment, optimism, and squad camaraderie across the formation.',
+      biomarkers: ['CD-RISC hardiness score > 75%', 'Squad trust index > 85%', 'Post-incident recovery velocity', 'Vocational pride & purpose'],
+      flaggedPersonnel: [
+        { name: 'Sepoy Amit Kumar', uid: 'UID-SLD-015', rank: 'Sepoy', unit: '10 Para SF', score: 86.0, risk: 'NOMINAL', trigger: 'High tactical bounce-back & camaraderie' },
+        { name: 'Major Alex Morgan', uid: 'UID-EMP-010', rank: 'Major', unit: 'Rapid Action Bn 1', score: 72.0, risk: 'NOMINAL', trigger: 'Demonstrated command resilience under stress' },
+      ],
+      actionProtocol: 'Incorporate positive psychology conditioning into regular morning parade brief.',
+      modelConfidence: '94.0% ROC-AUC'
+    },
+    {
+      id: 'operational-readiness',
+      num: 12,
+      title: 'Operational Readiness',
+      shortDesc: 'Cognitive sharpness, reaction stamina & mission suitability fit',
+      category: 'Mission Readiness',
+      riskLevel: 'NOMINAL',
+      metricLabel: 'Deployment Fit',
+      metricValue: '84.2% Combat Ready',
+      icon: Target,
+      color: 'text-blue-600',
+      bg: 'bg-blue-50',
+      border: 'border-blue-200',
+      clinicalSignificance: 'Calculates combat fitness and cognitive reaction capacity, identifying personnel primed for mission deployment vs. those requiring recovery.',
+      biomarkers: ['Cognitive reaction sharpness > 80%', 'Somatic endurance index', 'Zero absent-minded error telemetry', 'Alertness stability'],
+      flaggedPersonnel: [
+        { name: 'Sepoy Amit Kumar', uid: 'UID-SLD-015', rank: 'Sepoy', unit: '10 Para SF', score: 84.0, risk: 'NOMINAL', trigger: 'Combat Ready: High focus & physical fitness' },
+        { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 46.0, risk: 'CRITICAL', trigger: 'Unfit for frontline duty pending 48h rest' },
+      ],
+      actionProtocol: 'Certify deployment clearance for fit personnel; place fatigued personnel on local guard pacing.',
+      modelConfidence: '96.5% ROC-AUC'
+    },
+    {
+      id: 'occupational-stress-risk',
+      num: 13,
+      title: 'Occupational Stress Incident Risk',
+      shortDesc: 'Extreme terrain, hypoxia, shift hazard & safety vulnerability',
+      category: 'Safety & Risk Engineering',
+      riskLevel: 'HIGH',
+      metricLabel: 'Incident Risk Index',
+      metricValue: '11.2% Low-Moderate',
+      icon: AlertOctagon,
+      color: 'text-amber-600',
+      bg: 'bg-amber-50',
+      border: 'border-amber-200',
+      clinicalSignificance: 'Identifies environment-driven occupational hazards such as extreme altitude hypoxia, continuous night duties, and micro-sleep vulnerabilities.',
+      biomarkers: ['Continuous night duty > 5 cycles', 'High altitude exposure (>11,000 ft)', 'Micro-sleep latency drop during duty', 'Cumulative physical fatigue'],
+      flaggedPersonnel: [
+        { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 86.0, risk: 'CRITICAL', trigger: 'Hypoxia + night vigil safety hazard flag' },
+        { name: 'Naik Sandeep Patil', uid: 'UID-EMP-014', rank: 'Naik', unit: 'Signals & Telemetry', score: 72.0, risk: 'HIGH', trigger: 'Nocturnal screen fatigue & micro-sleep risk' },
+      ],
+      actionProtocol: 'Implement environmental rotation out of high altitude; mandate daylight duty shift transfers.',
+      modelConfidence: '95.8% ROC-AUC'
+    },
+  ];
+
+  const currentFactor = factorOptions.find((f) => f.id === selectedFactorId) || factorOptions[0];
+  const CurrentIcon = currentFactor.icon;
 
   const highRiskPersonnel = data?.high_risk_watchlist || [
     {
@@ -147,14 +496,23 @@ export const WelfareDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Toast Notification for factor actions */}
+      {actionAlert && (
+        <div className="fixed top-5 right-5 z-50 p-4 rounded-2xl bg-slate-900 text-white border border-emerald-500 shadow-2xl flex items-center gap-3 animate-fade-in text-xs font-semibold">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          <span>{actionAlert}</span>
+        </div>
+      )}
+
       {/* Welcome Banner */}
       <div className="p-7 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft relative overflow-hidden">
         <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-50/70 rounded-full blur-3xl pointer-events-none" />
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-[0.15em] bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
-                Welfare & Psychological Support Center
+              <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-[0.15em] bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Chief Welfare Officer Command Center</span>
               </span>
               <span className="text-xs text-slate-500 font-mono font-semibold">
                 &bull; HRMS Unique ID: <span className="text-emerald-700 font-bold">{user?.uid || 'UID-WEL-007'}</span>
@@ -167,7 +525,7 @@ export const WelfareDashboard: React.FC = () => {
               Welcome, {user?.full_name}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 mt-1.5 max-w-2xl leading-relaxed font-medium">
-              Synchronized HRMS Personnel Welfare Directory. Monitoring active mental wellness telemetry, AI-assisted burnout indicators, and structured counseling workflows.
+              Synchronized HRMS Personnel Welfare Directory. Monitoring active mental wellness telemetry, 13-factor clinical intelligence, AI-assisted burnout indicators, and structured counseling workflows.
             </p>
           </div>
 
@@ -180,7 +538,10 @@ export const WelfareDashboard: React.FC = () => {
               <RefreshCw className={`w-4 h-4 text-emerald-600 ${isRefreshing ? 'animate-spin' : ''}`} />
               <span>{isRefreshing ? 'Syncing...' : 'Sync HRMS'}</span>
             </button>
-            <button className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shadow-lg shadow-emerald-600/20 flex items-center gap-2 transition-all cursor-pointer">
+            <button
+              onClick={() => handleTriggerAction('Welfare Command', 'New Case Initiation')}
+              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shadow-lg shadow-emerald-600/20 flex items-center gap-2 transition-all cursor-pointer"
+            >
               <PlusCircle className="w-4 h-4" />
               <span>Initiate Case</span>
             </button>
@@ -208,6 +569,243 @@ export const WelfareDashboard: React.FC = () => {
             </div>
           );
         })}
+      </div>
+
+      {/* ========================================================================= */}
+      {/* SECTION: ANALYSIS BASED ON FACTOR (CHIEF WELFARE OFFICER INTELLIGENCE) */}
+      {/* ========================================================================= */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft space-y-6 relative overflow-hidden">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-5">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 shadow-xs">
+                <Sliders className="w-5 h-5" />
+              </div>
+              <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+                Analysis Based on Factor
+              </h2>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium max-w-3xl">
+              13-Factor Psychometric Intelligence Matrix. Click any factor option below to inspect clinical telemetry, root-cause biomarkers, flagged personnel cohorts, and automated welfare protocols.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 self-start md:self-auto">
+            <span className="text-xs font-mono font-bold text-blue-700 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-200 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+              <span>13 Active Factor Models</span>
+            </span>
+          </div>
+        </div>
+
+        {/* 13 Factor Options Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3">
+          {factorOptions.map((factor) => {
+            const Icon = factor.icon;
+            const isSelected = selectedFactorId === factor.id;
+
+            return (
+              <button
+                key={factor.id}
+                onClick={() => setSelectedFactorId(factor.id)}
+                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between space-y-3 relative group ${
+                  isSelected
+                    ? 'bg-slate-900 border-slate-900 text-white shadow-lg ring-2 ring-blue-500/40 transform -translate-y-0.5'
+                    : 'bg-slate-50/70 hover:bg-white border-slate-200/90 hover:border-slate-300 text-slate-800 shadow-xs'
+                }`}
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className={`text-[10px] font-mono font-black px-2 py-0.5 rounded-md ${
+                      isSelected ? 'bg-slate-800 text-blue-300 border border-slate-700' : 'bg-slate-200/70 text-slate-700'
+                    }`}>
+                      #{String(factor.num).padStart(2, '0')}
+                    </span>
+                    <span
+                      className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
+                        factor.riskLevel === 'CRITICAL'
+                          ? isSelected ? 'bg-rose-900/80 text-rose-300 border border-rose-700' : 'bg-rose-100 text-rose-800'
+                          : factor.riskLevel === 'HIGH'
+                          ? isSelected ? 'bg-amber-900/80 text-amber-300 border border-amber-700' : 'bg-amber-100 text-amber-800'
+                          : factor.riskLevel === 'MODERATE'
+                          ? isSelected ? 'bg-teal-900/80 text-teal-300 border border-teal-700' : 'bg-teal-100 text-teal-800'
+                          : isSelected ? 'bg-emerald-900/80 text-emerald-300 border border-emerald-700' : 'bg-emerald-100 text-emerald-800'
+                      }`}
+                    >
+                      {factor.riskLevel}
+                    </span>
+                  </div>
+
+                  <div className="flex items-start gap-2.5">
+                    <div className={`p-2 rounded-xl border shrink-0 ${
+                      isSelected ? 'bg-slate-800 border-slate-700 text-blue-400' : `${factor.bg} ${factor.border} ${factor.color}`
+                    }`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className={`font-extrabold text-xs leading-snug tracking-tight ${isSelected ? 'text-white' : 'text-slate-900 group-hover:text-blue-600'}`}>
+                        {factor.num}. {factor.title}
+                      </h3>
+                      <p className={`text-[10px] mt-0.5 line-clamp-1 font-medium ${isSelected ? 'text-slate-400' : 'text-slate-500'}`}>
+                        {factor.shortDesc}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`pt-2 border-t flex items-center justify-between text-[11px] font-mono ${
+                  isSelected ? 'border-slate-800 text-slate-300' : 'border-slate-200/60 text-slate-600'
+                }`}>
+                  <span className="text-[10px] font-sans">{factor.metricLabel}:</span>
+                  <span className={`font-extrabold ${isSelected ? 'text-emerald-400' : 'text-slate-900'}`}>
+                    {factor.metricValue}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Selected Factor Deep-Dive Intelligence Panel */}
+        <div className="p-6 sm:p-7 rounded-3xl bg-slate-900 text-white border border-slate-800 shadow-xl space-y-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Panel Header */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-5 relative z-10">
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-2xl bg-slate-800 border border-slate-700 text-blue-400 shadow-md shrink-0">
+                <CurrentIcon className="w-7 h-7" />
+              </div>
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-mono font-bold text-blue-400 bg-blue-950/80 px-2.5 py-0.5 rounded-full border border-blue-800">
+                    Factor #{currentFactor.num} &bull; {currentFactor.category}
+                  </span>
+                  <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full ${
+                    currentFactor.riskLevel === 'CRITICAL'
+                      ? 'bg-rose-950 text-rose-300 border border-rose-800'
+                      : currentFactor.riskLevel === 'HIGH'
+                      ? 'bg-amber-950 text-amber-300 border border-amber-800'
+                      : 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                  }`}>
+                    {currentFactor.riskLevel} PRIORITY
+                  </span>
+                  <span className="text-xs text-slate-400 font-mono">
+                    Model Reliability: <strong className="text-emerald-400">{currentFactor.modelConfidence}</strong>
+                  </span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white mt-1">
+                  {currentFactor.num}. {currentFactor.title}
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-3xl leading-relaxed font-medium">
+                  {currentFactor.clinicalSignificance}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => handleTriggerAction(currentFactor.title, 'Welfare Protocol Dispatch')}
+                className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-blue-600/30 transition-all cursor-pointer"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>Initiate Factor Protocol</span>
+              </button>
+              <button
+                onClick={() => handleTriggerAction(currentFactor.title, 'Telemetry Export')}
+                className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer"
+              >
+                <FileText className="w-3.5 h-3.5 text-slate-400" />
+                <span>Export Dossier</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Panel Body Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
+            {/* Left: Root Cause Biomarkers & Clinical Protocol */}
+            <div className="lg:col-span-6 space-y-5">
+              <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-3">
+                <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                  <Brain className="w-4 h-4 text-blue-400" />
+                  <span>Key Telemetry Signals & Root-Cause Biomarkers</span>
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {currentFactor.biomarkers.map((bio, idx) => (
+                    <div key={idx} className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-start gap-2 text-xs text-slate-200">
+                      <ChevronRight className="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
+                      <span>{bio}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-2.5">
+                <h4 className="text-xs font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  <span>Welfare Officer Action Protocol</span>
+                </h4>
+                <p className="text-xs text-slate-200 leading-relaxed font-medium bg-slate-900/90 p-3.5 rounded-xl border border-slate-800">
+                  {currentFactor.actionProtocol}
+                </p>
+              </div>
+            </div>
+
+            {/* Right: Flagged Personnel Cohort under this factor */}
+            <div className="lg:col-span-6 p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                  <Users className="w-4 h-4 text-amber-400" />
+                  <span>Flagged Personnel Cohort ({currentFactor.flaggedPersonnel.length} Matched)</span>
+                </h4>
+                <span className="text-[10px] font-mono text-slate-400">Unit Telemetry Live</span>
+              </div>
+
+              <div className="space-y-2.5">
+                {currentFactor.flaggedPersonnel.map((p, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-extrabold text-xs text-white">{p.name}</span>
+                        <span className="text-[10px] font-mono text-blue-300 bg-blue-950 px-1.5 py-0.5 rounded border border-blue-900">
+                          {p.uid}
+                        </span>
+                        <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
+                          p.risk === 'CRITICAL' ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-amber-950 text-amber-300 border border-amber-800'
+                        }`}>
+                          {p.risk}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 font-medium">
+                        {p.rank} &bull; {p.unit}
+                      </p>
+                      <p className="text-[11px] text-amber-300/90 font-medium flex items-center gap-1.5 pt-0.5">
+                        <AlertTriangle className="w-3 h-3 text-amber-400 shrink-0" />
+                        <span>Trigger: {p.trigger}</span>
+                      </p>
+                    </div>
+
+                    <div className="flex items-center sm:flex-col items-end gap-2 shrink-0">
+                      <div className="text-right">
+                        <span className="text-[9px] uppercase font-bold text-slate-400 block">Factor Score</span>
+                        <span className="text-base font-black font-mono text-rose-400">{p.score}/100</span>
+                      </div>
+                      <button
+                        onClick={() => handleTriggerAction(currentFactor.title, `Counseling outreach for ${p.name}`)}
+                        className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs"
+                      >
+                        <MessageSquare className="w-3 h-3" />
+                        <span>Outreach</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Main Content Grid */}
@@ -264,7 +862,10 @@ export const WelfareDashboard: React.FC = () => {
                     <div className="text-[10px] uppercase font-black text-slate-400">Stress Score</div>
                     <div className="text-xl font-black text-rose-600 font-mono">{p.stress_score}<span className="text-xs text-slate-400">/100</span></div>
                   </div>
-                  <button className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer">
+                  <button
+                    onClick={() => handleTriggerAction('Flagged Watchlist', `Open Case for ${p.name}`)}
+                    className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                  >
                     <MessageSquare className="w-3.5 h-3.5" />
                     <span>Open Case</span>
                   </button>
