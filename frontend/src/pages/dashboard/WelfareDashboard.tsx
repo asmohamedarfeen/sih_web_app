@@ -34,6 +34,7 @@ import {
   Filter,
   UserCheck,
   Sparkle,
+  Database,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { dashboardService, WelfareDashboardData } from '../../services/dashboardService';
@@ -68,6 +69,15 @@ export interface PersonnelBurnoutProfile {
     emotional_exhaustion: any;
     assessment_responses: any;
   };
+  psychological_distress_params?: {
+    mood_assessments: any;
+    anxiety_questions: any;
+    depression_indicators: any;
+    sleep_quality: any;
+    social_isolation: any;
+    traumatic_exposure: any;
+    wellness_survey: any;
+  };
 }
 
 const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
@@ -90,9 +100,18 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
       workload_trend: { score: 88, available: true, source: 'Command Operations Log', note: 'High task escalation slope with double perimeter watch shifts.' },
       deployment_duration: { score: 95, available: true, source: 'Service Dossier Database', note: '14 continuous months stationed in extreme sub-zero forward sector.' },
       duty_schedule: { score: 84, available: true, source: 'Battalion Roster', note: '8 consecutive night vigils with irregular sleep window rotation.' },
-      sleep_quality: { score: 92, available: true, source: 'Biometric Wearable Telemetry', note: 'Severe nocturnal sleep deficit (<3.8h recorded on biometric tracker).' },
+      sleep_quality: { score: 92, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: 'Logged via Soldier Mobile App (3.8h sleep recorded, severe sleep deficit).' },
       emotional_exhaustion: { score: 82, available: true, source: 'Clinical MBI-GS Telemetry', note: 'Maslach affective depletion index elevated; high somatic weariness.' },
-      assessment_responses: { score: 76, available: true, source: 'AI Psychological Twin Assessment', note: 'AI self-assessment flagged cognitive fatigue and high vigilance strain.' },
+      assessment_responses: { score: 76, available: true, source: 'Soldier Mobile App (Burnout Questions)', note: 'Psychometric strain 76% calculated strictly from mobile app burnout domain questions.' },
+    },
+    psychological_distress_params: {
+      mood_assessments: { score: 78, available: true, source: 'Soldier Mobile App (Daily Mood Pulse)', note: 'High-altitude affective fatigue, low mood valence recorded on mobile.' },
+      anxiety_questions: { score: 84, available: true, source: 'Soldier Mobile App (GAD-7 Anxiety Screening)', note: 'Hypoxia restlessness & nocturnal startle response reported via mobile assessment.' },
+      depression_indicators: { score: 80, available: true, source: 'Soldier Mobile App (PHQ-9 Depression Inventory)', note: 'PHQ-9 anhedonia and vegetative fatigue markers elevated on mobile app.' },
+      sleep_quality: { score: 92, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: '3.8h average rest logged via Soldier Mobile App (severe sleep deficit).' },
+      social_isolation: { score: 70, available: true, source: 'Central Database (Barracks Peer Network)', note: 'Remote forward post isolation score retrieved from Central PostgreSQL DB.' },
+      traumatic_exposure: { score: 86, available: true, source: 'HRMS Portal (Combat Operations & Incident Dossier)', note: 'Extreme sub-zero vigil and high-threat avalanche sector records in HRMS Dossier.' },
+      wellness_survey: { score: 76, available: true, source: 'Central Database (Periodic Psychometric Assessment Archive)', note: 'Periodic comprehensive psychological survey strain retrieved from Database.' },
     },
   },
   {
@@ -114,9 +133,18 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
       workload_trend: { score: 84, available: true, source: 'Field Operations Log', note: 'Field artillery exercise coordination under condensed timeline.' },
       deployment_duration: { score: 75, available: true, source: 'Service Dossier Database', note: '8 continuous months in active artillery forward battery line.' },
       duty_schedule: { score: 78, available: true, source: 'Battalion Roster', note: 'Split shifts with early dawn drill inspections and night logistics.' },
-      sleep_quality: { score: 82, available: true, source: 'Biometric Wearable Telemetry', note: 'High latency sleep fragmentation; restless off-duty periods.' },
+      sleep_quality: { score: 82, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: 'Logged via Soldier Mobile App (4.2h sleep, high sleep latency fragmentation).' },
       emotional_exhaustion: { score: 80, available: true, source: 'Clinical MBI-GS Telemetry', note: 'Cumulative command burden combined with caregiver strain.' },
-      assessment_responses: { score: 74, available: true, source: 'AI Psychological Twin Assessment', note: 'Distress score 75/100 on Kessler-10 AI behavioral evaluation.' },
+      assessment_responses: { score: 74, available: true, source: 'Soldier Mobile App (Burnout Questions)', note: 'Mobile app burnout questions result: 74% task weariness & emotional depletion.' },
+    },
+    psychological_distress_params: {
+      mood_assessments: { score: 82, available: true, source: 'Soldier Mobile App (Daily Mood Pulse)', note: 'Caregiver distress & urgent family hospitalization anxiety logged via mobile app.' },
+      anxiety_questions: { score: 78, available: true, source: 'Soldier Mobile App (GAD-7 Anxiety Screening)', note: 'Persistent tactical tension and family medical worry scored via GAD-7 mobile items.' },
+      depression_indicators: { score: 70, available: true, source: 'Soldier Mobile App (PHQ-9 Depression Inventory)', note: 'Low hedonic tone and command stress markers recorded on mobile app.' },
+      sleep_quality: { score: 82, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: '4.2h sleep average with frequent nighttime awakenings logged on mobile terminal.' },
+      social_isolation: { score: 55, available: true, source: 'Central Database (Barracks Peer Network)', note: 'Good squad buddy network but domestic isolation recorded in central DB.' },
+      traumatic_exposure: { score: 74, available: true, source: 'HRMS Portal (Combat Operations & Incident Dossier)', note: 'Artillery forward battery line counter-fire incident records in HRMS Dossier.' },
+      wellness_survey: { score: 78, available: true, source: 'Central Database (Periodic Psychometric Assessment Archive)', note: 'High psychological friction index retrieved from monthly survey database.' },
     },
   },
   {
@@ -1029,6 +1057,211 @@ export const WelfareDashboard: React.FC = () => {
     },
   ], [resolvedParams]);
 
+  const resolvedPsychologicalParams = useMemo(() => {
+    const raw: any = selectedPersonnel.psychological_distress_params || {};
+    return {
+      mood_assessments: parseParam(
+        raw.mood_assessments,
+        60,
+        'Daily affective valence & mood stability',
+        'Soldier Mobile App (Daily Mood Pulse)'
+      ),
+      anxiety_questions: parseParam(
+        raw.anxiety_questions,
+        65,
+        'GAD-7 anxiety & hypervigilance screening',
+        'Soldier Mobile App (GAD-7 Anxiety Screening)'
+      ),
+      depression_indicators: parseParam(
+        raw.depression_indicators,
+        58,
+        'PHQ-9 anhedonia & mood deficit markers',
+        'Soldier Mobile App (PHQ-9 Depression Inventory)'
+      ),
+      sleep_quality: parseParam(
+        raw.sleep_quality,
+        resolvedParams.sleep_quality.score,
+        'Sleep deficit & latency recorded on mobile',
+        'Soldier Mobile App (Sleep Telemetry)'
+      ),
+      social_isolation: parseParam(
+        raw.social_isolation,
+        50,
+        'Barracks peer camaraderie & buddy network',
+        'Central Database (Barracks Peer Network)'
+      ),
+      traumatic_exposure: parseParam(
+        raw.traumatic_exposure,
+        55,
+        'High-threat incident & combat logs in HRMS',
+        'HRMS Portal (Combat Operations & Incident Dossier)'
+      ),
+      wellness_survey: parseParam(
+        raw.wellness_survey,
+        62,
+        'Periodic multi-domain psychometric survey',
+        'Central Database (Periodic Psychometric Assessment Archive)'
+      ),
+    };
+  }, [selectedPersonnel, resolvedParams]);
+
+  const calculatedPsychologicalDistress = useMemo(() => {
+    const p = resolvedPsychologicalParams;
+    const score = (
+      0.15 * p.mood_assessments.score +
+      0.16 * p.anxiety_questions.score +
+      0.18 * p.depression_indicators.score +
+      0.14 * p.sleep_quality.score +
+      0.12 * p.social_isolation.score +
+      0.13 * p.traumatic_exposure.score +
+      0.12 * p.wellness_survey.score
+    );
+    const rounded = Math.round(score * 10) / 10;
+    
+    let level: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'NOMINAL' = 'NOMINAL';
+    let levelColor = 'text-emerald-400';
+    let levelBg = 'bg-emerald-950 text-emerald-300 border-emerald-800';
+    let k10Tier = 'Well / Low Distress (Kessler-10 Tier 1)';
+    let recommendation = 'Standard duty rotation confirmed. Squad camaraderie and recreational morale high.';
+
+    if (rounded >= 78.0) {
+      level = 'CRITICAL';
+      levelColor = 'text-rose-400';
+      levelBg = 'bg-rose-950 text-rose-300 border-rose-800';
+      k10Tier = 'Severe Psychological Distress (Kessler-10 Tier 4)';
+      recommendation = 'MANDATORY ACTION: Immediate 24-hour non-punitive welfare detachment, confidential clinical psychologist debrief, and acute trauma decompression protocol.';
+    } else if (rounded >= 65.0) {
+      level = 'HIGH';
+      levelColor = 'text-amber-400';
+      levelBg = 'bg-amber-950 text-amber-300 border-amber-800';
+      k10Tier = 'Moderate-High Distress (Kessler-10 Tier 3)';
+      recommendation = 'PRIORITY ACTION: Schedule 1-on-1 counseling with Chief Welfare Officer, initiate peer-buddy support pairing, and adjust shift rotation out of night duty.';
+    } else if (rounded >= 45.0) {
+      level = 'MODERATE';
+      levelColor = 'text-teal-400';
+      levelBg = 'bg-teal-950 text-teal-300 border-teal-800';
+      k10Tier = 'Mild Psychological Distress (Kessler-10 Tier 2)';
+      recommendation = 'MONITORING ACTION: Prescribe guided mobile breathing decompression, sleep hygiene tracking, and weekly wellness pulse review.';
+    }
+
+    return {
+      score: rounded,
+      level,
+      levelColor,
+      levelBg,
+      k10Tier,
+      recommendation,
+    };
+  }, [resolvedPsychologicalParams]);
+
+  const psychologicalParamDefinitions = useMemo(() => [
+    {
+      key: 'mood_assessments',
+      name: '1. Mood assessments',
+      weight: 0.15,
+      weightLabel: '15%',
+      sourceBadge: '📱 Soldier Mobile App',
+      sourceType: 'MOBILE',
+      note: resolvedPsychologicalParams.mood_assessments.note,
+      source: resolvedPsychologicalParams.mood_assessments.source,
+      available: resolvedPsychologicalParams.mood_assessments.available,
+      score: resolvedPsychologicalParams.mood_assessments.score,
+      color: 'text-amber-400',
+      bar: 'bg-amber-500',
+      desc: 'Daily affective valence, mood volatility & somatic emotional pulse logged via Mobile'
+    },
+    {
+      key: 'anxiety_questions',
+      name: '2. Anxiety questions',
+      weight: 0.16,
+      weightLabel: '16%',
+      sourceBadge: '📱 Soldier Mobile App',
+      sourceType: 'MOBILE',
+      note: resolvedPsychologicalParams.anxiety_questions.note,
+      source: resolvedPsychologicalParams.anxiety_questions.source,
+      available: resolvedPsychologicalParams.anxiety_questions.available,
+      score: resolvedPsychologicalParams.anxiety_questions.score,
+      color: 'text-rose-400',
+      bar: 'bg-rose-500',
+      desc: 'GAD-7 hypervigilance strain, physical restlessness & tactical unwinding difficulty'
+    },
+    {
+      key: 'depression_indicators',
+      name: '3. Depression indicators',
+      weight: 0.18,
+      weightLabel: '18%',
+      sourceBadge: '📱 Soldier Mobile App',
+      sourceType: 'MOBILE',
+      note: resolvedPsychologicalParams.depression_indicators.note,
+      source: resolvedPsychologicalParams.depression_indicators.source,
+      available: resolvedPsychologicalParams.depression_indicators.available,
+      score: resolvedPsychologicalParams.depression_indicators.score,
+      color: 'text-rose-400',
+      bar: 'bg-rose-500',
+      desc: 'PHQ-9 anhedonia markers, vegetative energy loss & low vocational drive'
+    },
+    {
+      key: 'sleep_quality',
+      name: '4. Sleep quality',
+      weight: 0.14,
+      weightLabel: '14%',
+      sourceBadge: '📱 Soldier Mobile App',
+      sourceType: 'MOBILE',
+      note: resolvedPsychologicalParams.sleep_quality.note,
+      source: resolvedPsychologicalParams.sleep_quality.source,
+      available: resolvedPsychologicalParams.sleep_quality.available,
+      score: resolvedPsychologicalParams.sleep_quality.score,
+      color: 'text-rose-400',
+      bar: 'bg-rose-500',
+      desc: 'Sleep debt (<4.5h), nocturnal fragmentation & latency logged on mobile terminal'
+    },
+    {
+      key: 'social_isolation',
+      name: '5. Social isolation',
+      weight: 0.12,
+      weightLabel: '12%',
+      sourceBadge: '💾 Central Database',
+      sourceType: 'DATABASE',
+      note: resolvedPsychologicalParams.social_isolation.note,
+      source: resolvedPsychologicalParams.social_isolation.source,
+      available: resolvedPsychologicalParams.social_isolation.available,
+      score: resolvedPsychologicalParams.social_isolation.score,
+      color: 'text-teal-400',
+      bar: 'bg-teal-500',
+      desc: 'Barracks detachment, lack of squad buddy support & communication friction index'
+    },
+    {
+      key: 'traumatic_exposure',
+      name: '6. Traumatic exposure',
+      weight: 0.13,
+      weightLabel: '13%',
+      sourceBadge: '🏢 HRMS Portal',
+      sourceType: 'HRMS',
+      note: resolvedPsychologicalParams.traumatic_exposure.note,
+      source: resolvedPsychologicalParams.traumatic_exposure.source,
+      available: resolvedPsychologicalParams.traumatic_exposure.available,
+      score: resolvedPsychologicalParams.traumatic_exposure.score,
+      color: 'text-amber-400',
+      bar: 'bg-amber-500',
+      desc: 'High-threat operational contact, ambush exposure & critical incident log in HRMS Dossier'
+    },
+    {
+      key: 'wellness_survey',
+      name: '7. Wellness survey',
+      weight: 0.12,
+      weightLabel: '12%',
+      sourceBadge: '💾 Central Database',
+      sourceType: 'DATABASE',
+      note: resolvedPsychologicalParams.wellness_survey.note,
+      source: resolvedPsychologicalParams.wellness_survey.source,
+      available: resolvedPsychologicalParams.wellness_survey.available,
+      score: resolvedPsychologicalParams.wellness_survey.score,
+      color: 'text-teal-400',
+      bar: 'bg-teal-500',
+      desc: 'Periodic comprehensive multi-domain psychological survey telemetry retrieved from DB'
+    },
+  ], [resolvedPsychologicalParams]);
+
   return (
     <div className="space-y-6">
       {/* Toast Notification for factor actions */}
@@ -1629,93 +1862,247 @@ export const WelfareDashboard: React.FC = () => {
           </div>
 
           {/* Panel Body Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
-            {/* Left: Root Cause Biomarkers & Clinical Protocol */}
-            <div className="lg:col-span-6 space-y-5">
-              <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-3">
-                <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                  <Brain className="w-4 h-4 text-blue-400" />
-                  <span>Key Telemetry Signals & Root-Cause Biomarkers</span>
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {currentFactor.biomarkers.map((bio, idx) => (
-                    <div key={idx} className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-start gap-2 text-xs text-slate-200">
-                      <ChevronRight className="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
-                      <span>{bio}</span>
+          {selectedFactorId === 'psychological-distress' ? (
+            <div className="space-y-6 relative z-10">
+              {/* Multi-Source Provenance Header Banner */}
+              <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-mono font-extrabold uppercase px-2.5 py-1 rounded-full bg-blue-950 text-blue-300 border border-blue-800 flex items-center gap-1.5">
+                    <Database className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Multi-Source Unified Telemetry</span>
+                  </span>
+                  <span className="text-xs text-slate-300 font-medium">
+                    Evaluating Active Subject: <strong className="text-white">{selectedPersonnel.name}</strong> ({selectedPersonnel.rank}) &bull; <span className="text-blue-300 font-mono">{selectedPersonnel.uid}</span>
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono font-bold">
+                  <span className="px-2.5 py-1 rounded-lg bg-indigo-950 text-indigo-300 border border-indigo-800 flex items-center gap-1">
+                    📱 Mobile App: 4 Params
+                  </span>
+                  <span className="px-2.5 py-1 rounded-lg bg-amber-950 text-amber-300 border border-amber-800 flex items-center gap-1">
+                    🏢 HRMS Portal: 1 Param
+                  </span>
+                  <span className="px-2.5 py-1 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center gap-1">
+                    💾 Central DB: 2 Params
+                  </span>
+                </div>
+              </div>
+
+              {/* Psychological Distress Composite Score Banner */}
+              <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-800 via-slate-800/90 to-slate-900 border border-slate-700 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                <div className="space-y-1.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${calculatedPsychologicalDistress.levelBg}`}>
+                      {calculatedPsychologicalDistress.level} DISTRESS RISK
+                    </span>
+                    <span className="text-xs font-mono font-semibold text-slate-300">
+                      &bull; {calculatedPsychologicalDistress.k10Tier}
+                    </span>
+                  </div>
+                  <h4 className="text-base sm:text-lg font-black text-white">
+                    Psychological Distress Prediction Index: <span className="font-mono text-xl sm:text-2xl text-rose-400 font-black">{calculatedPsychologicalDistress.score} / 100</span>
+                  </h4>
+                  <p className="text-xs text-slate-300 font-medium max-w-3xl leading-relaxed">
+                    <strong className="text-slate-100">Formula:</strong> 0.15(Mood) + 0.16(Anxiety) + 0.18(Depression) + 0.14(Sleep) + 0.12(Isolation) + 0.13(Trauma) + 0.12(Wellness)
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => handleTriggerAction('Psychological Distress', `Confidential Debrief for ${selectedPersonnel.name}`)}
+                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-md cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Dispatch Protocol</span>
+                  </button>
+                  <button
+                    onClick={() => handleTriggerAction('Psychological Distress', `Pair Peer Buddy for ${selectedPersonnel.name}`)}
+                    className="px-3.5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold border border-slate-600 transition-all cursor-pointer"
+                  >
+                    Pair Buddy
+                  </button>
+                </div>
+              </div>
+
+              {/* 7 Parameters Telemetry Grid with Fixed Progress Meters */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
+                {psychologicalParamDefinitions.map((param) => {
+                  const currentVal = param.score;
+                  return (
+                    <div
+                      key={param.key}
+                      className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-3 relative group hover:border-slate-600 transition-all flex flex-col justify-between"
+                    >
+                      <div className="space-y-2">
+                        {/* Header with weight and source tag */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-mono font-bold text-blue-300 bg-blue-950 px-2 py-0.5 rounded border border-blue-900">
+                            Weight: {param.weightLabel}
+                          </span>
+                          <span
+                            className={`text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded-full flex items-center gap-1 ${
+                              param.available
+                                ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                                : 'bg-rose-950 text-rose-300 border border-rose-800'
+                            }`}
+                          >
+                            <span className={`w-1.5 h-1.5 rounded-full ${param.available ? 'bg-emerald-400' : 'bg-rose-400 animate-ping'}`} />
+                            {param.available ? 'Synchronized' : 'Sync Pending'}
+                          </span>
+                        </div>
+
+                        {/* Title and Origin Source */}
+                        <div>
+                          <h5 className="font-extrabold text-xs text-white leading-snug">
+                            {param.name}
+                          </h5>
+                          <p className="text-[10px] text-slate-400 line-clamp-1 font-medium mt-0.5">
+                            {param.desc}
+                          </p>
+                          <div className="mt-1.5 flex items-center gap-1">
+                            <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-800 font-semibold">
+                              {param.sourceBadge}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Read-only Fixed Telemetry Meter (No editable adjustment bar) */}
+                      <div className="space-y-2 pt-1 border-t border-slate-700/60">
+                        <div className="flex items-center justify-between text-xs font-mono">
+                          <span className="text-[10px] text-slate-400 font-sans">Retrieved Telemetry:</span>
+                          <span className={`font-black text-sm ${param.color}`}>
+                            {currentVal}%
+                          </span>
+                        </div>
+
+                        {/* Fixed Meter Bar */}
+                        <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-700/80 p-0.5">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${param.bar}`}
+                            style={{ width: `${Math.min(100, Math.max(5, currentVal))}%` }}
+                          />
+                        </div>
+
+                        <div className="flex justify-between text-[9px] text-slate-500 font-mono">
+                          <span>0% Nominal</span>
+                          <span className="font-semibold text-slate-300">{currentVal}% Strain</span>
+                          <span>100% Critical</span>
+                        </div>
+
+                        {/* Telemetry Detail Note */}
+                        <p className="text-[10px] text-slate-300 line-clamp-2 leading-relaxed font-medium bg-slate-900/90 p-2 rounded-xl border border-slate-800">
+                          {param.note}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Action Recommendation Card */}
+              <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    <span>Chief Welfare Officer Clinical Protocol for {selectedPersonnel.name}</span>
+                  </span>
+                  <p className="text-xs text-slate-200 leading-relaxed font-medium">
+                    {calculatedPsychologicalDistress.recommendation}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
+              {/* Left: Root Cause Biomarkers & Clinical Protocol */}
+              <div className="lg:col-span-6 space-y-5">
+                <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-3">
+                  <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                    <Brain className="w-4 h-4 text-blue-400" />
+                    <span>Key Telemetry Signals & Root-Cause Biomarkers</span>
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {currentFactor.biomarkers.map((bio, idx) => (
+                      <div key={idx} className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-start gap-2 text-xs text-slate-200">
+                        <ChevronRight className="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
+                        <span>{bio}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-2.5">
+                  <h4 className="text-xs font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    <span>Welfare Officer Action Protocol</span>
+                  </h4>
+                  <p className="text-xs text-slate-200 leading-relaxed font-medium bg-slate-900/90 p-3.5 rounded-xl border border-slate-800">
+                    {currentFactor.actionProtocol}
+                  </p>
+                </div>
+              </div>
+
+              {/* Right: Flagged Personnel Cohort under this factor */}
+              <div className="lg:col-span-6 p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                    <Users className="w-4 h-4 text-amber-400" />
+                    <span>Flagged Personnel Cohort ({currentFactor.flaggedPersonnel.length} Matched)</span>
+                  </h4>
+                  <span className="text-[10px] font-mono text-slate-400">Unit Telemetry Live</span>
+                </div>
+
+                <div className="space-y-2.5">
+                  {currentFactor.flaggedPersonnel.map((p, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-extrabold text-xs text-white">{p.name}</span>
+                          <span className="text-[10px] font-mono text-blue-300 bg-blue-950 px-1.5 py-0.5 rounded border border-blue-900">
+                            {p.uid}
+                          </span>
+                          <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
+                            p.risk === 'CRITICAL' ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-amber-950 text-amber-300 border border-amber-800'
+                          }`}>
+                            {p.risk}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 font-medium">
+                          {p.rank} &bull; {p.unit}
+                        </p>
+                        <p className="text-[11px] text-amber-300/90 font-medium flex items-center gap-1.5 pt-0.5">
+                          <AlertTriangle className="w-3 h-3 text-amber-400 shrink-0" />
+                          <span>Trigger: {p.trigger}</span>
+                        </p>
+                      </div>
+
+                      <div className="flex items-center sm:flex-col items-end gap-2 shrink-0">
+                        <div className="text-right">
+                          <span className="text-[9px] uppercase font-bold text-slate-400 block">Factor Score</span>
+                          <span className="text-base font-black font-mono text-rose-400">{p.score}/100</span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setSelectedPersonnelUid(p.uid);
+                            handleTriggerAction(currentFactor.title, `Selected ${p.name} for Burnout prediction`);
+                          }}
+                          className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs"
+                        >
+                          <Flame className="w-3 h-3" />
+                          <span>Analyze Burnout</span>
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
-
-              <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-2.5">
-                <h4 className="text-xs font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  <span>Welfare Officer Action Protocol</span>
-                </h4>
-                <p className="text-xs text-slate-200 leading-relaxed font-medium bg-slate-900/90 p-3.5 rounded-xl border border-slate-800">
-                  {currentFactor.actionProtocol}
-                </p>
-              </div>
             </div>
-
-            {/* Right: Flagged Personnel Cohort under this factor */}
-            <div className="lg:col-span-6 p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-3">
-              <div className="flex items-center justify-between">
-                <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-amber-400" />
-                  <span>Flagged Personnel Cohort ({currentFactor.flaggedPersonnel.length} Matched)</span>
-                </h4>
-                <span className="text-[10px] font-mono text-slate-400">Unit Telemetry Live</span>
-              </div>
-
-              <div className="space-y-2.5">
-                {currentFactor.flaggedPersonnel.map((p, idx) => (
-                  <div
-                    key={idx}
-                    className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                  >
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-extrabold text-xs text-white">{p.name}</span>
-                        <span className="text-[10px] font-mono text-blue-300 bg-blue-950 px-1.5 py-0.5 rounded border border-blue-900">
-                          {p.uid}
-                        </span>
-                        <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
-                          p.risk === 'CRITICAL' ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-amber-950 text-amber-300 border border-amber-800'
-                        }`}>
-                          {p.risk}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-400 font-medium">
-                        {p.rank} &bull; {p.unit}
-                      </p>
-                      <p className="text-[11px] text-amber-300/90 font-medium flex items-center gap-1.5 pt-0.5">
-                        <AlertTriangle className="w-3 h-3 text-amber-400 shrink-0" />
-                        <span>Trigger: {p.trigger}</span>
-                      </p>
-                    </div>
-
-                    <div className="flex items-center sm:flex-col items-end gap-2 shrink-0">
-                      <div className="text-right">
-                        <span className="text-[9px] uppercase font-bold text-slate-400 block">Factor Score</span>
-                        <span className="text-base font-black font-mono text-rose-400">{p.score}/100</span>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setSelectedPersonnelUid(p.uid);
-                          handleTriggerAction(currentFactor.title, `Selected ${p.name} for Burnout prediction`);
-                        }}
-                        className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs"
-                      >
-                        <Flame className="w-3 h-3" />
-                        <span>Analyze Burnout</span>
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 

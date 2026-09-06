@@ -52,6 +52,15 @@ class HRMSClient:
                 "sleep_quality": {"score": 92, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "Logged via Soldier Mobile App (3.8h sleep recorded, severe sleep deficit)."},
                 "emotional_exhaustion": {"score": 82, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "Maslach affective depletion index elevated; high somatic weariness."},
                 "assessment_responses": {"score": 76, "available": True, "source": "Soldier Mobile App (Burnout Questions)", "note": "Psychometric strain 76% calculated strictly from mobile app burnout domain questions."}
+            },
+            "psychological_distress_params": {
+                "mood_assessments": {"score": 78, "available": True, "source": "Soldier Mobile App (Daily Mood Pulse)", "note": "High-altitude affective fatigue, low mood valence recorded on mobile."},
+                "anxiety_questions": {"score": 84, "available": True, "source": "Soldier Mobile App (GAD-7 Anxiety Screening)", "note": "Hypoxia restlessness & nocturnal startle response reported via mobile assessment."},
+                "depression_indicators": {"score": 80, "available": True, "source": "Soldier Mobile App (PHQ-9 Depression Inventory)", "note": "PHQ-9 anhedonia and vegetative fatigue markers elevated on mobile app."},
+                "sleep_quality": {"score": 92, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "3.8h average rest logged via Soldier Mobile App (severe sleep deficit)."},
+                "social_isolation": {"score": 70, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Remote forward post isolation score retrieved from Central PostgreSQL DB."},
+                "traumatic_exposure": {"score": 86, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Extreme sub-zero vigil and high-threat avalanche sector records in HRMS Dossier."},
+                "wellness_survey": {"score": 76, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "Periodic comprehensive psychological survey strain retrieved from Database."}
             }
         },
         {
@@ -89,6 +98,15 @@ class HRMSClient:
                 "sleep_quality": {"score": 82, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "Logged via Soldier Mobile App (4.2h sleep, high sleep latency fragmentation)."},
                 "emotional_exhaustion": {"score": 80, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "Cumulative command burden combined with caregiver strain."},
                 "assessment_responses": {"score": 74, "available": True, "source": "Soldier Mobile App (Burnout Questions)", "note": "Mobile app burnout questions result: 74% task weariness & emotional depletion."}
+            },
+            "psychological_distress_params": {
+                "mood_assessments": {"score": 82, "available": True, "source": "Soldier Mobile App (Daily Mood Pulse)", "note": "Caregiver distress & urgent family hospitalization anxiety logged via mobile app."},
+                "anxiety_questions": {"score": 78, "available": True, "source": "Soldier Mobile App (GAD-7 Anxiety Screening)", "note": "Persistent tactical tension and family medical worry scored via GAD-7 mobile items."},
+                "depression_indicators": {"score": 70, "available": True, "source": "Soldier Mobile App (PHQ-9 Depression Inventory)", "note": "Low hedonic tone and command stress markers recorded on mobile app."},
+                "sleep_quality": {"score": 82, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "4.2h sleep average with frequent nighttime awakenings logged on mobile terminal."},
+                "social_isolation": {"score": 55, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Good squad buddy network but domestic isolation recorded in central DB."},
+                "traumatic_exposure": {"score": 74, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Artillery forward battery line counter-fire incident records in HRMS Dossier."},
+                "wellness_survey": {"score": 78, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "High psychological friction index retrieved from monthly survey database."}
             }
         },
         {
@@ -126,6 +144,15 @@ class HRMSClient:
                 "sleep_quality": {"score": 75, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "Logged via Soldier Mobile App (5.0h sleep, circadian shift disturbance)."},
                 "emotional_exhaustion": {"score": 68, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "Moderate sensory overload and isolation weariness."},
                 "assessment_responses": {"score": 62, "available": True, "source": "Soldier Mobile App (Burnout Questions)", "note": "Mobile app burnout questions result: 62% operational cynicism & mental weariness."}
+            },
+            "psychological_distress_params": {
+                "mood_assessments": {"score": 65, "available": True, "source": "Soldier Mobile App (Daily Mood Pulse)", "note": "Screen fatigue and repetitive console boredom logged via mobile app."},
+                "anxiety_questions": {"score": 60, "available": True, "source": "Soldier Mobile App (GAD-7 Anxiety Screening)", "note": "Moderate communications watch alertness strain on mobile GAD-7."},
+                "depression_indicators": {"score": 58, "available": True, "source": "Soldier Mobile App (PHQ-9 Depression Inventory)", "note": "Sensory desensitization and mild low mood recorded on mobile app."},
+                "sleep_quality": {"score": 75, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "5.0h sleep with circadian cycle disruption logged on mobile app."},
+                "social_isolation": {"score": 64, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Rotational night shifts causing detachment from daytime squad activities."},
+                "traumatic_exposure": {"score": 40, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Technical outpost stationed with low direct combat engagement logs in HRMS."},
+                "wellness_survey": {"score": 62, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "Moderate sensory fatigue index in monthly database psychometric archive."}
             }
         },
         {
@@ -163,6 +190,15 @@ class HRMSClient:
                 "sleep_quality": {"score": 58, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "Logged via Soldier Mobile App (5.5h sleep, moderate variability)."},
                 "emotional_exhaustion": {"score": 62, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "Tactical vigilance maintenance; strong squad peer camaraderie."},
                 "assessment_responses": {"score": 64, "available": True, "source": "Soldier Mobile App (Burnout Questions)", "note": "Mobile app burnout questions result: 64% task fatigue (Moderate)."}
+            },
+            "psychological_distress_params": {
+                "mood_assessments": {"score": 50, "available": True, "source": "Soldier Mobile App (Daily Mood Pulse)", "note": "Positive affective tone and high commando unit morale logged via mobile."},
+                "anxiety_questions": {"score": 58, "available": True, "source": "Soldier Mobile App (GAD-7 Anxiety Screening)", "note": "Tactical pre-mission readiness hyper-vigilance recorded on mobile app."},
+                "depression_indicators": {"score": 45, "available": True, "source": "Soldier Mobile App (PHQ-9 Depression Inventory)", "note": "Optimal drive, low depressive markers recorded on mobile terminal."},
+                "sleep_quality": {"score": 58, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "5.5h field sleep logged via Soldier Mobile App."},
+                "social_isolation": {"score": 35, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Exceptional Para SF team cohesion and buddy trust index in central DB."},
+                "traumatic_exposure": {"score": 76, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Special forces high-threat tactical operation logs in HRMS Dossier."},
+                "wellness_survey": {"score": 56, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "Strong resilience and psychological hardiness confirmed in database archive."}
             }
         },
         {
@@ -200,6 +236,15 @@ class HRMSClient:
                 "sleep_quality": {"score": 78, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "Logged via Soldier Mobile App (4.5h sleep average recorded)."},
                 "emotional_exhaustion": {"score": 75, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "High responsibility load; resilience score remains robust."},
                 "assessment_responses": {"score": 72, "available": True, "source": "Soldier Mobile App (Burnout Questions)", "note": "Mobile app burnout questions result: 72% command vigilance fatigue."}
+            },
+            "psychological_distress_params": {
+                "mood_assessments": {"score": 72, "available": True, "source": "Soldier Mobile App (Daily Mood Pulse)", "note": "High command vigilance tension logged via mobile app."},
+                "anxiety_questions": {"score": 76, "available": True, "source": "Soldier Mobile App (GAD-7 Anxiety Screening)", "note": "Night patrol vigilance and operational responsibility load on mobile GAD-7."},
+                "depression_indicators": {"score": 64, "available": True, "source": "Soldier Mobile App (PHQ-9 Depression Inventory)", "note": "Executive fatigue markers recorded on mobile app."},
+                "sleep_quality": {"score": 78, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "4.5h sleep average with delayed sleep onset recorded on mobile."},
+                "social_isolation": {"score": 50, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Command level isolation but good officer cadre support in central DB."},
+                "traumatic_exposure": {"score": 82, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Rapid action counter-insurgency command logs in HRMS Dossier."},
+                "wellness_survey": {"score": 72, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "Elevated operational strain score in monthly psychometric database."}
             }
         },
         {
@@ -237,6 +282,15 @@ class HRMSClient:
                 "sleep_quality": {"score": 24, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "Logged via Soldier Mobile App (7.5h restorative sleep recorded)."},
                 "emotional_exhaustion": {"score": 30, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "High job satisfaction, excellent morale, low somatic stress."},
                 "assessment_responses": {"score": 28, "available": True, "source": "Soldier Mobile App (Burnout Questions)", "note": "Mobile app burnout questions result: 28% strain (Nominal optimal state)."}
+            },
+            "psychological_distress_params": {
+                "mood_assessments": {"score": 25, "available": True, "source": "Soldier Mobile App (Daily Mood Pulse)", "note": "Optimal positive valence and high morale logged via mobile."},
+                "anxiety_questions": {"score": 28, "available": True, "source": "Soldier Mobile App (GAD-7 Anxiety Screening)", "note": "Nominal alertness within healthy threshold on mobile GAD-7."},
+                "depression_indicators": {"score": 22, "available": True, "source": "Soldier Mobile App (PHQ-9 Depression Inventory)", "note": "Zero depressive markers logged via mobile PHQ-9."},
+                "sleep_quality": {"score": 24, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "7.5h restorative sleep average recorded on mobile app."},
+                "social_isolation": {"score": 20, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Active peer engagement and squad camaraderie in central DB."},
+                "traumatic_exposure": {"score": 15, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Peace station base duties with zero combat incident logs in HRMS."},
+                "wellness_survey": {"score": 26, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "High resilience and excellent mental hardiness in DB archive."}
             }
         },
         {
@@ -274,6 +328,15 @@ class HRMSClient:
                 "sleep_quality": {"score": 50, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "Logged via Soldier Mobile App (6.8h sleep, mountain acclimatization)."},
                 "emotional_exhaustion": {"score": 48, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "Good buddy-system support and recreational morale."},
                 "assessment_responses": {"score": 52, "available": True, "source": "Soldier Mobile App (Burnout Questions)", "note": "Mobile app burnout questions result: 52% strain in high-altitude terrain."}
+            },
+            "psychological_distress_params": {
+                "mood_assessments": {"score": 52, "available": True, "source": "Soldier Mobile App (Daily Mood Pulse)", "note": "Moderate high-altitude acclimatization fatigue logged on mobile."},
+                "anxiety_questions": {"score": 48, "available": True, "source": "Soldier Mobile App (GAD-7 Anxiety Screening)", "note": "Routine border alertness within normal limits on mobile GAD-7."},
+                "depression_indicators": {"score": 46, "available": True, "source": "Soldier Mobile App (PHQ-9 Depression Inventory)", "note": "Stable mood valence recorded on mobile PHQ-9."},
+                "sleep_quality": {"score": 50, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "6.8h sleep logged via Soldier Mobile App."},
+                "social_isolation": {"score": 42, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Close 2-man buddy pairing active in central DB roster."},
+                "traumatic_exposure": {"score": 54, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Mountain pass border vigilance logs in HRMS Dossier."},
+                "wellness_survey": {"score": 50, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "Healthy baseline resilience in monthly database archive."}
             }
         },
         {
@@ -311,6 +374,15 @@ class HRMSClient:
                 "sleep_quality": {"score": 46, "available": False, "source": "Mobile App (Sleep Log Pending)", "note": "Soldier has not yet logged sleep hours on the mobile application in last 48h."},
                 "emotional_exhaustion": {"score": 44, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "Good peer morale and stable welfare support."},
                 "assessment_responses": {"score": 48, "available": False, "source": "Mobile App (Burnout Test Pending)", "note": "Soldier has not yet taken the psychometric assessment on the mobile application."}
+            },
+            "psychological_distress_params": {
+                "mood_assessments": {"score": 45, "available": False, "source": "Soldier Mobile App (Pending Sync)", "note": "Soldier has not completed daily mood pulse on mobile app."},
+                "anxiety_questions": {"score": 48, "available": False, "source": "Soldier Mobile App (Pending Sync)", "note": "GAD-7 screening pending completion on mobile application."},
+                "depression_indicators": {"score": 42, "available": False, "source": "Soldier Mobile App (Pending Sync)", "note": "PHQ-9 screening pending completion on mobile application."},
+                "sleep_quality": {"score": 46, "available": False, "source": "Soldier Mobile App (Pending Sync)", "note": "Mobile sleep telemetry log pending in last 48h."},
+                "social_isolation": {"score": 40, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Airport squad unit cohesion index retrieved from central DB."},
+                "traumatic_exposure": {"score": 30, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Aviation security zone with zero hostile incident records in HRMS."},
+                "wellness_survey": {"score": 44, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "Baseline wellness survey record retrieved from central DB."}
             }
         },
         {
@@ -348,6 +420,15 @@ class HRMSClient:
                 "sleep_quality": {"score": 74, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "Logged via Soldier Mobile App (4.8h sleep, vigilance latency)."},
                 "emotional_exhaustion": {"score": 68, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "High environmental fatigue; relies on squad support."},
                 "assessment_responses": {"score": 70, "available": True, "source": "Soldier Mobile App (Burnout Questions)", "note": "Mobile app burnout questions result: 70% terrain fatigue."}
+            },
+            "psychological_distress_params": {
+                "mood_assessments": {"score": 68, "available": True, "source": "Soldier Mobile App (Daily Mood Pulse)", "note": "Jungle patrol physical exhaustion logged via mobile app."},
+                "anxiety_questions": {"score": 72, "available": True, "source": "Soldier Mobile App (GAD-7 Anxiety Screening)", "note": "Ambush vigilance and hostile terrain alertness on mobile GAD-7."},
+                "depression_indicators": {"score": 64, "available": True, "source": "Soldier Mobile App (PHQ-9 Depression Inventory)", "note": "Sub-acute anhedonia and prolonged deployment isolation on mobile."},
+                "sleep_quality": {"score": 74, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "4.8h fragmented sleep logged on mobile app."},
+                "social_isolation": {"score": 60, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Remote forward jungle outpost isolation record in central DB."},
+                "traumatic_exposure": {"score": 78, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Active counter-insurgency cordon and encounter logs in HRMS Dossier."},
+                "wellness_survey": {"score": 70, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "Elevated fatigue and terrain stress in monthly survey DB archive."}
             }
         }
     ]
