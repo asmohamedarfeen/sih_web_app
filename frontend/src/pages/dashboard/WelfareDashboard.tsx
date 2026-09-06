@@ -33,7 +33,6 @@ import {
   Search,
   Filter,
   UserCheck,
-  RotateCcw,
   Sparkle,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
@@ -345,8 +344,6 @@ export const WelfareDashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedRiskFilter, setSelectedRiskFilter] = useState<string>('ALL');
   const [selectedPersonnelUid, setSelectedPersonnelUid] = useState<string>('UID-EMP-012');
-  
-  const [customParams, setCustomParams] = useState<{ [key: string]: number }>({});
 
   const loadWelfareData = async () => {
     try {
@@ -414,16 +411,16 @@ export const WelfareDashboard: React.FC = () => {
 
   const currentParamValues = useMemo(() => {
     return {
-      leave_patterns: customParams['leave_patterns'] ?? resolvedParams.leave_patterns.score,
-      overtime: customParams['overtime'] ?? resolvedParams.overtime.score,
-      workload_trend: customParams['workload_trend'] ?? resolvedParams.workload_trend.score,
-      deployment_duration: customParams['deployment_duration'] ?? resolvedParams.deployment_duration.score,
-      duty_schedule: customParams['duty_schedule'] ?? resolvedParams.duty_schedule.score,
-      sleep_quality: customParams['sleep_quality'] ?? resolvedParams.sleep_quality.score,
-      emotional_exhaustion: customParams['emotional_exhaustion'] ?? resolvedParams.emotional_exhaustion.score,
-      assessment_responses: customParams['assessment_responses'] ?? resolvedParams.assessment_responses.score,
+      leave_patterns: resolvedParams.leave_patterns.score,
+      overtime: resolvedParams.overtime.score,
+      workload_trend: resolvedParams.workload_trend.score,
+      deployment_duration: resolvedParams.deployment_duration.score,
+      duty_schedule: resolvedParams.duty_schedule.score,
+      sleep_quality: resolvedParams.sleep_quality.score,
+      emotional_exhaustion: resolvedParams.emotional_exhaustion.score,
+      assessment_responses: resolvedParams.assessment_responses.score,
     };
-  }, [resolvedParams, customParams]);
+  }, [resolvedParams]);
 
   const calculatedBurnout = useMemo(() => {
     const p = currentParamValues;
@@ -523,17 +520,6 @@ export const WelfareDashboard: React.FC = () => {
       return true;
     });
   }, [searchQuery, selectedRiskFilter, personnelRoster]);
-
-  const resetSliders = () => {
-    setCustomParams({});
-  };
-
-  const handleSliderChange = (paramKey: string, val: number) => {
-    setCustomParams((prev) => ({
-      ...prev,
-      [paramKey]: val,
-    }));
-  };
 
 
 
@@ -1217,7 +1203,6 @@ export const WelfareDashboard: React.FC = () => {
                   key={p.uid}
                   onClick={() => {
                     setSelectedPersonnelUid(p.uid);
-                    setCustomParams({});
                   }}
                   className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between relative group ${
                     isSelected
@@ -1336,17 +1321,10 @@ export const WelfareDashboard: React.FC = () => {
               <div className="flex flex-col gap-1.5">
                 <button
                   onClick={() => handleTriggerAction('Burnout Dispatch', `Priority intervention for ${selectedPersonnel.name}`)}
-                  className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>Dispatch Intervention</span>
-                </button>
-                <button
-                  onClick={resetSliders}
-                  className="px-3 py-1.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 text-[11px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer border border-slate-600"
-                >
-                  <RotateCcw className="w-3 h-3 text-slate-400" />
-                  <span>Reset Simulation</span>
                 </button>
               </div>
             </div>
@@ -1364,7 +1342,7 @@ export const WelfareDashboard: React.FC = () => {
                   </span>
                 </div>
                 <p className="mt-1 text-amber-200/90 leading-relaxed font-medium">
-                  Live data for <strong className="text-white underline">{missingParams.join(', ')}</strong> is not yet available in the HRMS database for this personnel. Using baseline unit default values for interactive simulation until telemetry packets synchronize.
+                  Live data for <strong className="text-white underline">{missingParams.join(', ')}</strong> is not yet available in the HRMS / Mobile database for this personnel. Using baseline unit default values until telemetry packets synchronize.
                 </p>
               </div>
             </div>
@@ -1378,16 +1356,16 @@ export const WelfareDashboard: React.FC = () => {
                 <strong className="text-white">Burnout Formula:</strong> 0.12(Leave) + 0.14(Overtime) + 0.13(Workload) + 0.10(Deployment) + 0.13(Schedule) + 0.15(Sleep) + 0.12(Exhaustion) + 0.11(Assessment)
               </span>
             </div>
-            <span className="text-[11px] text-emerald-400 font-bold">
-              Adjust sliders below to run live predictive simulations &rarr;
+            <span className="text-[11px] font-mono text-emerald-400 font-bold flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Retrieved Live Telemetry • Multi-Source Aggregation</span>
             </span>
           </div>
 
-          {/* 8 Parameters Detailed Breakdown & Live Simulation Sliders */}
+          {/* 8 Parameters Detailed Breakdown (Fixed Retrieved Telemetry Metrics) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
             {paramDefinitions.map((param) => {
               const currentVal = (currentParamValues as any)[param.key];
-              const isModified = customParams[param.key] !== undefined;
 
               return (
                 <div
@@ -1395,8 +1373,6 @@ export const WelfareDashboard: React.FC = () => {
                   className={`p-4 rounded-2xl border transition-all space-y-2.5 ${
                     !param.available
                       ? 'bg-slate-800/70 border-amber-500/50 ring-1 ring-amber-500/20'
-                      : isModified
-                      ? 'bg-slate-800/90 border-emerald-500/60 ring-1 ring-emerald-500/30 shadow-md'
                       : 'bg-slate-800/60 border-slate-700/80'
                   }`}
                 >
@@ -1432,18 +1408,25 @@ export const WelfareDashboard: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Interactive Slider */}
-                  <div className="space-y-1">
-                    <input
-                      type="range"
-                      min={0}
-                      max={100}
-                      value={currentVal}
-                      onChange={(e) => handleSliderChange(param.key, parseInt(e.target.value, 10))}
-                      className="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-700 rounded-lg appearance-none"
-                    />
-                    <div className="flex justify-between text-[9px] font-mono text-slate-500">
+                  {/* Retrieved Telemetry Strain Bar Meter */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-700/60 p-0.5">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          currentVal >= 80
+                            ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]'
+                            : currentVal >= 70
+                            ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'
+                            : currentVal >= 50
+                            ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]'
+                            : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'
+                        }`}
+                        style={{ width: `${Math.min(100, Math.max(4, currentVal))}%` }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-[9px] font-mono text-slate-400">
                       <span>0% Nominal</span>
+                      <span className="font-semibold text-slate-300">{currentVal}% Strain</span>
                       <span>100% Critical</span>
                     </div>
                   </div>
