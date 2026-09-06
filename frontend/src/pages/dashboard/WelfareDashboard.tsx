@@ -39,6 +39,13 @@ import {
 import { useAuthStore } from '../../store/authStore';
 import { dashboardService, WelfareDashboardData } from '../../services/dashboardService';
 
+export interface ParamTelemetryDetail {
+  score: number;
+  available: boolean;
+  source: string;
+  note: string;
+}
+
 export interface PersonnelBurnoutProfile {
   uid: string;
   name: string;
@@ -48,23 +55,19 @@ export interface PersonnelBurnoutProfile {
   regimental_number: string;
   medical_category: string;
   status: string;
+  hrms_sync_status?: string;
+  last_sync_timestamp?: string;
+  data_completeness_pct?: number;
+  missing_telemetry?: string[];
   params: {
-    leave_patterns: number;
-    leave_note: string;
-    overtime: number;
-    overtime_note: string;
-    workload_trend: number;
-    workload_note: string;
-    deployment_duration: number;
-    deployment_note: string;
-    duty_schedule: number;
-    duty_note: string;
-    sleep_quality: number;
-    sleep_note: string;
-    emotional_exhaustion: number;
-    exhaustion_note: string;
-    assessment_responses: number;
-    assessment_note: string;
+    leave_patterns: any;
+    overtime: any;
+    workload_trend: any;
+    deployment_duration: any;
+    duty_schedule: any;
+    sleep_quality: any;
+    emotional_exhaustion: any;
+    assessment_responses: any;
   };
 }
 
@@ -78,23 +81,19 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
     regimental_number: 'CRPF-2016-8012',
     medical_category: 'SHAPE-1 (Temporary P2)',
     status: 'Under Medical Observation',
+    hrms_sync_status: 'SYNCHRONIZED',
+    last_sync_timestamp: '2026-09-06T06:15:00Z',
+    data_completeness_pct: 100,
+    missing_telemetry: [],
     params: {
-      leave_patterns: 80,
-      leave_note: '3 consecutive leave applications deferred due to forward vigil deployment.',
-      overtime: 92,
-      overtime_note: '48 duty hours logged in past 5 days (64% over standard roster).',
-      workload_trend: 88,
-      workload_note: 'High task escalation slope with double perimeter watch shifts.',
-      deployment_duration: 95,
-      deployment_note: '14 continuous months stationed in extreme sub-zero forward sector.',
-      duty_schedule: 84,
-      duty_note: '8 consecutive night vigils with irregular sleep window rotation.',
-      sleep_quality: 92,
-      sleep_note: 'Severe nocturnal sleep deficit (<3.8h recorded on biometric tracker).',
-      emotional_exhaustion: 82,
-      exhaustion_note: 'Maslach affective depletion index elevated; high somatic weariness.',
-      assessment_responses: 76,
-      assessment_note: 'AI self-assessment flagged cognitive fatigue and high vigilance strain.',
+      leave_patterns: { score: 80, available: true, source: 'HRMS Leave Portal', note: '3 consecutive leave applications deferred due to forward vigil deployment.' },
+      overtime: { score: 92, available: true, source: 'HRMS Watch Roster', note: '48 duty hours logged in past 5 days (64% over standard roster).' },
+      workload_trend: { score: 88, available: true, source: 'Command Operations Log', note: 'High task escalation slope with double perimeter watch shifts.' },
+      deployment_duration: { score: 95, available: true, source: 'Service Dossier Database', note: '14 continuous months stationed in extreme sub-zero forward sector.' },
+      duty_schedule: { score: 84, available: true, source: 'Battalion Roster', note: '8 consecutive night vigils with irregular sleep window rotation.' },
+      sleep_quality: { score: 92, available: true, source: 'Biometric Wearable Telemetry', note: 'Severe nocturnal sleep deficit (<3.8h recorded on biometric tracker).' },
+      emotional_exhaustion: { score: 82, available: true, source: 'Clinical MBI-GS Telemetry', note: 'Maslach affective depletion index elevated; high somatic weariness.' },
+      assessment_responses: { score: 76, available: true, source: 'AI Psychological Twin Assessment', note: 'AI self-assessment flagged cognitive fatigue and high vigilance strain.' },
     },
   },
   {
@@ -106,23 +105,19 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
     regimental_number: 'ARMY-2018-8013',
     medical_category: 'SHAPE-1',
     status: 'Active Duty (Command)',
+    hrms_sync_status: 'SYNCHRONIZED',
+    last_sync_timestamp: '2026-09-06T06:14:30Z',
+    data_completeness_pct: 100,
+    missing_telemetry: [],
     params: {
-      leave_patterns: 88,
-      leave_note: 'Family medical leave pending; urgent domestic distress reported.',
-      overtime: 78,
-      overtime_note: 'Command logistics management beyond standard battery shifts.',
-      workload_trend: 84,
-      workload_note: 'Field artillery exercise coordination under condensed timeline.',
-      deployment_duration: 75,
-      deployment_note: '8 continuous months in active artillery forward battery line.',
-      duty_schedule: 78,
-      duty_note: 'Split shifts with early dawn drill inspections and night logistics.',
-      sleep_quality: 82,
-      sleep_note: 'High latency sleep fragmentation; restless off-duty periods.',
-      emotional_exhaustion: 80,
-      exhaustion_note: 'Cumulative command burden combined with caregiver strain.',
-      assessment_responses: 74,
-      assessment_note: 'Distress score 75/100 on Kessler-10 AI behavioral evaluation.',
+      leave_patterns: { score: 88, available: true, source: 'HRMS Leave Portal', note: 'Family medical leave pending; urgent domestic distress reported.' },
+      overtime: { score: 78, available: true, source: 'Battery Duty Roster', note: 'Command logistics management beyond standard battery shifts.' },
+      workload_trend: { score: 84, available: true, source: 'Field Operations Log', note: 'Field artillery exercise coordination under condensed timeline.' },
+      deployment_duration: { score: 75, available: true, source: 'Service Dossier Database', note: '8 continuous months in active artillery forward battery line.' },
+      duty_schedule: { score: 78, available: true, source: 'Battalion Roster', note: 'Split shifts with early dawn drill inspections and night logistics.' },
+      sleep_quality: { score: 82, available: true, source: 'Biometric Wearable Telemetry', note: 'High latency sleep fragmentation; restless off-duty periods.' },
+      emotional_exhaustion: { score: 80, available: true, source: 'Clinical MBI-GS Telemetry', note: 'Cumulative command burden combined with caregiver strain.' },
+      assessment_responses: { score: 74, available: true, source: 'AI Psychological Twin Assessment', note: 'Distress score 75/100 on Kessler-10 AI behavioral evaluation.' },
     },
   },
   {
@@ -134,23 +129,19 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
     regimental_number: 'BSF-2019-8014',
     medical_category: 'SHAPE-1',
     status: 'Active Duty',
+    hrms_sync_status: 'SYNCHRONIZED',
+    last_sync_timestamp: '2026-09-06T06:10:00Z',
+    data_completeness_pct: 100,
+    missing_telemetry: [],
     params: {
-      leave_patterns: 55,
-      leave_note: 'Annual leave taken 4 months ago; nominal leave status.',
-      overtime: 82,
-      overtime_note: 'Prolonged communications console monitoring duty (12h shifts).',
-      workload_trend: 72,
-      workload_note: 'Increased signal traffic and perimeter radar maintenance calls.',
-      deployment_duration: 60,
-      deployment_note: '6 months in border telemetry outpost station.',
-      duty_schedule: 85,
-      duty_note: 'Continuous rotational night console shifts causing circadian shift.',
-      sleep_quality: 75,
-      sleep_note: 'Blue light screen latency and disturbed deep sleep cycles.',
-      emotional_exhaustion: 68,
-      exhaustion_note: 'Moderate sensory overload and isolation weariness.',
-      assessment_responses: 62,
-      assessment_note: 'Responses reflect high mental focus requirements with mild strain.',
+      leave_patterns: { score: 55, available: true, source: 'HRMS Leave Portal', note: 'Annual leave taken 4 months ago; nominal leave status.' },
+      overtime: { score: 82, available: true, source: 'Console Watch Roster', note: 'Prolonged communications console monitoring duty (12h shifts).' },
+      workload_trend: { score: 72, available: true, source: 'Signals Traffic Engine', note: 'Increased signal traffic and perimeter radar maintenance calls.' },
+      deployment_duration: { score: 60, available: true, source: 'Service Dossier Database', note: '6 months in border telemetry outpost station.' },
+      duty_schedule: { score: 85, available: true, source: 'Shift Telemetry', note: 'Continuous rotational night console shifts causing circadian shift.' },
+      sleep_quality: { score: 75, available: true, source: 'Biometric Wearable Telemetry', note: 'Blue light screen latency and disturbed deep sleep cycles.' },
+      emotional_exhaustion: { score: 68, available: true, source: 'Clinical MBI-GS Telemetry', note: 'Moderate sensory overload and isolation weariness.' },
+      assessment_responses: { score: 62, available: true, source: 'AI Psychological Twin Assessment', note: 'Responses reflect high mental focus requirements with mild strain.' },
     },
   },
   {
@@ -162,23 +153,19 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
     regimental_number: 'ARMY-2021-9988',
     medical_category: 'SHAPE-1 (S1H1A1P1E1)',
     status: 'Active Frontline Patrol',
+    hrms_sync_status: 'SYNCHRONIZED',
+    last_sync_timestamp: '2026-09-06T06:17:15Z',
+    data_completeness_pct: 100,
+    missing_telemetry: [],
     params: {
-      leave_patterns: 60,
-      leave_note: 'Leave scheduled next month; currently on tactical patrol roster.',
-      overtime: 68,
-      overtime_note: 'Tactical reconnaissance exercises and high-tempo patrol duties.',
-      workload_trend: 70,
-      workload_note: 'Physical training and live field deployment drills.',
-      deployment_duration: 65,
-      deployment_note: '7 months forward stationing with high operational focus.',
-      duty_schedule: 66,
-      duty_note: 'Variable tactical patrol timings with standard debrief recovery.',
-      sleep_quality: 58,
-      sleep_note: 'Moderate sleep variability; high cardiovascular bounce-back.',
-      emotional_exhaustion: 62,
-      exhaustion_note: 'Tactical vigilance maintenance; strong squad peer camaraderie.',
-      assessment_responses: 64,
-      assessment_note: 'Valid psychometric self-assessment score 64.2/100 (Moderate).',
+      leave_patterns: { score: 60, available: true, source: 'HRMS Leave Portal', note: 'Leave scheduled next month; currently on tactical patrol roster.' },
+      overtime: { score: 68, available: true, source: 'Tactical Patrol Roster', note: 'Tactical reconnaissance exercises and high-tempo patrol duties.' },
+      workload_trend: { score: 70, available: true, source: 'Operations Command Log', note: 'Physical training and live field deployment drills.' },
+      deployment_duration: { score: 65, available: true, source: 'Service Dossier Database', note: '7 months forward stationing with high operational focus.' },
+      duty_schedule: { score: 66, available: true, source: 'Patrol Schedule Matrix', note: 'Variable tactical patrol timings with standard debrief recovery.' },
+      sleep_quality: { score: 58, available: true, source: 'Biometric Wearable Telemetry', note: 'Moderate sleep variability; high cardiovascular bounce-back.' },
+      emotional_exhaustion: { score: 62, available: true, source: 'Clinical MBI-GS Telemetry', note: 'Tactical vigilance maintenance; strong squad peer camaraderie.' },
+      assessment_responses: { score: 64, available: true, source: 'Gemini AI Self-Assessment', note: 'Valid psychometric self-assessment score 64.2/100 (Moderate).' },
     },
   },
   {
@@ -190,23 +177,19 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
     regimental_number: 'CRPF-2015-8010',
     medical_category: 'SHAPE-1',
     status: 'Active Command Duty',
+    hrms_sync_status: 'SYNCHRONIZED',
+    last_sync_timestamp: '2026-09-06T06:12:00Z',
+    data_completeness_pct: 100,
+    missing_telemetry: [],
     params: {
-      leave_patterns: 72,
-      leave_note: 'Consecutive operational deployments delaying annual furlough.',
-      overtime: 80,
-      overtime_note: 'Prolonged night sector sweeps and battalion operational reviews.',
-      workload_trend: 76,
-      workload_note: 'High leadership tempo and operational briefing load.',
-      deployment_duration: 70,
-      deployment_note: '9 months forward command post deployment.',
-      duty_schedule: 74,
-      duty_note: 'Irregular operational call-outs during recovery intervals.',
-      sleep_quality: 78,
-      sleep_note: 'Average 4.9 hours sleep recorded per night; elevated cortisol.',
-      emotional_exhaustion: 75,
-      exhaustion_note: 'High responsibility load; resilience score remains robust.',
-      assessment_responses: 72,
-      assessment_note: 'Assessment reflects sustained command vigilance with early strain.',
+      leave_patterns: { score: 72, available: true, source: 'HRMS Leave Portal', note: 'Consecutive operational deployments delaying annual furlough.' },
+      overtime: { score: 80, available: true, source: 'Command Watch Roster', note: 'Prolonged night sector sweeps and battalion operational reviews.' },
+      workload_trend: { score: 76, available: true, source: 'Operations Command Log', note: 'High leadership tempo and operational briefing load.' },
+      deployment_duration: { score: 70, available: true, source: 'Service Dossier Database', note: '9 months forward command post deployment.' },
+      duty_schedule: { score: 74, available: true, source: 'Patrol Schedule Matrix', note: 'Irregular operational call-outs during recovery intervals.' },
+      sleep_quality: { score: 78, available: true, source: 'Biometric Wearable Telemetry', note: 'Average 4.9 hours sleep recorded per night; elevated cortisol.' },
+      emotional_exhaustion: { score: 75, available: true, source: 'Clinical MBI-GS Telemetry', note: 'High responsibility load; resilience score remains robust.' },
+      assessment_responses: { score: 72, available: true, source: 'AI Psychological Twin Assessment', note: 'Assessment reflects sustained command vigilance with early strain.' },
     },
   },
   {
@@ -218,23 +201,19 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
     regimental_number: 'IAF-2017-8011',
     medical_category: 'SHAPE-1',
     status: 'Active Nominal Duty',
+    hrms_sync_status: 'SYNCHRONIZED',
+    last_sync_timestamp: '2026-09-06T06:05:00Z',
+    data_completeness_pct: 100,
+    missing_telemetry: [],
     params: {
-      leave_patterns: 25,
-      leave_note: 'Regular furlough balance maintained; leave taken on schedule.',
-      overtime: 30,
-      overtime_note: 'Standard radar watch cycles with mandatory 12h rest interval.',
-      workload_trend: 32,
-      workload_note: 'Balanced air traffic management and simulation schedules.',
-      deployment_duration: 20,
-      deployment_note: '3 months in peace-station technical command hub.',
-      duty_schedule: 28,
-      duty_note: 'Consistent daylight and evening rotation with full rest days.',
-      sleep_quality: 24,
-      sleep_note: 'Optimal restorative sleep (7.4h average, >90 min deep sleep).',
-      emotional_exhaustion: 30,
-      exhaustion_note: 'High job satisfaction, excellent morale, low somatic stress.',
-      assessment_responses: 28,
-      assessment_note: 'Assessment score 28.4/100 indicating prime mental wellness.',
+      leave_patterns: { score: 25, available: true, source: 'HRMS Leave Portal', note: 'Regular furlough balance maintained; leave taken on schedule.' },
+      overtime: { score: 30, available: true, source: 'Air Defense Watch Roster', note: 'Standard radar watch cycles with mandatory 12h rest interval.' },
+      workload_trend: { score: 32, available: true, source: 'Operations Command Log', note: 'Balanced air traffic management and simulation schedules.' },
+      deployment_duration: { score: 20, available: true, source: 'Service Dossier Database', note: '3 months in peace-station technical command hub.' },
+      duty_schedule: { score: 28, available: true, source: 'Roster Matrix', note: 'Consistent daylight and evening rotation with full rest days.' },
+      sleep_quality: { score: 24, available: true, source: 'Biometric Wearable Telemetry', note: 'Optimal restorative sleep (7.4h average, >90 min deep sleep).' },
+      emotional_exhaustion: { score: 30, available: true, source: 'Clinical MBI-GS Telemetry', note: 'High job satisfaction, excellent morale, low somatic stress.' },
+      assessment_responses: { score: 28, available: true, source: 'AI Psychological Twin Assessment', note: 'Assessment score 28.4/100 indicating prime mental wellness.' },
     },
   },
   {
@@ -246,51 +225,19 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
     regimental_number: 'ITBP-2020-8015',
     medical_category: 'SHAPE-1',
     status: 'Active Duty',
+    hrms_sync_status: 'SYNCHRONIZED',
+    last_sync_timestamp: '2026-09-06T05:50:00Z',
+    data_completeness_pct: 100,
+    missing_telemetry: [],
     params: {
-      leave_patterns: 50,
-      leave_note: 'Furlough approved for next cycle; awaiting replacement.',
-      overtime: 55,
-      overtime_note: 'Moderate patrol duration in mountain passes.',
-      workload_trend: 54,
-      workload_note: 'Standard patrol routines with regular acclimatization stops.',
-      deployment_duration: 60,
-      deployment_note: '5 months at forward border outpost.',
-      duty_schedule: 52,
-      duty_note: 'Rotational 8-hour patrol watches with squad partner.',
-      sleep_quality: 50,
-      sleep_note: 'Moderate sleep quality with mild altitude-related awakening.',
-      emotional_exhaustion: 48,
-      exhaustion_note: 'Good buddy-system support and recreational morale.',
-      assessment_responses: 52,
-      assessment_note: 'Self-assessment indicates balanced coping in extreme terrain.',
-    },
-  },
-  {
-    uid: 'UID-CMD-005',
-    name: 'Brig. Santosh Babu',
-    rank: 'Brigadier',
-    unit: 'HQ Command Wing',
-    branch: 'Indian Army',
-    regimental_number: 'ARMY-2010-8005',
-    medical_category: 'SHAPE-1',
-    status: 'Command HQ',
-    params: {
-      leave_patterns: 35,
-      leave_note: 'Standard administrative leave planned; executive calendar.',
-      overtime: 40,
-      overtime_note: 'HQ strategic meetings and operational oversight.',
-      workload_trend: 38,
-      workload_note: 'Strategic planning tempo with adequate staff support.',
-      deployment_duration: 25,
-      deployment_note: 'Peace station headquarters posting.',
-      duty_schedule: 32,
-      duty_note: 'Structured administrative hours with scheduled executive rest.',
-      sleep_quality: 30,
-      sleep_note: 'Consistent restorative rest; low autonomic volatility.',
-      emotional_exhaustion: 34,
-      exhaustion_note: 'High psychological hardiness and seasoned executive coping.',
-      assessment_responses: 36,
-      assessment_note: 'Wellness score 34.0/100 (Nominal, resilient).',
+      leave_patterns: { score: 50, available: true, source: 'HRMS Leave Portal', note: 'Furlough approved for next cycle; awaiting replacement.' },
+      overtime: { score: 55, available: true, source: 'Mountain Patrol Roster', note: 'Moderate patrol duration in mountain passes.' },
+      workload_trend: { score: 54, available: true, source: 'Operations Log', note: 'Standard patrol routines with regular acclimatization stops.' },
+      deployment_duration: { score: 60, available: true, source: 'Service Dossier Database', note: '5 months at forward border outpost.' },
+      duty_schedule: { score: 52, available: true, source: 'Roster Matrix', note: 'Rotational 8-hour patrol watches with squad partner.' },
+      sleep_quality: { score: 50, available: true, source: 'Biometric Wearable Telemetry', note: 'Moderate sleep quality with mild altitude-related awakening.' },
+      emotional_exhaustion: { score: 48, available: true, source: 'Clinical MBI-GS Telemetry', note: 'Good buddy-system support and recreational morale.' },
+      assessment_responses: { score: 52, available: true, source: 'AI Psychological Twin Assessment', note: 'Self-assessment indicates balanced coping in extreme terrain.' },
     },
   },
   {
@@ -302,23 +249,19 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
     regimental_number: 'CISF-2021-8016',
     medical_category: 'SHAPE-1',
     status: 'Active Duty',
+    hrms_sync_status: 'PARTIAL_SYNC',
+    last_sync_timestamp: '2026-09-06T04:30:00Z',
+    data_completeness_pct: 75,
+    missing_telemetry: ['sleep_quality', 'assessment_responses'],
     params: {
-      leave_patterns: 45,
-      leave_note: 'Casual leave utilized last month; steady roster.',
-      overtime: 50,
-      overtime_note: 'Terminal surveillance watches during high airport footfall.',
-      workload_trend: 48,
-      workload_note: 'Standard security screening shifts with rotations.',
-      deployment_duration: 40,
-      deployment_note: '4 months at metropolitan airport unit.',
-      duty_schedule: 55,
-      duty_note: 'Rotational morning/evening shifts with standard breaks.',
-      sleep_quality: 46,
-      sleep_note: 'Adequate rest (6.5h average) with minor shift fatigue.',
-      emotional_exhaustion: 44,
-      exhaustion_note: 'Good peer morale and stable welfare support.',
-      assessment_responses: 48,
-      assessment_note: 'Self-assessment score 48.0/100 (Moderate, manageable).',
+      leave_patterns: { score: 45, available: true, source: 'HRMS Leave Portal', note: 'Casual leave utilized last month; steady roster.' },
+      overtime: { score: 50, available: true, source: 'Airport Security Roster', note: 'Terminal surveillance watches during high airport footfall.' },
+      workload_trend: { score: 48, available: true, source: 'Operations Log', note: 'Standard security screening shifts with rotations.' },
+      deployment_duration: { score: 40, available: true, source: 'Service Dossier Database', note: '4 months at metropolitan airport unit.' },
+      duty_schedule: { score: 55, available: true, source: 'Shift Roster', note: 'Rotational morning/evening shifts with standard breaks.' },
+      sleep_quality: { score: 46, available: false, source: 'Pending Wearable Sync', note: 'Wearable biometric sleep tracker not synced in last 48 hours.' },
+      emotional_exhaustion: { score: 44, available: true, source: 'Clinical MBI-GS Telemetry', note: 'Good peer morale and stable welfare support.' },
+      assessment_responses: { score: 48, available: false, source: 'Pending Self-Assessment', note: 'Soldier self-assessment questionnaire pending completion.' },
     },
   },
   {
@@ -330,26 +273,39 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
     regimental_number: 'AR-2022-8017',
     medical_category: 'SHAPE-1',
     status: 'Field Deployment',
+    hrms_sync_status: 'SYNCHRONIZED',
+    last_sync_timestamp: '2026-09-06T05:20:00Z',
+    data_completeness_pct: 100,
+    missing_telemetry: [],
     params: {
-      leave_patterns: 75,
-      leave_note: 'Leave delayed by 2 months due to operational cordon duties.',
-      overtime: 76,
-      overtime_note: 'Extensive jungle patrol watches in remote hill sectors.',
-      workload_trend: 74,
-      workload_note: 'High-tempo tactical cordon and search operations.',
-      deployment_duration: 72,
-      deployment_note: '8 continuous months in dense terrain remote post.',
-      duty_schedule: 70,
-      duty_note: 'Irregular operational schedules with rapid alerts.',
-      sleep_quality: 74,
-      sleep_note: 'Interrupted sleep cycles with high vigilance latency.',
-      emotional_exhaustion: 68,
-      exhaustion_note: 'High environmental fatigue; relies on squad support.',
-      assessment_responses: 70,
-      assessment_note: 'Evaluation score 72.4/100 (High strain, priority review).',
+      leave_patterns: { score: 75, available: true, source: 'HRMS Leave Portal', note: 'Leave delayed by 2 months due to operational cordon duties.' },
+      overtime: { score: 76, available: true, source: 'Field Operations Roster', note: 'Extensive jungle patrol watches in remote hill sectors.' },
+      workload_trend: { score: 74, available: true, source: 'Command Operations Log', note: 'High-tempo tactical cordon and search operations.' },
+      deployment_duration: { score: 72, available: true, source: 'Service Dossier Database', note: '8 continuous months in dense terrain remote post.' },
+      duty_schedule: { score: 70, available: true, source: 'Battalion Roster', note: 'Irregular operational schedules with rapid alerts.' },
+      sleep_quality: { score: 74, available: true, source: 'Biometric Wearable Telemetry', note: 'Interrupted sleep cycles with high vigilance latency.' },
+      emotional_exhaustion: { score: 68, available: true, source: 'Clinical MBI-GS Telemetry', note: 'High environmental fatigue; relies on squad support.' },
+      assessment_responses: { score: 70, available: true, source: 'AI Psychological Twin Assessment', note: 'Evaluation score 72.4/100 (High strain, priority review).' },
     },
   },
 ];
+
+const parseParam = (raw: any, fallbackScore: number, fallbackNote: string, defaultSource: string): ParamTelemetryDetail => {
+  if (raw && typeof raw === 'object') {
+    return {
+      score: typeof raw.score === 'number' ? raw.score : fallbackScore,
+      available: raw.available !== false,
+      source: raw.source || defaultSource,
+      note: raw.note || fallbackNote,
+    };
+  }
+  return {
+    score: typeof raw === 'number' ? raw : fallbackScore,
+    available: true,
+    source: defaultSource,
+    note: fallbackNote,
+  };
+};
 
 interface FactorItem {
   id: string;
@@ -397,7 +353,7 @@ export const WelfareDashboard: React.FC = () => {
       const res = await dashboardService.getWelfareDashboard();
       setData(res);
     } catch (err) {
-      console.error('Failed to load live welfare data:', err);
+      console.error('Failed to load live welfare data from backend HRMS API:', err);
     } finally {
       setIsRefreshing(false);
     }
@@ -417,23 +373,57 @@ export const WelfareDashboard: React.FC = () => {
     setTimeout(() => setActionAlert(null), 4000);
   };
 
+  // Synchronized database personnel list
+  const personnelRoster: PersonnelBurnoutProfile[] = useMemo(() => {
+    if (data?.assigned_personnel && Array.isArray(data.assigned_personnel) && data.assigned_personnel.length > 0) {
+      return data.assigned_personnel.map((p) => ({
+        ...p,
+        params: p.params || {
+          leave_patterns: { score: 50, available: true, source: 'HRMS Leave Portal', note: 'Standard roster' },
+          overtime: { score: 50, available: true, source: 'HRMS Watch Roster', note: 'Standard shift' },
+          workload_trend: { score: 50, available: true, source: 'Command Operations Log', note: 'Nominal workload' },
+          deployment_duration: { score: 40, available: true, source: 'Service Dossier Database', note: 'Active deployment' },
+          duty_schedule: { score: 50, available: true, source: 'Battalion Roster', note: 'Standard rotation' },
+          sleep_quality: { score: p.sleep_hours ? Math.max(10, Math.round(100 - p.sleep_hours * 10)) : 50, available: true, source: 'Biometric Wearable Telemetry', note: `${p.sleep_hours || 6}h sleep recorded` },
+          emotional_exhaustion: { score: p.stress_score || 50, available: true, source: 'Clinical MBI-GS Telemetry', note: 'Telemetry index' },
+          assessment_responses: { score: p.stress_score ? Math.round(p.stress_score * 0.9) : 50, available: true, source: 'AI Twin Self-Assessment', note: 'Self-assessment score' },
+        }
+      }));
+    }
+    return ALL_PERSONNEL;
+  }, [data]);
+
   const selectedPersonnel = useMemo(() => {
-    return ALL_PERSONNEL.find((p) => p.uid === selectedPersonnelUid) || ALL_PERSONNEL[0];
-  }, [selectedPersonnelUid]);
+    return personnelRoster.find((p) => p.uid === selectedPersonnelUid) || personnelRoster[0] || ALL_PERSONNEL[0];
+  }, [selectedPersonnelUid, personnelRoster]);
+
+  // Parse structured 8 parameters
+  const resolvedParams = useMemo(() => {
+    const raw = selectedPersonnel.params;
+    return {
+      leave_patterns: parseParam(raw.leave_patterns, 50, 'Leave patterns active', 'HRMS Leave Portal'),
+      overtime: parseParam(raw.overtime, 50, 'Overtime watch active', 'HRMS Watch Roster'),
+      workload_trend: parseParam(raw.workload_trend, 50, 'Workload slope', 'Command Operations Log'),
+      deployment_duration: parseParam(raw.deployment_duration, 40, 'Deployment duration', 'Service Dossier Database'),
+      duty_schedule: parseParam(raw.duty_schedule, 50, 'Duty schedule rotation', 'Battalion Roster'),
+      sleep_quality: parseParam(raw.sleep_quality, 50, 'Sleep quality telemetry', 'Biometric Wearable Telemetry'),
+      emotional_exhaustion: parseParam(raw.emotional_exhaustion, 50, 'Emotional exhaustion telemetry', 'Clinical MBI-GS Telemetry'),
+      assessment_responses: parseParam(raw.assessment_responses, 50, 'Assessment response telemetry', 'AI Twin Self-Assessment'),
+    };
+  }, [selectedPersonnel]);
 
   const currentParamValues = useMemo(() => {
-    const base = selectedPersonnel.params;
     return {
-      leave_patterns: customParams['leave_patterns'] ?? base.leave_patterns,
-      overtime: customParams['overtime'] ?? base.overtime,
-      workload_trend: customParams['workload_trend'] ?? base.workload_trend,
-      deployment_duration: customParams['deployment_duration'] ?? base.deployment_duration,
-      duty_schedule: customParams['duty_schedule'] ?? base.duty_schedule,
-      sleep_quality: customParams['sleep_quality'] ?? base.sleep_quality,
-      emotional_exhaustion: customParams['emotional_exhaustion'] ?? base.emotional_exhaustion,
-      assessment_responses: customParams['assessment_responses'] ?? base.assessment_responses,
+      leave_patterns: customParams['leave_patterns'] ?? resolvedParams.leave_patterns.score,
+      overtime: customParams['overtime'] ?? resolvedParams.overtime.score,
+      workload_trend: customParams['workload_trend'] ?? resolvedParams.workload_trend.score,
+      deployment_duration: customParams['deployment_duration'] ?? resolvedParams.deployment_duration.score,
+      duty_schedule: customParams['duty_schedule'] ?? resolvedParams.duty_schedule.score,
+      sleep_quality: customParams['sleep_quality'] ?? resolvedParams.sleep_quality.score,
+      emotional_exhaustion: customParams['emotional_exhaustion'] ?? resolvedParams.emotional_exhaustion.score,
+      assessment_responses: customParams['assessment_responses'] ?? resolvedParams.assessment_responses.score,
     };
-  }, [selectedPersonnel, customParams]);
+  }, [resolvedParams, customParams]);
 
   const calculatedBurnout = useMemo(() => {
     const p = currentParamValues;
@@ -480,8 +470,18 @@ export const WelfareDashboard: React.FC = () => {
     };
   }, [currentParamValues]);
 
+  const missingParams = useMemo(() => {
+    const missingList: string[] = [];
+    Object.entries(resolvedParams).forEach(([k, v]) => {
+      if (!v.available) {
+        missingList.push(k.replace(/_/g, ' ').toUpperCase());
+      }
+    });
+    return missingList;
+  }, [resolvedParams]);
+
   const filteredPersonnel = useMemo(() => {
-    return ALL_PERSONNEL.filter((p) => {
+    return personnelRoster.filter((p) => {
       const q = searchQuery.toLowerCase().trim();
       const matchesSearch =
         !q ||
@@ -496,15 +496,24 @@ export const WelfareDashboard: React.FC = () => {
 
       if (selectedRiskFilter === 'ALL') return true;
 
+      const pLeave = typeof p.params.leave_patterns === 'object' ? p.params.leave_patterns.score : p.params.leave_patterns;
+      const pOver = typeof p.params.overtime === 'object' ? p.params.overtime.score : p.params.overtime;
+      const pWork = typeof p.params.workload_trend === 'object' ? p.params.workload_trend.score : p.params.workload_trend;
+      const pDep = typeof p.params.deployment_duration === 'object' ? p.params.deployment_duration.score : p.params.deployment_duration;
+      const pDuty = typeof p.params.duty_schedule === 'object' ? p.params.duty_schedule.score : p.params.duty_schedule;
+      const pSleep = typeof p.params.sleep_quality === 'object' ? p.params.sleep_quality.score : p.params.sleep_quality;
+      const pExh = typeof p.params.emotional_exhaustion === 'object' ? p.params.emotional_exhaustion.score : p.params.emotional_exhaustion;
+      const pAss = typeof p.params.assessment_responses === 'object' ? p.params.assessment_responses.score : p.params.assessment_responses;
+
       const baseScore =
-        0.12 * p.params.leave_patterns +
-        0.14 * p.params.overtime +
-        0.13 * p.params.workload_trend +
-        0.10 * p.params.deployment_duration +
-        0.13 * p.params.duty_schedule +
-        0.15 * p.params.sleep_quality +
-        0.12 * p.params.emotional_exhaustion +
-        0.11 * p.params.assessment_responses;
+        0.12 * (pLeave || 50) +
+        0.14 * (pOver || 50) +
+        0.13 * (pWork || 50) +
+        0.10 * (pDep || 40) +
+        0.13 * (pDuty || 50) +
+        0.15 * (pSleep || 50) +
+        0.12 * (pExh || 50) +
+        0.11 * (pAss || 50);
 
       if (selectedRiskFilter === 'CRITICAL') return baseScore >= 80;
       if (selectedRiskFilter === 'HIGH') return baseScore >= 70 && baseScore < 80;
@@ -513,7 +522,7 @@ export const WelfareDashboard: React.FC = () => {
 
       return true;
     });
-  }, [searchQuery, selectedRiskFilter]);
+  }, [searchQuery, selectedRiskFilter, personnelRoster]);
 
   const resetSliders = () => {
     setCustomParams({});
@@ -926,16 +935,104 @@ export const WelfareDashboard: React.FC = () => {
     },
   ];
 
-  const paramDefinitions = [
-    { key: 'leave_patterns', name: '1. Leave patterns', weight: 0.12, weightLabel: '12%', note: selectedPersonnel.params.leave_note, color: 'text-amber-400', bar: 'bg-amber-500', desc: 'Leave denial frequency, furlough deficits & emergency leave queue' },
-    { key: 'overtime', name: '2. Overtime', weight: 0.14, weightLabel: '14%', note: selectedPersonnel.params.overtime_note, color: 'text-rose-400', bar: 'bg-rose-500', desc: 'Duty hours beyond standard watch cycles & double-shift load' },
-    { key: 'workload_trend', name: '3. Workload trend', weight: 0.13, weightLabel: '13%', note: selectedPersonnel.params.workload_note, color: 'text-rose-400', bar: 'bg-rose-500', desc: '14-day and 30-day task volume escalation slope' },
-    { key: 'deployment_duration', name: '4. Deployment duration', weight: 0.10, weightLabel: '10%', note: selectedPersonnel.params.deployment_note, color: 'text-rose-400', bar: 'bg-rose-500', desc: 'Continuous months stationed in hostile or high-altitude stations' },
-    { key: 'duty_schedule', name: '5. Duty schedule', weight: 0.13, weightLabel: '13%', note: selectedPersonnel.params.duty_note, color: 'text-amber-400', bar: 'bg-amber-500', desc: 'Night shift concentration, rotational irregularity & short recovery' },
-    { key: 'sleep_quality', name: '6. Sleep quality', weight: 0.15, weightLabel: '15%', note: selectedPersonnel.params.sleep_note, color: 'text-rose-400', bar: 'bg-rose-500', desc: 'Sleep deficit (<4.5h), nocturnal fragmentation & latency' },
-    { key: 'emotional_exhaustion', name: '7. Emotional exhaustion score', weight: 0.12, weightLabel: '12%', note: selectedPersonnel.params.exhaustion_note, color: 'text-amber-400', bar: 'bg-amber-500', desc: 'Maslach MBI-GS affective depletion & compassion weariness' },
-    { key: 'assessment_responses', name: '8. Assessment responses', weight: 0.11, weightLabel: '11%', note: selectedPersonnel.params.assessment_note, color: 'text-teal-400', bar: 'bg-teal-500', desc: 'Gemini AI multi-domain self-assessment validated psychometrics' },
-  ];
+  const paramDefinitions = useMemo(() => [
+    { 
+      key: 'leave_patterns', 
+      name: '1. Leave patterns', 
+      weight: 0.12, 
+      weightLabel: '12%', 
+      note: resolvedParams.leave_patterns.note, 
+      source: resolvedParams.leave_patterns.source,
+      available: resolvedParams.leave_patterns.available,
+      color: 'text-amber-400', 
+      bar: 'bg-amber-500', 
+      desc: 'Leave denial frequency, furlough deficits & emergency leave queue' 
+    },
+    { 
+      key: 'overtime', 
+      name: '2. Overtime', 
+      weight: 0.14, 
+      weightLabel: '14%', 
+      note: resolvedParams.overtime.note, 
+      source: resolvedParams.overtime.source,
+      available: resolvedParams.overtime.available,
+      color: 'text-rose-400', 
+      bar: 'bg-rose-500', 
+      desc: 'Duty hours beyond standard watch cycles & double-shift load' 
+    },
+    { 
+      key: 'workload_trend', 
+      name: '3. Workload trend', 
+      weight: 0.13, 
+      weightLabel: '13%', 
+      note: resolvedParams.workload_trend.note, 
+      source: resolvedParams.workload_trend.source,
+      available: resolvedParams.workload_trend.available,
+      color: 'text-rose-400', 
+      bar: 'bg-rose-500', 
+      desc: '14-day and 30-day task volume escalation slope' 
+    },
+    { 
+      key: 'deployment_duration', 
+      name: '4. Deployment duration', 
+      weight: 0.10, 
+      weightLabel: '10%', 
+      note: resolvedParams.deployment_duration.note, 
+      source: resolvedParams.deployment_duration.source,
+      available: resolvedParams.deployment_duration.available,
+      color: 'text-rose-400', 
+      bar: 'bg-rose-500', 
+      desc: 'Continuous months stationed in hostile or high-altitude stations' 
+    },
+    { 
+      key: 'duty_schedule', 
+      name: '5. Duty schedule', 
+      weight: 0.13, 
+      weightLabel: '13%', 
+      note: resolvedParams.duty_schedule.note, 
+      source: resolvedParams.duty_schedule.source,
+      available: resolvedParams.duty_schedule.available,
+      color: 'text-amber-400', 
+      bar: 'bg-amber-500', 
+      desc: 'Night shift concentration, rotational irregularity & short recovery' 
+    },
+    { 
+      key: 'sleep_quality', 
+      name: '6. Sleep quality', 
+      weight: 0.15, 
+      weightLabel: '15%', 
+      note: resolvedParams.sleep_quality.note, 
+      source: resolvedParams.sleep_quality.source,
+      available: resolvedParams.sleep_quality.available,
+      color: 'text-rose-400', 
+      bar: 'bg-rose-500', 
+      desc: 'Sleep deficit (<4.5h), nocturnal fragmentation & latency' 
+    },
+    { 
+      key: 'emotional_exhaustion', 
+      name: '7. Emotional exhaustion score', 
+      weight: 0.12, 
+      weightLabel: '12%', 
+      note: resolvedParams.emotional_exhaustion.note, 
+      source: resolvedParams.emotional_exhaustion.source,
+      available: resolvedParams.emotional_exhaustion.available,
+      color: 'text-amber-400', 
+      bar: 'bg-amber-500', 
+      desc: 'Maslach MBI-GS affective depletion & compassion weariness' 
+    },
+    { 
+      key: 'assessment_responses', 
+      name: '8. Assessment responses', 
+      weight: 0.11, 
+      weightLabel: '11%', 
+      note: resolvedParams.assessment_responses.note, 
+      source: resolvedParams.assessment_responses.source,
+      available: resolvedParams.assessment_responses.available,
+      color: 'text-teal-400', 
+      bar: 'bg-teal-500', 
+      desc: 'Gemini AI multi-domain self-assessment validated psychometrics' 
+    },
+  ], [resolvedParams]);
 
   return (
     <div className="space-y-6">
@@ -1198,6 +1295,17 @@ export const WelfareDashboard: React.FC = () => {
                   <span className="text-xs font-mono text-slate-400">
                     Category: <strong className="text-white">{selectedPersonnel.medical_category}</strong>
                   </span>
+                  {selectedPersonnel.hrms_sync_status === 'PARTIAL_SYNC' ? (
+                    <span className="text-[10px] font-mono font-black text-amber-300 bg-amber-950/90 px-2.5 py-0.5 rounded-full border border-amber-600 flex items-center gap-1.5 animate-pulse">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                      <span>HRMS Sync: PARTIAL SYNC ({selectedPersonnel.data_completeness_pct || 75}%)</span>
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-mono font-black text-emerald-300 bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-700 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                      <span>HRMS Sync: SYNCHRONIZED (100%)</span>
+                    </span>
+                  )}
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white mt-1 flex items-center gap-2">
                   <span>{selectedPersonnel.name}</span>
@@ -1244,6 +1352,24 @@ export const WelfareDashboard: React.FC = () => {
             </div>
           </div>
 
+          {/* Missing Telemetry Notification Alert (if any parameter not available in database) */}
+          {missingParams.length > 0 && (
+            <div className="p-4 rounded-2xl bg-amber-950/70 border border-amber-500/60 flex items-start gap-3.5 text-amber-200 text-xs shadow-lg relative z-10 animate-fade-in">
+              <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5 animate-pulse" />
+              <div>
+                <div className="flex items-center gap-2 font-black text-amber-300">
+                  <span>⚠️ HRMS TELEMETRY NOTICE: PENDING SYNCHRONIZATION</span>
+                  <span className="text-[10px] bg-amber-900/90 text-amber-300 px-2 py-0.5 rounded border border-amber-700">
+                    {missingParams.length} Parameter(s) Unsynced
+                  </span>
+                </div>
+                <p className="mt-1 text-amber-200/90 leading-relaxed font-medium">
+                  Live data for <strong className="text-white underline">{missingParams.join(', ')}</strong> is not yet available in the HRMS database for this personnel. Using baseline unit default values for interactive simulation until telemetry packets synchronize.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Mathematical Weight Breakdown Formula Bar */}
           <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 flex flex-col md:flex-row md:items-center justify-between gap-2 font-mono">
             <div className="flex items-center gap-2">
@@ -1267,7 +1393,9 @@ export const WelfareDashboard: React.FC = () => {
                 <div
                   key={param.key}
                   className={`p-4 rounded-2xl border transition-all space-y-2.5 ${
-                    isModified
+                    !param.available
+                      ? 'bg-slate-800/70 border-amber-500/50 ring-1 ring-amber-500/20'
+                      : isModified
                       ? 'bg-slate-800/90 border-emerald-500/60 ring-1 ring-emerald-500/30 shadow-md'
                       : 'bg-slate-800/60 border-slate-700/80'
                   }`}
@@ -1279,8 +1407,20 @@ export const WelfareDashboard: React.FC = () => {
                     </span>
                   </div>
 
+                  {/* Telemetry Availability & Source Tag */}
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-slate-400 font-medium">Telemetry Strain:</span>
+                    {param.available ? (
+                      <span className="text-[9px] font-mono text-emerald-400 bg-emerald-950/70 border border-emerald-800/80 px-2 py-0.5 rounded-md flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        <span className="truncate max-w-[130px]">{param.source}</span>
+                      </span>
+                    ) : (
+                      <span className="text-[9px] font-mono text-amber-300 bg-amber-950/90 border border-amber-600 px-2 py-0.5 rounded-md flex items-center gap-1 font-bold">
+                        <AlertTriangle className="w-2.5 h-2.5 text-amber-400 shrink-0" />
+                        <span>Data Pending Sync</span>
+                      </span>
+                    )}
+
                     <span className={`text-sm font-mono font-black ${
                       currentVal >= 80 ? 'text-rose-400' : currentVal >= 70 ? 'text-amber-400' : currentVal >= 50 ? 'text-blue-400' : 'text-emerald-400'
                     }`}>
