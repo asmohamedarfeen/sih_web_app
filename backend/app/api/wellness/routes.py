@@ -570,6 +570,64 @@ def evaluate_burnout_prediction(
 
 
 # ==============================================================================
+# 7-PARAMETER PSYCHOLOGICAL DISTRESS PREDICTION PIPELINE
+# ==============================================================================
+
+class PsychologicalDistressPredictionRequest(BaseModel):
+    personnel_uid: Optional[str] = "UID-EMP-013"
+    mood_assessments: float = Field(default=60.0, ge=0.0, le=100.0)
+    anxiety_questions: float = Field(default=65.0, ge=0.0, le=100.0)
+    depression_indicators: float = Field(default=58.0, ge=0.0, le=100.0)
+    sleep_quality: float = Field(default=72.0, ge=0.0, le=100.0)
+    social_isolation: float = Field(default=50.0, ge=0.0, le=100.0)
+    traumatic_exposure: float = Field(default=55.0, ge=0.0, le=100.0)
+    wellness_survey: float = Field(default=62.0, ge=0.0, le=100.0)
+
+
+@router.post("/psychological-distress/evaluate")
+def evaluate_psychological_distress(
+    req: PsychologicalDistressPredictionRequest,
+    current_user: Optional[User] = Depends(get_optional_current_user)
+):
+    """
+    Evaluates multi-variate Psychological Distress Prediction using the 7 clinical & operational parameters:
+    1. Mood assessments (15%)
+    2. Anxiety questions (16%)
+    3. Depression indicators (18%)
+    4. Sleep quality (14%)
+    5. Social isolation (12%)
+    6. Traumatic exposure (13%)
+    7. Wellness survey (12%)
+    """
+    personnel = next((p for p in hrms_service.PERSONNEL_DATABASE if p["uid"] == req.personnel_uid), None)
+    name = personnel["name"] if personnel else (current_user.full_name if current_user else "Subedar Gurpreet Singh")
+    rank = personnel["rank"] if personnel else (current_user.rank if current_user else "Subedar")
+    unit = personnel["unit"] if personnel else (current_user.unit if current_user else "Field Artillery 3rd Bn")
+
+    result = ai_risk_engine.predict_psychological_distress(
+        mood_assessments=req.mood_assessments,
+        anxiety_questions=req.anxiety_questions,
+        depression_indicators=req.depression_indicators,
+        sleep_quality=req.sleep_quality,
+        social_isolation=req.social_isolation,
+        traumatic_exposure=req.traumatic_exposure,
+        wellness_survey=req.wellness_survey
+    )
+
+    result["personnel"] = {
+        "uid": req.personnel_uid,
+        "name": name,
+        "rank": rank,
+        "unit": unit
+    }
+
+    return {
+        "status": "success",
+        "data": result
+    }
+
+
+# ==============================================================================
 # AI-POWERED ADAPTIVE SELF-ASSESSMENT PIPELINE (GEMINI ENGINE)
 # ==============================================================================
 

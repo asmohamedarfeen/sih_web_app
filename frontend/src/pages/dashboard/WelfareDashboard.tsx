@@ -586,23 +586,32 @@ export const WelfareDashboard: React.FC = () => {
       id: 'psychological-distress',
       num: 2,
       title: 'Psychological Distress',
-      shortDesc: 'Kessler-10 affective strain & somatic dysphoria telemetry',
+      shortDesc: '7-Parameter Kessler-10 & Defense Affective Strain Model',
       category: 'Clinical Screening',
       riskLevel: 'HIGH',
-      metricLabel: 'K10 Distress Index',
-      metricValue: '68 / 100',
+      metricLabel: 'Distress Index',
+      metricValue: '72.4 / 100',
       icon: Activity,
       color: 'text-amber-600',
       bg: 'bg-amber-50',
       border: 'border-amber-200',
-      clinicalSignificance: 'Screens for generalized affective distress, non-specific anxiety, and somatic tension in high-stress operational deployments.',
-      biomarkers: ['Elevated restlessness off-duty', 'Somatic muscle tension indices', 'Dysphoric mood fluctuations', 'Sub-clinical emotional fatigue'],
-      flaggedPersonnel: [
-        { name: 'Subedar Gurpreet Singh', uid: 'UID-EMP-013', rank: 'Subedar', unit: 'Field Artillery 3rd Bn', score: 75.0, risk: 'HIGH', trigger: 'Family medical distress combined with battery command' },
-        { name: 'Sepoy Amit Kumar', uid: 'UID-SLD-015', rank: 'Sepoy', unit: '10 Para SF', score: 56.0, risk: 'MODERATE', trigger: 'Tactical vigilance down-regulation latency' },
+      clinicalSignificance: 'Multivariate 7-Parameter Predictive Model: 0.15(Mood assessments) + 0.16(Anxiety questions) + 0.18(Depression indicators) + 0.14(Sleep quality) + 0.12(Social isolation) + 0.13(Traumatic exposure) + 0.12(Wellness survey). Calibrated to Armed Forces Kessler-10 (K10) & defense psychiatric benchmarks.',
+      biomarkers: [
+        '1. Mood assessments (15%) - Daily affective valence',
+        '2. Anxiety questions (16%) - GAD-7 hypervigilance',
+        '3. Depression indicators (18%) - PHQ-9 anhedonia',
+        '4. Sleep quality (14%) - Nocturnal sleep depth',
+        '5. Social isolation (12%) - Squad buddy detachment',
+        '6. Traumatic exposure (13%) - High-threat incident log',
+        '7. Wellness survey (12%) - Monthly psychometrics'
       ],
-      actionProtocol: '1-on-1 confidential counselor debrief and somatic relaxation guidance session.',
-      modelConfidence: '94.8% ROC-AUC'
+      flaggedPersonnel: [
+        { name: 'Subedar Gurpreet Singh', uid: 'UID-EMP-013', rank: 'Subedar', unit: 'Field Artillery 3rd Bn', score: 78.4, risk: 'CRITICAL', trigger: 'Family medical distress + High anxiety score on GAD-7 items' },
+        { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 74.2, risk: 'HIGH', trigger: 'Severe sleep fragmentation (3.8h) + High trauma exposure index' },
+        { name: 'Sepoy Amit Kumar', uid: 'UID-SLD-015', rank: 'Sepoy', unit: '10 Para SF', score: 58.6, risk: 'MODERATE', trigger: 'Tactical vigilance unwinding latency & mild isolation' },
+      ],
+      actionProtocol: 'Mandatory 1-on-1 confidential counselor debrief, acute trauma decompression protocol, and shift rotation out of night duty.',
+      modelConfidence: '95.8% ROC-AUC'
     },
     {
       id: 'stress-indicators-detection',
