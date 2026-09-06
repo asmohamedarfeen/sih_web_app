@@ -384,9 +384,9 @@ export const WelfareDashboard: React.FC = () => {
           workload_trend: { score: 50, available: true, source: 'Command Operations Log', note: 'Nominal workload' },
           deployment_duration: { score: 40, available: true, source: 'Service Dossier Database', note: 'Active deployment' },
           duty_schedule: { score: 50, available: true, source: 'Battalion Roster', note: 'Standard rotation' },
-          sleep_quality: { score: p.sleep_hours ? Math.max(10, Math.round(100 - p.sleep_hours * 10)) : 50, available: true, source: 'Biometric Wearable Telemetry', note: `${p.sleep_hours || 6}h sleep recorded` },
+          sleep_quality: { score: p.sleep_hours ? Math.max(10, Math.round(100 - p.sleep_hours * 10)) : 50, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: `Logged via Soldier Mobile App (${p.sleep_hours || 6}h sleep recorded)` },
           emotional_exhaustion: { score: p.stress_score || 50, available: true, source: 'Clinical MBI-GS Telemetry', note: 'Telemetry index' },
-          assessment_responses: { score: p.stress_score ? Math.round(p.stress_score * 0.9) : 50, available: true, source: 'AI Twin Self-Assessment', note: 'Self-assessment score' },
+          assessment_responses: { score: p.stress_score ? Math.round(p.stress_score * 0.9) : 50, available: true, source: 'Soldier Mobile App (Burnout Questions)', note: 'Calculated strictly from mobile app burnout domain questions' },
         }
       }));
     }
@@ -406,9 +406,9 @@ export const WelfareDashboard: React.FC = () => {
       workload_trend: parseParam(raw.workload_trend, 50, 'Workload slope', 'Command Operations Log'),
       deployment_duration: parseParam(raw.deployment_duration, 40, 'Deployment duration', 'Service Dossier Database'),
       duty_schedule: parseParam(raw.duty_schedule, 50, 'Duty schedule rotation', 'Battalion Roster'),
-      sleep_quality: parseParam(raw.sleep_quality, 50, 'Sleep quality telemetry', 'Biometric Wearable Telemetry'),
+      sleep_quality: parseParam(raw.sleep_quality, 50, 'Sleep quality telemetry', 'Soldier Mobile App (Sleep Telemetry)'),
       emotional_exhaustion: parseParam(raw.emotional_exhaustion, 50, 'Emotional exhaustion telemetry', 'Clinical MBI-GS Telemetry'),
-      assessment_responses: parseParam(raw.assessment_responses, 50, 'Assessment response telemetry', 'AI Twin Self-Assessment'),
+      assessment_responses: parseParam(raw.assessment_responses, 50, 'Assessment response telemetry', 'Soldier Mobile App (Burnout Questions)'),
     };
   }, [selectedPersonnel]);
 
@@ -1006,7 +1006,7 @@ export const WelfareDashboard: React.FC = () => {
       available: resolvedParams.sleep_quality.available,
       color: 'text-rose-400', 
       bar: 'bg-rose-500', 
-      desc: 'Sleep deficit (<4.5h), nocturnal fragmentation & latency' 
+      desc: 'Sleep hours & restorative depth logged via Soldier Mobile Terminal' 
     },
     { 
       key: 'emotional_exhaustion', 
@@ -1030,7 +1030,7 @@ export const WelfareDashboard: React.FC = () => {
       available: resolvedParams.assessment_responses.available,
       color: 'text-teal-400', 
       bar: 'bg-teal-500', 
-      desc: 'Gemini AI multi-domain self-assessment validated psychometrics' 
+      desc: 'Psychometric strain score calculated exclusively from Burnout domain questions in Soldier Mobile App' 
     },
   ], [resolvedParams]);
 
@@ -1410,9 +1410,13 @@ export const WelfareDashboard: React.FC = () => {
                   {/* Telemetry Availability & Source Tag */}
                   <div className="flex items-center justify-between">
                     {param.available ? (
-                      <span className="text-[9px] font-mono text-emerald-400 bg-emerald-950/70 border border-emerald-800/80 px-2 py-0.5 rounded-md flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                        <span className="truncate max-w-[130px]">{param.source}</span>
+                      <span className={`text-[9px] font-mono px-2 py-0.5 rounded-md flex items-center gap-1 border ${
+                        param.source?.includes('Mobile')
+                          ? 'text-cyan-300 bg-cyan-950/80 border-cyan-700/80'
+                          : 'text-emerald-400 bg-emerald-950/70 border-emerald-800/80'
+                      }`}>
+                        <span>{param.source?.includes('Mobile') ? '📱' : '✅'}</span>
+                        <span className="truncate max-w-[135px] font-semibold">{param.source}</span>
                       </span>
                     ) : (
                       <span className="text-[9px] font-mono text-amber-300 bg-amber-950/90 border border-amber-600 px-2 py-0.5 rounded-md flex items-center gap-1 font-bold">

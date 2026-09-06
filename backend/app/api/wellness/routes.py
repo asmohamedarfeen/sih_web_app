@@ -135,6 +135,24 @@ def submit_assessment(
     db.commit()
     db.refresh(assessment)
 
+    # Dynamically update the soldier's sleep_quality telemetry in PERSONNEL_DATABASE
+    target_personnel = next((p for p in hrms_service.PERSONNEL_DATABASE if p["uid"] == req.personnel_uid), None)
+    if target_personnel and "params" in target_personnel:
+        sleep_strain = max(10, min(95, round(100 - (req.sleep_hours * 10))))
+        target_personnel["sleep_hours"] = req.sleep_hours
+        target_personnel["fatigue_level"] = req.fatigue_level
+        target_personnel["params"]["sleep_quality"] = {
+            "score": sleep_strain,
+            "available": True,
+            "source": "Soldier Mobile App (Sleep Telemetry)",
+            "note": f"Logged via Soldier Mobile App ({req.sleep_hours}h sleep recorded, fatigue level {req.fatigue_level}/10)."
+        }
+        if "sleep_quality" in target_personnel.get("missing_telemetry", []):
+            target_personnel["missing_telemetry"].remove("sleep_quality")
+            target_personnel["data_completeness_pct"] = int((8 - len(target_personnel["missing_telemetry"])) / 8 * 100)
+            if len(target_personnel["missing_telemetry"]) == 0:
+                target_personnel["hrms_sync_status"] = "SYNCHRONIZED"
+
     # Compute AI Risk
     evaluation = ai_risk_engine.evaluate_risk(
         sleep_hours=req.sleep_hours,
@@ -204,6 +222,24 @@ def batch_sync_assessments(
         db.add(assessment)
         db.commit()
         db.refresh(assessment)
+
+        # Update telemetry in PERSONNEL_DATABASE
+        if personnel and "params" in personnel:
+            sleep_strain = max(10, min(95, round(100 - (item.sleep_hours * 10))))
+            personnel["sleep_hours"] = item.sleep_hours
+            personnel["fatigue_level"] = item.fatigue_level
+            personnel["params"]["sleep_quality"] = {
+                "score": sleep_strain,
+                "available": True,
+                "source": "Soldier Mobile App (Sleep Telemetry)",
+                "note": f"Logged via Soldier Mobile App offline sync ({item.sleep_hours}h sleep recorded)."
+            }
+            if "sleep_quality" in personnel.get("missing_telemetry", []):
+                personnel["missing_telemetry"].remove("sleep_quality")
+                personnel["data_completeness_pct"] = int((8 - len(personnel["missing_telemetry"])) / 8 * 100)
+                if len(personnel["missing_telemetry"]) == 0:
+                    personnel["hrms_sync_status"] = "SYNCHRONIZED"
+
         synced_ids.append({
             "client_id": item.client_id,
             "server_id": assessment.id,
@@ -642,6 +678,25 @@ def submit_self_assessment(
         SELF_ASSESSMENT_REGISTRY[existing_idx] = record
     else:
         SELF_ASSESSMENT_REGISTRY.insert(0, record)
+
+    # Dynamically update the soldier's assessment_responses telemetry strictly with burnout question results
+    burnout_domain = next((c for c in record.get("categorical_breakdown", []) if c["domain_id"] == "burnout"), None)
+    burnout_strain = round(100.0 - (burnout_domain["score"] if burnout_domain else 50.0), 1)
+    burnout_level = burnout_domain.get("risk_level", "MODERATE") if burnout_domain else "MODERATE"
+
+    target_personnel = next((p for p in hrms_service.PERSONNEL_DATABASE if p["uid"] == req.personnel_uid), None)
+    if target_personnel and "params" in target_personnel:
+        target_personnel["params"]["assessment_responses"] = {
+            "score": burnout_strain,
+            "available": True,
+            "source": "Soldier Mobile App (Burnout Questions)",
+            "note": f"Live mobile assessment: Burnout questions strain {burnout_strain}% ({burnout_level} hazard)."
+        }
+        if "assessment_responses" in target_personnel.get("missing_telemetry", []):
+            target_personnel["missing_telemetry"].remove("assessment_responses")
+            target_personnel["data_completeness_pct"] = int((8 - len(target_personnel["missing_telemetry"])) / 8 * 100)
+            if len(target_personnel["missing_telemetry"]) == 0:
+                target_personnel["hrms_sync_status"] = "SYNCHRONIZED"
 
     return {
         "status": "success",

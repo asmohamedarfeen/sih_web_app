@@ -49,9 +49,9 @@ class HRMSClient:
                 "workload_trend": {"score": 88, "available": True, "source": "Command Operations Log", "note": "High task escalation slope with double perimeter watch shifts."},
                 "deployment_duration": {"score": 95, "available": True, "source": "Service Dossier Database", "note": "14 continuous months stationed in extreme sub-zero forward sector."},
                 "duty_schedule": {"score": 84, "available": True, "source": "Battalion Roster", "note": "8 consecutive night vigils with irregular sleep window rotation."},
-                "sleep_quality": {"score": 92, "available": True, "source": "Biometric Wearable Telemetry", "note": "Severe nocturnal sleep deficit (<3.8h recorded on biometric tracker)."},
+                "sleep_quality": {"score": 92, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "Logged via Soldier Mobile App (3.8h sleep recorded, severe sleep deficit)."},
                 "emotional_exhaustion": {"score": 82, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "Maslach affective depletion index elevated; high somatic weariness."},
-                "assessment_responses": {"score": 76, "available": True, "source": "AI Psychological Twin Assessment", "note": "AI self-assessment flagged cognitive fatigue and high vigilance strain."}
+                "assessment_responses": {"score": 76, "available": True, "source": "Soldier Mobile App (Burnout Questions)", "note": "Psychometric strain 76% calculated strictly from mobile app burnout domain questions."}
             }
         },
         {
@@ -86,9 +86,9 @@ class HRMSClient:
                 "workload_trend": {"score": 84, "available": True, "source": "Field Operations Log", "note": "Field artillery exercise coordination under condensed timeline."},
                 "deployment_duration": {"score": 75, "available": True, "source": "Service Dossier Database", "note": "8 continuous months in active artillery forward battery line."},
                 "duty_schedule": {"score": 78, "available": True, "source": "Battalion Roster", "note": "Split shifts with early dawn drill inspections and night logistics."},
-                "sleep_quality": {"score": 82, "available": True, "source": "Biometric Wearable Telemetry", "note": "High latency sleep fragmentation; restless off-duty periods."},
+                "sleep_quality": {"score": 82, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "Logged via Soldier Mobile App (4.2h sleep, high sleep latency fragmentation)."},
                 "emotional_exhaustion": {"score": 80, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "Cumulative command burden combined with caregiver strain."},
-                "assessment_responses": {"score": 74, "available": True, "source": "AI Psychological Twin Assessment", "note": "Distress score 75/100 on Kessler-10 AI behavioral evaluation."}
+                "assessment_responses": {"score": 74, "available": True, "source": "Soldier Mobile App (Burnout Questions)", "note": "Mobile app burnout questions result: 74% task weariness & emotional depletion."}
             }
         },
         {
@@ -123,9 +123,9 @@ class HRMSClient:
                 "workload_trend": {"score": 72, "available": True, "source": "Signals Traffic Engine", "note": "Increased signal traffic and perimeter radar maintenance calls."},
                 "deployment_duration": {"score": 60, "available": True, "source": "Service Dossier Database", "note": "6 months in border telemetry outpost station."},
                 "duty_schedule": {"score": 85, "available": True, "source": "Shift Telemetry", "note": "Continuous rotational night console shifts causing circadian shift."},
-                "sleep_quality": {"score": 75, "available": True, "source": "Biometric Wearable Telemetry", "note": "Blue light screen latency and disturbed deep sleep cycles."},
+                "sleep_quality": {"score": 75, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "Logged via Soldier Mobile App (5.0h sleep, circadian shift disturbance)."},
                 "emotional_exhaustion": {"score": 68, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "Moderate sensory overload and isolation weariness."},
-                "assessment_responses": {"score": 62, "available": True, "source": "AI Psychological Twin Assessment", "note": "Responses reflect high mental focus requirements with mild strain."}
+                "assessment_responses": {"score": 62, "available": True, "source": "Soldier Mobile App (Burnout Questions)", "note": "Mobile app burnout questions result: 62% operational cynicism & mental weariness."}
             }
         },
         {
@@ -160,9 +160,9 @@ class HRMSClient:
                 "workload_trend": {"score": 70, "available": True, "source": "Operations Command Log", "note": "Physical training and live field deployment drills."},
                 "deployment_duration": {"score": 65, "available": True, "source": "Service Dossier Database", "note": "7 months forward stationing with high operational focus."},
                 "duty_schedule": {"score": 66, "available": True, "source": "Patrol Schedule Matrix", "note": "Variable tactical patrol timings with standard debrief recovery."},
-                "sleep_quality": {"score": 58, "available": True, "source": "Biometric Wearable Telemetry", "note": "Moderate sleep variability; high cardiovascular bounce-back."},
+                "sleep_quality": {"score": 58, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "Logged via Soldier Mobile App (5.5h sleep, moderate variability)."},
                 "emotional_exhaustion": {"score": 62, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "Tactical vigilance maintenance; strong squad peer camaraderie."},
-                "assessment_responses": {"score": 64, "available": True, "source": "Gemini AI Self-Assessment", "note": "Valid psychometric self-assessment score 64.2/100 (Moderate)."}
+                "assessment_responses": {"score": 64, "available": True, "source": "Soldier Mobile App (Burnout Questions)", "note": "Mobile app burnout questions result: 64% task fatigue (Moderate)."}
             }
         },
         {
@@ -197,9 +197,9 @@ class HRMSClient:
                 "workload_trend": {"score": 76, "available": True, "source": "Operations Command Log", "note": "High leadership tempo and operational briefing load."},
                 "deployment_duration": {"score": 70, "available": True, "source": "Service Dossier Database", "note": "9 months forward command post deployment."},
                 "duty_schedule": {"score": 74, "available": True, "source": "Patrol Schedule Matrix", "note": "Irregular operational call-outs during recovery intervals."},
-                "sleep_quality": {"score": 78, "available": True, "source": "Biometric Wearable Telemetry", "note": "Average 4.9 hours sleep recorded per night; elevated cortisol."},
+                "sleep_quality": {"score": 78, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "Logged via Soldier Mobile App (4.5h sleep average recorded)."},
                 "emotional_exhaustion": {"score": 75, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "High responsibility load; resilience score remains robust."},
-                "assessment_responses": {"score": 72, "available": True, "source": "AI Psychological Twin Assessment", "note": "Assessment reflects sustained command vigilance with early strain."}
+                "assessment_responses": {"score": 72, "available": True, "source": "Soldier Mobile App (Burnout Questions)", "note": "Mobile app burnout questions result: 72% command vigilance fatigue."}
             }
         },
         {
@@ -234,9 +234,9 @@ class HRMSClient:
                 "workload_trend": {"score": 32, "available": True, "source": "Operations Command Log", "note": "Balanced air traffic management and simulation schedules."},
                 "deployment_duration": {"score": 20, "available": True, "source": "Service Dossier Database", "note": "3 months in peace-station technical command hub."},
                 "duty_schedule": {"score": 28, "available": True, "source": "Roster Matrix", "note": "Consistent daylight and evening rotation with full rest days."},
-                "sleep_quality": {"score": 24, "available": True, "source": "Biometric Wearable Telemetry", "note": "Optimal restorative sleep (7.4h average, >90 min deep sleep)."},
+                "sleep_quality": {"score": 24, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "Logged via Soldier Mobile App (7.5h restorative sleep recorded)."},
                 "emotional_exhaustion": {"score": 30, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "High job satisfaction, excellent morale, low somatic stress."},
-                "assessment_responses": {"score": 28, "available": True, "source": "AI Psychological Twin Assessment", "note": "Assessment score 28.4/100 indicating prime mental wellness."}
+                "assessment_responses": {"score": 28, "available": True, "source": "Soldier Mobile App (Burnout Questions)", "note": "Mobile app burnout questions result: 28% strain (Nominal optimal state)."}
             }
         },
         {
@@ -271,9 +271,9 @@ class HRMSClient:
                 "workload_trend": {"score": 54, "available": True, "source": "Operations Log", "note": "Standard patrol routines with regular acclimatization stops."},
                 "deployment_duration": {"score": 60, "available": True, "source": "Service Dossier Database", "note": "5 months at forward border outpost."},
                 "duty_schedule": {"score": 52, "available": True, "source": "Roster Matrix", "note": "Rotational 8-hour patrol watches with squad partner."},
-                "sleep_quality": {"score": 50, "available": True, "source": "Biometric Wearable Telemetry", "note": "Moderate sleep quality with mild altitude-related awakening."},
+                "sleep_quality": {"score": 50, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "Logged via Soldier Mobile App (6.8h sleep, mountain acclimatization)."},
                 "emotional_exhaustion": {"score": 48, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "Good buddy-system support and recreational morale."},
-                "assessment_responses": {"score": 52, "available": True, "source": "AI Psychological Twin Assessment", "note": "Self-assessment indicates balanced coping in extreme terrain."}
+                "assessment_responses": {"score": 52, "available": True, "source": "Soldier Mobile App (Burnout Questions)", "note": "Mobile app burnout questions result: 52% strain in high-altitude terrain."}
             }
         },
         {
@@ -308,9 +308,9 @@ class HRMSClient:
                 "workload_trend": {"score": 48, "available": True, "source": "Operations Log", "note": "Standard security screening shifts with rotations."},
                 "deployment_duration": {"score": 40, "available": True, "source": "Service Dossier Database", "note": "4 months at metropolitan airport unit."},
                 "duty_schedule": {"score": 55, "available": True, "source": "Shift Roster", "note": "Rotational morning/evening shifts with standard breaks."},
-                "sleep_quality": {"score": 46, "available": False, "source": "Pending Wearable Sync", "note": "Wearable biometric sleep tracker not synced in last 48 hours."},
+                "sleep_quality": {"score": 46, "available": False, "source": "Mobile App (Sleep Log Pending)", "note": "Soldier has not yet logged sleep hours on the mobile application in last 48h."},
                 "emotional_exhaustion": {"score": 44, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "Good peer morale and stable welfare support."},
-                "assessment_responses": {"score": 48, "available": False, "source": "Pending Self-Assessment", "note": "Soldier self-assessment questionnaire pending completion."}
+                "assessment_responses": {"score": 48, "available": False, "source": "Mobile App (Burnout Test Pending)", "note": "Soldier has not yet taken the psychometric assessment on the mobile application."}
             }
         },
         {
@@ -345,9 +345,9 @@ class HRMSClient:
                 "workload_trend": {"score": 74, "available": True, "source": "Command Operations Log", "note": "High-tempo tactical cordon and search operations."},
                 "deployment_duration": {"score": 72, "available": True, "source": "Service Dossier Database", "note": "8 continuous months in dense terrain remote post."},
                 "duty_schedule": {"score": 70, "available": True, "source": "Battalion Roster", "note": "Irregular operational schedules with rapid alerts."},
-                "sleep_quality": {"score": 74, "available": True, "source": "Biometric Wearable Telemetry", "note": "Interrupted sleep cycles with high vigilance latency."},
+                "sleep_quality": {"score": 74, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "Logged via Soldier Mobile App (4.8h sleep, vigilance latency)."},
                 "emotional_exhaustion": {"score": 68, "available": True, "source": "Clinical MBI-GS Telemetry", "note": "High environmental fatigue; relies on squad support."},
-                "assessment_responses": {"score": 70, "available": True, "source": "AI Psychological Twin Assessment", "note": "Evaluation score 72.4/100 (High strain, priority review)."}
+                "assessment_responses": {"score": 70, "available": True, "source": "Soldier Mobile App (Burnout Questions)", "note": "Mobile app burnout questions result: 70% terrain fatigue."}
             }
         }
     ]
