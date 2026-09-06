@@ -473,6 +473,67 @@ def submit_screen_time(
 
 
 # ==============================================================================
+# 8-PARAMETER DEFENSE BURNOUT PREDICTION PIPELINE
+# ==============================================================================
+
+class BurnoutPredictionRequest(BaseModel):
+    personnel_uid: Optional[str] = "UID-EMP-012"
+    leave_patterns: float = Field(default=65.0, ge=0.0, le=100.0)
+    overtime: float = Field(default=70.0, ge=0.0, le=100.0)
+    workload_trend: float = Field(default=75.0, ge=0.0, le=100.0)
+    deployment_duration: float = Field(default=80.0, ge=0.0, le=100.0)
+    duty_schedule: float = Field(default=72.0, ge=0.0, le=100.0)
+    sleep_quality: float = Field(default=78.0, ge=0.0, le=100.0)
+    emotional_exhaustion: float = Field(default=76.0, ge=0.0, le=100.0)
+    assessment_responses: float = Field(default=74.0, ge=0.0, le=100.0)
+
+
+@router.post("/burnout-prediction/evaluate")
+def evaluate_burnout_prediction(
+    req: BurnoutPredictionRequest,
+    current_user: Optional[User] = Depends(get_optional_current_user)
+):
+    """
+    Evaluates multi-variate Burnout Prediction using the standardized 8 defense parameters:
+    1. Leave patterns
+    2. Overtime
+    3. Workload trend
+    4. Deployment duration
+    5. Duty schedule
+    6. Sleep quality
+    7. Emotional exhaustion score
+    8. Assessment responses
+    """
+    personnel = next((p for p in hrms_service.PERSONNEL_DATABASE if p["uid"] == req.personnel_uid), None)
+    name = personnel["name"] if personnel else (current_user.full_name if current_user else "Havildar Ramesh Chand")
+    rank = personnel["rank"] if personnel else (current_user.rank if current_user else "Havildar")
+    unit = personnel["unit"] if personnel else (current_user.unit if current_user else "High Altitude Guard")
+
+    result = ai_risk_engine.predict_burnout_from_8_parameters(
+        leave_patterns=req.leave_patterns,
+        overtime=req.overtime,
+        workload_trend=req.workload_trend,
+        deployment_duration=req.deployment_duration,
+        duty_schedule=req.duty_schedule,
+        sleep_quality=req.sleep_quality,
+        emotional_exhaustion=req.emotional_exhaustion,
+        assessment_responses=req.assessment_responses
+    )
+
+    result["personnel"] = {
+        "uid": req.personnel_uid,
+        "name": name,
+        "rank": rank,
+        "unit": unit
+    }
+
+    return {
+        "status": "success",
+        "data": result
+    }
+
+
+# ==============================================================================
 # AI-POWERED ADAPTIVE SELF-ASSESSMENT PIPELINE (GEMINI ENGINE)
 # ==============================================================================
 

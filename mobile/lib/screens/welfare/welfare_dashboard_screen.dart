@@ -592,9 +592,83 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
                   ],
                 ),
               ),
-              const SizedBox(height: 14),
-
-              // Biomarkers List
+              // Special 8-Parameter Suite for Factor #1 Burnout Prediction
+              if (currentFactor['num'] == 1) ...[
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E293B),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFF3B82F6).withOpacity(0.5)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.hub, color: AppColors.accent, size: 16),
+                          SizedBox(width: 6),
+                          Text(
+                            '8-PARAMETER BURNOUT TELEMETRY SUITE',
+                            style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Multivariate predictive model parameters and active strain indicators:',
+                        style: TextStyle(color: Colors.white60, fontSize: 10),
+                      ),
+                      const SizedBox(height: 10),
+                      ...[
+                        {'name': '1. Leave patterns', 'weight': '12%', 'score': '78%', 'desc': 'Leave delays & emergency leave queue'},
+                        {'name': '2. Overtime', 'weight': '14%', 'score': '85%', 'desc': 'Excess watch hours & double shifts'},
+                        {'name': '3. Workload trend', 'weight': '13%', 'score': '82%', 'desc': '14-day task volume escalation'},
+                        {'name': '4. Deployment duration', 'weight': '10%', 'score': '90%', 'desc': 'Continuous high-altitude deployment'},
+                        {'name': '5. Duty schedule', 'weight': '13%', 'score': '76%', 'desc': 'Night shifts & irregular rotations'},
+                        {'name': '6. Sleep quality', 'weight': '15%', 'score': '88%', 'desc': 'Restorative deficit & fragmentation'},
+                        {'name': '7. Emotional exhaustion score', 'weight': '12%', 'score': '74%', 'desc': 'MBI-GS emotional weariness'},
+                        {'name': '8. Assessment responses', 'weight': '11%', 'score': '70%', 'desc': 'Gemini AI self-assessment ratings'},
+                      ].map((p) => Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 6,
+                              height: 6,
+                              decoration: const BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                p['name']!,
+                                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                            Text(
+                              'Weight: ${p['weight']}',
+                              style: const TextStyle(color: Colors.white60, fontSize: 10, fontFamily: 'monospace'),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: AppColors.roseLight,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                p['score']!,
+                                style: const TextStyle(color: AppColors.rose, fontSize: 9, fontWeight: FontWeight.w900, fontFamily: 'monospace'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )).toList(),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+              ],
               const Text(
                 'ROOT-CAUSE BIOMARKERS & SIGNALS',
                 style: TextStyle(color: Colors.white60, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5),

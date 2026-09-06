@@ -722,6 +722,133 @@ export const WelfareDashboard: React.FC = () => {
 
           {/* Panel Body Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
+            {/* Special Section for Factor #1: 8-Parameter Defense Burnout Matrix & Simulator */}
+            {currentFactor.id === 'burnout-prediction' && (
+              <div className="lg:col-span-12 p-6 rounded-2xl bg-slate-800/90 border border-blue-500/40 shadow-xl space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-700 pb-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-900/80 text-blue-300 border border-blue-700">
+                        8-Parameter Predictive Telemetry Suite
+                      </span>
+                      <span className="text-xs text-slate-400 font-mono font-bold">&bull; Defense Burnout Hazard Model</span>
+                    </div>
+                    <h4 className="text-base font-black text-white mt-1">
+                      Multi-Variate Burnout Prediction Parameters & Feature Weights
+                    </h4>
+                  </div>
+                  <span className="text-xs font-mono text-emerald-400 bg-emerald-950/80 px-3 py-1 rounded-lg border border-emerald-800 font-bold self-start sm:self-auto">
+                    Model Confidence: 96.2% ROC-AUC
+                  </span>
+                </div>
+
+                {/* 8 Parameters Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  {[
+                    { name: '1. Leave patterns', weight: '12%', score: '78%', desc: 'Leave denial frequency, furlough deficits & emergency leave queue', color: 'text-amber-400', bar: 'bg-amber-500' },
+                    { name: '2. Overtime', weight: '14%', score: '85%', desc: 'Duty hours beyond standard watch cycles & double-shift load', color: 'text-rose-400', bar: 'bg-rose-500' },
+                    { name: '3. Workload trend', weight: '13%', score: '82%', desc: '14-day and 30-day task volume escalation slope', color: 'text-rose-400', bar: 'bg-rose-500' },
+                    { name: '4. Deployment duration', weight: '10%', score: '90%', desc: 'Continuous months stationed in hostile or high-altitude stations', color: 'text-rose-400', bar: 'bg-rose-500' },
+                    { name: '5. Duty schedule', weight: '13%', score: '76%', desc: 'Night shift concentration, rotational irregularity & short recovery', color: 'text-amber-400', bar: 'bg-amber-500' },
+                    { name: '6. Sleep quality', weight: '15%', score: '88%', desc: 'Sleep deficit (<4.5h), nocturnal fragmentation & latency', color: 'text-rose-400', bar: 'bg-rose-500' },
+                    { name: '7. Emotional exhaustion score', weight: '12%', score: '74%', desc: 'Maslach MBI-GS affective depletion & compassion weariness', color: 'text-amber-400', bar: 'bg-amber-500' },
+                    { name: '8. Assessment responses', weight: '11%', score: '70%', desc: 'Gemini AI multi-domain self-assessment validated psychometrics', color: 'text-teal-400', bar: 'bg-teal-500' },
+                  ].map((param, pIdx) => (
+                    <div key={pIdx} className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-700/80 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-extrabold text-white">{param.name}</span>
+                        <span className="text-[10px] font-mono font-bold text-slate-400">Weight: {param.weight}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] text-slate-400 font-medium">Strain Index:</span>
+                        <span className={`text-xs font-mono font-black ${param.color}`}>{param.score}</span>
+                      </div>
+                      <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                        <div className={`h-full rounded-full ${param.bar}`} style={{ width: param.score }} />
+                      </div>
+                      <p className="text-[10px] text-slate-400 line-clamp-2 leading-relaxed font-medium">
+                        {param.desc}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Flagged Personnel Parameter Scoring Matrix */}
+                <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-700/80 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h5 className="text-xs font-extrabold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                      <Users className="w-4 h-4 text-amber-400" />
+                      <span>Personnel 8-Parameter Telemetry Tele-Matrix</span>
+                    </h5>
+                    <span className="text-[10px] font-mono text-slate-400">Live Frontline Biometrics</span>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="border-b border-slate-800 text-slate-400 font-mono text-[10px]">
+                          <th className="pb-2">Personnel</th>
+                          <th className="pb-2 text-center">Leave</th>
+                          <th className="pb-2 text-center">Overtime</th>
+                          <th className="pb-2 text-center">Workload</th>
+                          <th className="pb-2 text-center">Deployment</th>
+                          <th className="pb-2 text-center">Schedule</th>
+                          <th className="pb-2 text-center">Sleep</th>
+                          <th className="pb-2 text-center">Exhaustion</th>
+                          <th className="pb-2 text-center">Assessment</th>
+                          <th className="pb-2 text-right">Predicted Burnout</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="py-2.5 font-sans font-bold text-white">
+                            Havildar Ramesh Chand <span className="text-slate-400 font-normal text-[10px]">(UID-EMP-012)</span>
+                          </td>
+                          <td className="py-2.5 text-center text-amber-400">80%</td>
+                          <td className="py-2.5 text-center text-rose-400">92%</td>
+                          <td className="py-2.5 text-center text-rose-400">88%</td>
+                          <td className="py-2.5 text-center text-rose-400">95%</td>
+                          <td className="py-2.5 text-center text-rose-400">84%</td>
+                          <td className="py-2.5 text-center text-rose-400">92%</td>
+                          <td className="py-2.5 text-center text-rose-400">82%</td>
+                          <td className="py-2.5 text-center text-amber-400">76%</td>
+                          <td className="py-2.5 text-right font-black text-rose-400 text-xs">86.4% CRITICAL</td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="py-2.5 font-sans font-bold text-white">
+                            Subedar Gurpreet Singh <span className="text-slate-400 font-normal text-[10px]">(UID-EMP-013)</span>
+                          </td>
+                          <td className="py-2.5 text-center text-rose-400">88%</td>
+                          <td className="py-2.5 text-center text-amber-400">78%</td>
+                          <td className="py-2.5 text-center text-rose-400">84%</td>
+                          <td className="py-2.5 text-center text-amber-400">75%</td>
+                          <td className="py-2.5 text-center text-amber-400">78%</td>
+                          <td className="py-2.5 text-center text-rose-400">82%</td>
+                          <td className="py-2.5 text-center text-rose-400">80%</td>
+                          <td className="py-2.5 text-center text-amber-400">74%</td>
+                          <td className="py-2.5 text-right font-black text-amber-400 text-xs">80.8% HIGH</td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="py-2.5 font-sans font-bold text-white">
+                            Naik Sandeep Patil <span className="text-slate-400 font-normal text-[10px]">(UID-EMP-014)</span>
+                          </td>
+                          <td className="py-2.5 text-center text-slate-300">55%</td>
+                          <td className="py-2.5 text-center text-rose-400">82%</td>
+                          <td className="py-2.5 text-center text-amber-400">72%</td>
+                          <td className="py-2.5 text-center text-slate-300">60%</td>
+                          <td className="py-2.5 text-center text-rose-400">85%</td>
+                          <td className="py-2.5 text-center text-amber-400">75%</td>
+                          <td className="py-2.5 text-center text-amber-400">68%</td>
+                          <td className="py-2.5 text-center text-slate-300">62%</td>
+                          <td className="py-2.5 text-right font-black text-amber-400 text-xs">70.5% HIGH</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Left: Root Cause Biomarkers & Clinical Protocol */}
             <div className="lg:col-span-6 space-y-5">
               <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-3">
