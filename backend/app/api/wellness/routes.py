@@ -628,6 +628,64 @@ def evaluate_psychological_distress(
 
 
 # ==============================================================================
+# 7-PARAMETER STRESS INDICATORS DETECTION PIPELINE
+# ==============================================================================
+
+class StressIndicatorsPredictionRequest(BaseModel):
+    personnel_uid: Optional[str] = "UID-EMP-012"
+    hrms_data: float = Field(default=65.0, ge=0.0, le=100.0)
+    leave_frequency: float = Field(default=70.0, ge=0.0, le=100.0)
+    workload: float = Field(default=75.0, ge=0.0, le=100.0)
+    missed_assessments: float = Field(default=50.0, ge=0.0, le=100.0)
+    sleep_pattern: float = Field(default=80.0, ge=0.0, le=100.0)
+    biometric_trends: float = Field(default=72.0, ge=0.0, le=100.0)
+    behavioral_changes: float = Field(default=60.0, ge=0.0, le=100.0)
+
+
+@router.post("/stress-indicators/evaluate")
+def evaluate_stress_indicators(
+    req: StressIndicatorsPredictionRequest,
+    current_user: Optional[User] = Depends(get_optional_current_user)
+):
+    """
+    Evaluates multi-variate Stress Indicators Detection using the 7 operational & biometric parameters:
+    1. HRMS data (14%) - HRMS Portal
+    2. Leave frequency (14%) - HRMS Portal
+    3. Workload (15%) - HRMS Portal
+    4. Missed assessments (13%) - Central Database / Backend Web
+    5. Sleep pattern (16%) - Soldier Mobile App
+    6. Biometric trends (15%) - Soldier Mobile App
+    7. Behavioral changes (13%) - Soldier Mobile App & Central DB
+    """
+    personnel = next((p for p in hrms_service.PERSONNEL_DATABASE if p["uid"] == req.personnel_uid), None)
+    name = personnel["name"] if personnel else (current_user.full_name if current_user else "Havildar Ramesh Chand")
+    rank = personnel["rank"] if personnel else (current_user.rank if current_user else "Havildar")
+    unit = personnel["unit"] if personnel else (current_user.unit if current_user else "High Altitude Guard")
+
+    result = ai_risk_engine.predict_stress_indicators(
+        hrms_data=req.hrms_data,
+        leave_frequency=req.leave_frequency,
+        workload=req.workload,
+        missed_assessments=req.missed_assessments,
+        sleep_pattern=req.sleep_pattern,
+        biometric_trends=req.biometric_trends,
+        behavioral_changes=req.behavioral_changes
+    )
+
+    result["personnel"] = {
+        "uid": req.personnel_uid,
+        "name": name,
+        "rank": rank,
+        "unit": unit
+    }
+
+    return {
+        "status": "success",
+        "data": result
+    }
+
+
+# ==============================================================================
 # AI-POWERED ADAPTIVE SELF-ASSESSMENT PIPELINE (GEMINI ENGINE)
 # ==============================================================================
 

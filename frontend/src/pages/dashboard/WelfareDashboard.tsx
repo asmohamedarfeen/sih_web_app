@@ -78,6 +78,15 @@ export interface PersonnelBurnoutProfile {
     traumatic_exposure: any;
     wellness_survey: any;
   };
+  stress_indicators_params?: {
+    hrms_data: any;
+    leave_frequency: any;
+    workload: any;
+    missed_assessments: any;
+    sleep_pattern: any;
+    biometric_trends: any;
+    behavioral_changes: any;
+  };
 }
 
 const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
@@ -113,6 +122,15 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
       traumatic_exposure: { score: 86, available: true, source: 'HRMS Portal (Combat Operations & Incident Dossier)', note: 'Extreme sub-zero vigil and high-threat avalanche sector records in HRMS Dossier.' },
       wellness_survey: { score: 76, available: true, source: 'Central Database (Periodic Psychometric Assessment Archive)', note: 'Periodic comprehensive psychological survey strain retrieved from Database.' },
     },
+    stress_indicators_params: {
+      hrms_data: { score: 88, available: true, source: 'HRMS Portal (Dossier & Stationing History)', note: '14 months continuous deployment in high-altitude extreme sector recorded in HRMS dossier.' },
+      leave_frequency: { score: 82, available: true, source: 'HRMS Portal (Leave Management System)', note: '3 consecutive leave applications deferred due to forward vigil operational readiness.' },
+      workload: { score: 90, available: true, source: 'HRMS Portal (Command Watch Rosters)', note: '48 duty hours logged in past 5 days (64% over standard roster threshold).' },
+      missed_assessments: { score: 40, available: true, source: 'Central Database (Compliance Log)', note: '85% on-time psychometric check-in completion rate logged in central database.' },
+      sleep_pattern: { score: 92, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: '3.8h average sleep recorded with severe circadian irregularity on mobile terminal.' },
+      biometric_trends: { score: 86, available: true, source: 'Soldier Mobile App (Biometric & Sensor Engine)', note: 'Resting Heart Rate elevation +14bpm and suppressed HRV (28ms) indicating autonomic strain.' },
+      behavioral_changes: { score: 80, available: true, source: 'Soldier Mobile App & Central DB (Behavioral Telemetry)', note: 'Increased somatic irritability and peer withdrawal flags logged across app & unit review.' }
+    }
   },
   {
     uid: 'UID-EMP-013',
@@ -146,6 +164,15 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
       traumatic_exposure: { score: 74, available: true, source: 'HRMS Portal (Combat Operations & Incident Dossier)', note: 'Artillery forward battery line counter-fire incident records in HRMS Dossier.' },
       wellness_survey: { score: 78, available: true, source: 'Central Database (Periodic Psychometric Assessment Archive)', note: 'High psychological friction index retrieved from monthly survey database.' },
     },
+    stress_indicators_params: {
+      hrms_data: { score: 80, available: true, source: 'HRMS Portal (Dossier & Stationing History)', note: 'Field artillery command tenure (8 continuous months in active firing line).' },
+      leave_frequency: { score: 88, available: true, source: 'HRMS Portal (Leave Management System)', note: 'Urgent family medical leave application pending approval in HRMS leave system.' },
+      workload: { score: 82, available: true, source: 'HRMS Portal (Command Watch Rosters)', note: 'High tactical artillery logistics coordination and battery shift overruns.' },
+      missed_assessments: { score: 65, available: true, source: 'Central Database (Compliance Log)', note: '3 missed daily check-in pulses during hospital communication intervals.' },
+      sleep_pattern: { score: 82, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: '4.2h sleep duration with frequent nocturnal awakenings recorded on mobile.' },
+      biometric_trends: { score: 78, available: true, source: 'Soldier Mobile App (Biometric & Sensor Engine)', note: 'Elevated sympathetic baseline (RHR +10bpm over baseline average).' },
+      behavioral_changes: { score: 75, available: true, source: 'Soldier Mobile App & Central DB (Behavioral Telemetry)', note: 'Acute caregiver worry and elevated verbal stress noted in welfare check.' }
+    }
   },
   {
     uid: 'UID-EMP-014',
@@ -170,6 +197,24 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
       emotional_exhaustion: { score: 68, available: true, source: 'Clinical MBI-GS Telemetry', note: 'Moderate sensory overload and isolation weariness.' },
       assessment_responses: { score: 62, available: true, source: 'AI Psychological Twin Assessment', note: 'Responses reflect high mental focus requirements with mild strain.' },
     },
+    psychological_distress_params: {
+      mood_assessments: { score: 60, available: true, source: 'Soldier Mobile App (Daily Mood Pulse)', note: 'Sensory fatigue from long console hours; moderate valence.' },
+      anxiety_questions: { score: 65, available: true, source: 'Soldier Mobile App (GAD-7 Anxiety Screening)', note: 'Border vigilance tension and night watch jitter logged via mobile.' },
+      depression_indicators: { score: 54, available: true, source: 'Soldier Mobile App (PHQ-9 Depression Inventory)', note: 'Normal interest markers; mild isolation fatigue.' },
+      sleep_quality: { score: 75, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: 'Circadian shift sleep deficit recorded via mobile telemetry.' },
+      social_isolation: { score: 62, available: true, source: 'Central Database (Barracks Peer Network)', note: 'Technical outpost isolation index from Central PostgreSQL.' },
+      traumatic_exposure: { score: 45, available: true, source: 'HRMS Portal (Combat Operations & Incident Dossier)', note: 'Non-combat signals support assignment records in HRMS.' },
+      wellness_survey: { score: 60, available: true, source: 'Central Database (Periodic Psychometric Assessment Archive)', note: 'Moderate psychometric strain from periodic assessment archive.' },
+    },
+    stress_indicators_params: {
+      hrms_data: { score: 62, available: true, source: 'HRMS Portal (Dossier & Stationing History)', note: '6 months border telemetry assignment logged in HRMS service records.' },
+      leave_frequency: { score: 55, available: true, source: 'HRMS Portal (Leave Management System)', note: 'Standard furlough interval maintained in HRMS leave system.' },
+      workload: { score: 78, available: true, source: 'HRMS Portal (Command Watch Rosters)', note: 'Rotational 12-hour communications radar console monitoring shifts.' },
+      missed_assessments: { score: 20, available: true, source: 'Central Database (Compliance Log)', note: 'High check-in compliance; 95% assessment completion rate.' },
+      sleep_pattern: { score: 75, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: 'Circadian shift delay and 5.1h fragmented daytime rest on mobile.' },
+      biometric_trends: { score: 68, available: true, source: 'Soldier Mobile App (Biometric & Sensor Engine)', note: 'Moderate nocturnal heart rate variability dip during shift rotations.' },
+      behavioral_changes: { score: 58, available: true, source: 'Soldier Mobile App & Central DB (Behavioral Telemetry)', note: 'Mild sensory fatigue; buddy communication active and cooperative.' }
+    }
   },
   {
     uid: 'UID-SLD-015',
@@ -194,6 +239,24 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
       emotional_exhaustion: { score: 62, available: true, source: 'Clinical MBI-GS Telemetry', note: 'Tactical vigilance maintenance; strong squad peer camaraderie.' },
       assessment_responses: { score: 64, available: true, source: 'Gemini AI Self-Assessment', note: 'Valid psychometric self-assessment score 64.2/100 (Moderate).' },
     },
+    psychological_distress_params: {
+      mood_assessments: { score: 52, available: true, source: 'Soldier Mobile App (Daily Mood Pulse)', note: 'High mental resilience, brief tactical fatigue logged on mobile.' },
+      anxiety_questions: { score: 58, available: true, source: 'Soldier Mobile App (GAD-7 Anxiety Screening)', note: 'Controlled tactical vigilance and low general anxiety on mobile GAD-7.' },
+      depression_indicators: { score: 40, available: true, source: 'Soldier Mobile App (PHQ-9 Depression Inventory)', note: 'Minimal depressive markers; high operational motivation.' },
+      sleep_quality: { score: 58, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: '6.0h restorative sleep logged on mobile terminal.' },
+      social_isolation: { score: 35, available: true, source: 'Central Database (Barracks Peer Network)', note: 'Excellent squad camaraderie in 10 Para SF barracks DB.' },
+      traumatic_exposure: { score: 68, available: true, source: 'HRMS Portal (Combat Operations & Incident Dossier)', note: 'High-threat combat exercises logged in HRMS Service Record.' },
+      wellness_survey: { score: 50, available: true, source: 'Central Database (Periodic Psychometric Assessment Archive)', note: 'Solid coping mechanisms across psychometric survey metrics.' },
+    },
+    stress_indicators_params: {
+      hrms_data: { score: 68, available: true, source: 'HRMS Portal (Dossier & Stationing History)', note: '7 months forward tactical SF stationing logged in HRMS dossier.' },
+      leave_frequency: { score: 60, available: true, source: 'HRMS Portal (Leave Management System)', note: 'Furlough scheduled for upcoming cycle after mission completion.' },
+      workload: { score: 72, available: true, source: 'HRMS Portal (Command Watch Rosters)', note: 'High-intensity tactical patrol and field reconnaissance rosters.' },
+      missed_assessments: { score: 15, available: true, source: 'Central Database (Compliance Log)', note: 'Outstanding assessment adherence; 98% check-in rate in database.' },
+      sleep_pattern: { score: 58, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: '6.0h average sleep with high autonomic sleep architecture rebound.' },
+      biometric_trends: { score: 52, available: true, source: 'Soldier Mobile App (Biometric & Sensor Engine)', note: 'Athletic resting pulse (56bpm) and robust HRV recovery curve.' },
+      behavioral_changes: { score: 45, available: true, source: 'Soldier Mobile App & Central DB (Behavioral Telemetry)', note: 'High squad engagement, positive peer evaluations across units.' }
+    }
   },
   {
     uid: 'UID-EMP-010',
@@ -218,6 +281,24 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
       emotional_exhaustion: { score: 75, available: true, source: 'Clinical MBI-GS Telemetry', note: 'High responsibility load; resilience score remains robust.' },
       assessment_responses: { score: 72, available: true, source: 'AI Psychological Twin Assessment', note: 'Assessment reflects sustained command vigilance with early strain.' },
     },
+    psychological_distress_params: {
+      mood_assessments: { score: 70, available: true, source: 'Soldier Mobile App (Daily Mood Pulse)', note: 'Command responsibility strain and irregular recovery logged via mobile.' },
+      anxiety_questions: { score: 72, available: true, source: 'Soldier Mobile App (GAD-7 Anxiety Screening)', note: 'Tactical accountability tension and operational alert vigilance on mobile.' },
+      depression_indicators: { score: 48, available: true, source: 'Soldier Mobile App (PHQ-9 Depression Inventory)', note: 'Strong leadership motivation; mild somatic fatigue.' },
+      sleep_quality: { score: 78, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: '4.9h average sleep logged with early awakenings.' },
+      social_isolation: { score: 42, available: true, source: 'Central Database (Barracks Peer Network)', note: 'High officer peer support network in CRPF central database.' },
+      traumatic_exposure: { score: 75, available: true, source: 'HRMS Portal (Combat Operations & Incident Dossier)', note: 'Rapid Action counter-insurgency command records in HRMS.' },
+      wellness_survey: { score: 68, available: true, source: 'Central Database (Periodic Psychometric Assessment Archive)', note: 'Balanced coping indices with high responsibility workload.' },
+    },
+    stress_indicators_params: {
+      hrms_data: { score: 74, available: true, source: 'HRMS Portal (Dossier & Stationing History)', note: '9 months forward command post deployment logged in HRMS.' },
+      leave_frequency: { score: 72, available: true, source: 'HRMS Portal (Leave Management System)', note: 'Annual furlough delayed by 4 months due to battalion operations.' },
+      workload: { score: 80, available: true, source: 'HRMS Portal (Command Watch Rosters)', note: 'Command supervision of night sector sweeps and logistics reviews.' },
+      missed_assessments: { score: 35, available: true, source: 'Central Database (Compliance Log)', note: 'Occasional delay during emergency tactical exercises in database.' },
+      sleep_pattern: { score: 78, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: '4.9h fragmented sleep with elevated nighttime restlessness on mobile.' },
+      biometric_trends: { score: 75, available: true, source: 'Soldier Mobile App (Biometric & Sensor Engine)', note: 'Sustained sympathetic tone and elevated morning cortisol indicator.' },
+      behavioral_changes: { score: 65, available: true, source: 'Soldier Mobile App & Central DB (Behavioral Telemetry)', note: 'High command discipline; increased task urgency communication.' }
+    }
   },
   {
     uid: 'UID-EMP-011',
@@ -242,6 +323,24 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
       emotional_exhaustion: { score: 30, available: true, source: 'Clinical MBI-GS Telemetry', note: 'High job satisfaction, excellent morale, low somatic stress.' },
       assessment_responses: { score: 28, available: true, source: 'AI Psychological Twin Assessment', note: 'Assessment score 28.4/100 indicating prime mental wellness.' },
     },
+    psychological_distress_params: {
+      mood_assessments: { score: 22, available: true, source: 'Soldier Mobile App (Daily Mood Pulse)', note: 'Positive affect valence and high mission satisfaction on mobile.' },
+      anxiety_questions: { score: 25, available: true, source: 'Soldier Mobile App (GAD-7 Anxiety Screening)', note: 'Optimal composure and emotional regulation on mobile GAD-7.' },
+      depression_indicators: { score: 18, available: true, source: 'Soldier Mobile App (PHQ-9 Depression Inventory)', note: 'Zero depressive indicators; peak performance state.' },
+      sleep_quality: { score: 24, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: '7.4h optimal restorative sleep with >90 min deep sleep phase.' },
+      social_isolation: { score: 20, available: true, source: 'Central Database (Barracks Peer Network)', note: 'Strong social integration in Air Defense squadron database.' },
+      traumatic_exposure: { score: 25, available: true, source: 'HRMS Portal (Combat Operations & Incident Dossier)', note: 'Peace-station technical deployment records in HRMS.' },
+      wellness_survey: { score: 26, available: true, source: 'Central Database (Periodic Psychometric Assessment Archive)', note: 'Top-tier psychological health index across all survey metrics.' },
+    },
+    stress_indicators_params: {
+      hrms_data: { score: 24, available: true, source: 'HRMS Portal (Dossier & Stationing History)', note: 'Peace station technical posting with balanced duty roster in HRMS.' },
+      leave_frequency: { score: 25, available: true, source: 'HRMS Portal (Leave Management System)', note: 'Annual furlough taken on schedule; regular leave balance active.' },
+      workload: { score: 30, available: true, source: 'HRMS Portal (Command Watch Rosters)', note: 'Standard radar watch cycles with mandatory 12h rest intervals.' },
+      missed_assessments: { score: 5, available: true, source: 'Central Database (Compliance Log)', note: 'Perfect check-in adherence across all psychometric pulses.' },
+      sleep_pattern: { score: 24, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: '7.4h average restorative sleep with excellent deep sleep ratio.' },
+      biometric_trends: { score: 22, available: true, source: 'Soldier Mobile App (Biometric & Sensor Engine)', note: 'Calm autonomic tone, high HRV (72ms) and stable resting pulse.' },
+      behavioral_changes: { score: 20, available: true, source: 'Soldier Mobile App & Central DB (Behavioral Telemetry)', note: 'High emotional stability, proactive leadership communication.' }
+    }
   },
   {
     uid: 'UID-EMP-015',
@@ -266,6 +365,24 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
       emotional_exhaustion: { score: 48, available: true, source: 'Clinical MBI-GS Telemetry', note: 'Good buddy-system support and recreational morale.' },
       assessment_responses: { score: 52, available: true, source: 'AI Psychological Twin Assessment', note: 'Self-assessment indicates balanced coping in extreme terrain.' },
     },
+    psychological_distress_params: {
+      mood_assessments: { score: 48, available: true, source: 'Soldier Mobile App (Daily Mood Pulse)', note: 'Stable morale with altitude acclimatization notes on mobile.' },
+      anxiety_questions: { score: 50, available: true, source: 'Soldier Mobile App (GAD-7 Anxiety Screening)', note: 'Controlled vigilance during mountain pass patrols on mobile.' },
+      depression_indicators: { score: 42, available: true, source: 'Soldier Mobile App (PHQ-9 Depression Inventory)', note: 'Nominal mood scores; active peer communication.' },
+      sleep_quality: { score: 50, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: '6.2h sleep with mild altitude disruption recorded on mobile.' },
+      social_isolation: { score: 45, available: true, source: 'Central Database (Barracks Peer Network)', note: 'Solid squad buddy cohesion in ITBP mountain post DB.' },
+      traumatic_exposure: { score: 55, available: true, source: 'HRMS Portal (Combat Operations & Incident Dossier)', note: 'High-altitude border vigilance logs in HRMS Service Record.' },
+      wellness_survey: { score: 52, available: true, source: 'Central Database (Periodic Psychometric Assessment Archive)', note: 'Moderate psychometric load, good physical conditioning.' },
+    },
+    stress_indicators_params: {
+      hrms_data: { score: 58, available: true, source: 'HRMS Portal (Dossier & Stationing History)', note: '5 months high-altitude border outpost deployment in HRMS.' },
+      leave_frequency: { score: 50, available: true, source: 'HRMS Portal (Leave Management System)', note: 'Furlough approved for next cycle; awaiting unit relief.' },
+      workload: { score: 55, available: true, source: 'HRMS Portal (Command Watch Rosters)', note: 'Moderate 8-hour rotational mountain patrol watches.' },
+      missed_assessments: { score: 25, available: true, source: 'Central Database (Compliance Log)', note: 'Good compliance with minor delay due to mountain weather.' },
+      sleep_pattern: { score: 50, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: '6.2h sleep with mild hypoxia-induced awakenings on mobile.' },
+      biometric_trends: { score: 54, available: true, source: 'Soldier Mobile App (Biometric & Sensor Engine)', note: 'Acclimatized baseline pulse (68bpm) with stable HRV recovery.' },
+      behavioral_changes: { score: 48, available: true, source: 'Soldier Mobile App & Central DB (Behavioral Telemetry)', note: 'Stable mood, active buddy participation and morale.' }
+    }
   },
   {
     uid: 'UID-EMP-016',
@@ -290,6 +407,24 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
       emotional_exhaustion: { score: 44, available: true, source: 'Clinical MBI-GS Telemetry', note: 'Good peer morale and stable welfare support.' },
       assessment_responses: { score: 48, available: false, source: 'Pending Self-Assessment', note: 'Soldier self-assessment questionnaire pending completion.' },
     },
+    psychological_distress_params: {
+      mood_assessments: { score: 45, available: true, source: 'Soldier Mobile App (Daily Mood Pulse)', note: 'Steady mood valence recorded during airport shift rotations.' },
+      anxiety_questions: { score: 48, available: true, source: 'Soldier Mobile App (GAD-7 Anxiety Screening)', note: 'Mild aviation security vigilance tension on mobile GAD-7.' },
+      depression_indicators: { score: 38, available: true, source: 'Soldier Mobile App (PHQ-9 Depression Inventory)', note: 'Low depressive markers; good interpersonal morale.' },
+      sleep_quality: { score: 46, available: false, source: 'Pending Wearable Sync', note: 'Wearable sleep telemetry sync pending for last 48 hours.' },
+      social_isolation: { score: 40, available: true, source: 'Central Database (Barracks Peer Network)', note: 'Active airport security detachment buddy connection in DB.' },
+      traumatic_exposure: { score: 30, available: true, source: 'HRMS Portal (Combat Operations & Incident Dossier)', note: 'Metropolitan aviation security duties in HRMS Dossier.' },
+      wellness_survey: { score: 45, available: false, source: 'Pending Psychometric Survey', note: 'Periodic survey cycle pending completion in central database.' },
+    },
+    stress_indicators_params: {
+      hrms_data: { score: 42, available: true, source: 'HRMS Portal (Dossier & Stationing History)', note: '4 months metropolitan airport security posting in HRMS dossier.' },
+      leave_frequency: { score: 45, available: true, source: 'HRMS Portal (Leave Management System)', note: 'Regular casual leave balance active in HRMS leave portal.' },
+      workload: { score: 50, available: true, source: 'HRMS Portal (Command Watch Rosters)', note: 'Standard airport passenger screening watch rosters.' },
+      missed_assessments: { score: 60, available: true, source: 'Central Database (Compliance Log)', note: 'Assessment sync pending for 48h logged in Central DB compliance log.' },
+      sleep_pattern: { score: 46, available: false, source: 'Pending Wearable Sync (Mobile App)', note: 'Mobile wearable sleep telemetry sync pending in terminal buffer.' },
+      biometric_trends: { score: 48, available: true, source: 'Soldier Mobile App (Biometric & Sensor Engine)', note: 'Normal sinus rhythm and steady cardiovascular indicators.' },
+      behavioral_changes: { score: 44, available: true, source: 'Soldier Mobile App & Central DB (Behavioral Telemetry)', note: 'Cooperative unit interaction, standard peer review ratings.' }
+    }
   },
   {
     uid: 'UID-EMP-017',
@@ -314,6 +449,24 @@ const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
       emotional_exhaustion: { score: 68, available: true, source: 'Clinical MBI-GS Telemetry', note: 'High environmental fatigue; relies on squad support.' },
       assessment_responses: { score: 70, available: true, source: 'AI Psychological Twin Assessment', note: 'Evaluation score 72.4/100 (High strain, priority review).' },
     },
+    psychological_distress_params: {
+      mood_assessments: { score: 72, available: true, source: 'Soldier Mobile App (Daily Mood Pulse)', note: 'Jungle terrain fatigue & sleep latency reported on mobile app.' },
+      anxiety_questions: { score: 75, available: true, source: 'Soldier Mobile App (GAD-7 Anxiety Screening)', note: 'Tactical alert strain and counter-insurgency vigilance on mobile.' },
+      depression_indicators: { score: 62, available: true, source: 'Soldier Mobile App (PHQ-9 Depression Inventory)', note: 'Environmental weariness; maintains strong buddy morale.' },
+      sleep_quality: { score: 74, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: '4.7h interrupted sleep logged during jungle patrols on mobile.' },
+      social_isolation: { score: 65, available: true, source: 'Central Database (Barracks Peer Network)', note: 'Dense terrain remote post isolation recorded in Central DB.' },
+      traumatic_exposure: { score: 80, available: true, source: 'HRMS Portal (Combat Operations & Incident Dossier)', note: 'Counter-insurgency cordon and ambush encounter logs in HRMS.' },
+      wellness_survey: { score: 72, available: true, source: 'Central Database (Periodic Psychometric Assessment Archive)', note: 'Elevated strain index from monthly psychometric assessment.' },
+    },
+    stress_indicators_params: {
+      hrms_data: { score: 76, available: true, source: 'HRMS Portal (Dossier & Stationing History)', note: '8 continuous months in dense terrain counter-insurgency sector.' },
+      leave_frequency: { score: 75, available: true, source: 'HRMS Portal (Leave Management System)', note: 'Furlough delayed by 2 months due to operational cordon duties.' },
+      workload: { score: 76, available: true, source: 'HRMS Portal (Command Watch Rosters)', note: 'Extensive jungle patrol watches and rapid alert call-outs.' },
+      missed_assessments: { score: 30, available: true, source: 'Central Database (Compliance Log)', note: 'Check-in delays during deep jungle tactical movements in DB.' },
+      sleep_pattern: { score: 74, available: true, source: 'Soldier Mobile App (Sleep Telemetry)', note: '4.7h fragmented sleep with high nocturnal alert awakenings.' },
+      biometric_trends: { score: 72, available: true, source: 'Soldier Mobile App (Biometric & Sensor Engine)', note: 'Elevated sympathetic tone and night pulse volatility on mobile.' },
+      behavioral_changes: { score: 68, available: true, source: 'Soldier Mobile App & Central DB (Behavioral Telemetry)', note: 'High environmental fatigue; cooperative squad buddy dynamic.' }
+    }
   },
 ];
 
@@ -645,23 +798,32 @@ export const WelfareDashboard: React.FC = () => {
       id: 'stress-indicators-detection',
       num: 3,
       title: 'Stress Indicators Detection',
-      shortDesc: 'Real-time autonomic signals, HRV volatility & sleep fragmentation',
-      category: 'Biometric Telemetry',
+      shortDesc: '7-Parameter Multi-Source Autonomic & Telemetry Model',
+      category: 'Biometric & Behavioral Telemetry',
       riskLevel: 'CRITICAL',
-      metricLabel: 'Anomaly Rate',
-      metricValue: '82% Flagged',
+      metricLabel: 'Stress Detection Index',
+      metricValue: '81.4 / 100',
       icon: Zap,
       color: 'text-rose-600',
       bg: 'bg-rose-50',
       border: 'border-rose-200',
-      clinicalSignificance: 'Extracts real-time physiological and psychological indicators from wearable telemetry and daily pulse check-ins.',
-      biomarkers: ['Resting pulse elevation > 18%', 'Sleep latency > 45 minutes', 'Nocturnal arousal frequency > 3x', 'Deep sleep deficit (<40 min)'],
-      flaggedPersonnel: [
-        { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 88.0, risk: 'CRITICAL', trigger: 'Severe sleep fragmentation (3.8h sleep recorded)' },
-        { name: 'Major Alex Morgan', uid: 'UID-EMP-010', rank: 'Major', unit: 'Rapid Action Bn 1', score: 78.0, risk: 'HIGH', trigger: 'Night duty cardiovascular recovery deficit' },
+      clinicalSignificance: 'Multivariate 7-Parameter Predictive Model: 0.14(HRMS data) + 0.14(Leave frequency) + 0.15(Workload) + 0.13(Missed assessments) + 0.16(Sleep pattern) + 0.15(Biometric trends) + 0.13(Behavioral changes). Unifies Soldier Mobile App, HRMS Portal & Central Database telemetry.',
+      biomarkers: [
+        '1. HRMS data (14%) - Stationing & deployment tenure',
+        '2. Leave frequency (14%) - Furlough deficit & deferrals',
+        '3. Workload (15%) - Watch roster overtime & tempo',
+        '4. Missed assessments (13%) - Compliance & avoidance',
+        '5. Sleep pattern (16%) - Mobile sleep debt (<4.5h)',
+        '6. Biometric trends (15%) - Resting HR elevation & HRV',
+        '7. Behavioral changes (13%) - Irritability & app pulse'
       ],
-      actionProtocol: 'Biofeedback paced-breathing intervention and wearable autonomic recovery tracking.',
-      modelConfidence: '97.1% ROC-AUC'
+      flaggedPersonnel: [
+        { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 81.4, risk: 'CRITICAL', trigger: 'Severe sleep fragmentation (3.8h) + RHR elevation + HRMS high deployment' },
+        { name: 'Subedar Gurpreet Singh', uid: 'UID-EMP-013', rank: 'Subedar', unit: 'Field Artillery 3rd Bn', score: 79.2, risk: 'CRITICAL', trigger: 'Pending urgent leave + Artillery command workload + Sympathetic overdrive' },
+        { name: 'Major Alex Morgan', uid: 'UID-EMP-010', rank: 'Major', unit: 'Rapid Action Bn 1', score: 74.8, risk: 'HIGH', trigger: 'Night duty cardiovascular deficit + 80h overtime roster in HRMS' },
+      ],
+      actionProtocol: 'Mandatory biofeedback paced-breathing intervention, 48-hour operational stand-down, and HRMS leave approval expediting.',
+      modelConfidence: '97.4% ROC-AUC'
     },
     {
       id: 'overall-stress-prediction',
@@ -1262,6 +1424,211 @@ export const WelfareDashboard: React.FC = () => {
     },
   ], [resolvedPsychologicalParams]);
 
+  const resolvedStressIndicatorsParams = useMemo(() => {
+    const raw: any = selectedPersonnel.stress_indicators_params || {};
+    return {
+      hrms_data: parseParam(
+        raw.hrms_data,
+        65,
+        'Career dossier, tenure & service history in HRMS',
+        'HRMS Portal (Dossier & Stationing History)'
+      ),
+      leave_frequency: parseParam(
+        raw.leave_frequency,
+        resolvedParams.leave_patterns.score,
+        'Leave application frequency & rejection/deferral patterns in HRMS',
+        'HRMS Portal (Leave Management System)'
+      ),
+      workload: parseParam(
+        raw.workload,
+        resolvedParams.workload_trend.score,
+        'Operational task allocation, shift tempo & overtime in HRMS',
+        'HRMS Portal (Command Watch Rosters)'
+      ),
+      missed_assessments: parseParam(
+        raw.missed_assessments,
+        45,
+        'Compliance tracking log for psychometric assessments in Central DB',
+        'Central Database (Compliance Log)'
+      ),
+      sleep_pattern: parseParam(
+        raw.sleep_pattern,
+        resolvedParams.sleep_quality.score,
+        'Sleep duration, latency & circadian irregularity recorded via Mobile App',
+        'Soldier Mobile App (Sleep Telemetry)'
+      ),
+      biometric_trends: parseParam(
+        raw.biometric_trends,
+        60,
+        'Resting Heart Rate elevation & suppressed HRV indicating autonomic strain',
+        'Soldier Mobile App (Biometric & Sensor Engine)'
+      ),
+      behavioral_changes: parseParam(
+        raw.behavioral_changes,
+        55,
+        'App interaction volatility, mood variance & peer check flags',
+        'Soldier Mobile App & Central DB (Behavioral Telemetry)'
+      ),
+    };
+  }, [selectedPersonnel, resolvedParams]);
+
+  const calculatedStressIndicators = useMemo(() => {
+    const p = resolvedStressIndicatorsParams;
+    const score = (
+      0.14 * p.hrms_data.score +
+      0.14 * p.leave_frequency.score +
+      0.15 * p.workload.score +
+      0.13 * p.missed_assessments.score +
+      0.16 * p.sleep_pattern.score +
+      0.15 * p.biometric_trends.score +
+      0.13 * p.behavioral_changes.score
+    );
+    const rounded = Math.round(score * 10) / 10;
+    
+    let level: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'NOMINAL' = 'NOMINAL';
+    let levelColor = 'text-emerald-400';
+    let levelBg = 'bg-emerald-950 text-emerald-300 border-emerald-800';
+    let tierLabel = 'Allostatic Homeostasis (Low Stress Indicators)';
+    let recommendation = 'Nominal physiological & behavioral telemetry. Continue standard deployment rotation and weekly wellness tracking.';
+
+    if (rounded >= 78.0) {
+      level = 'CRITICAL';
+      levelColor = 'text-rose-400';
+      levelBg = 'bg-rose-950 text-rose-300 border-rose-800';
+      tierLabel = 'Severe Autonomic Strain & High Allostatic Load';
+      recommendation = 'MANDATORY INTERVENTION: Urgent 48-hour operational stand-down, clinical autonomic biofeedback evaluation, and reassign night watch duties.';
+    } else if (rounded >= 65.0) {
+      level = 'HIGH';
+      levelColor = 'text-amber-400';
+      levelBg = 'bg-amber-950 text-amber-300 border-amber-800';
+      tierLabel = 'Elevated Sympathetic Overdrive & Behavioral Weariness';
+      recommendation = 'PRIORITY ACTION: Deploy wearable biofeedback breathing pacing, resolve pending leave requests in HRMS, and mandate sleep hygiene recovery protocol.';
+    } else if (rounded >= 45.0) {
+      level = 'MODERATE';
+      levelColor = 'text-teal-400';
+      levelBg = 'bg-teal-950 text-teal-300 border-teal-800';
+      tierLabel = 'Mild Tactical Stress Reactivity';
+      recommendation = 'MONITORING ACTION: Track weekly compliance check-in pulses on mobile app and monitor workload pacing in battalion roster.';
+    }
+
+    return {
+      score: rounded,
+      level,
+      levelColor,
+      levelBg,
+      tierLabel,
+      recommendation,
+    };
+  }, [resolvedStressIndicatorsParams]);
+
+  const stressIndicatorsParamDefinitions = useMemo(() => [
+    {
+      key: 'hrms_data',
+      name: '1. HRMS data',
+      weight: 0.14,
+      weightLabel: '14%',
+      sourceBadge: '🏢 HRMS Portal',
+      sourceType: 'HRMS',
+      note: resolvedStressIndicatorsParams.hrms_data.note,
+      source: resolvedStressIndicatorsParams.hrms_data.source,
+      available: resolvedStressIndicatorsParams.hrms_data.available,
+      score: resolvedStressIndicatorsParams.hrms_data.score,
+      color: 'text-amber-400',
+      bar: 'bg-amber-500',
+      desc: 'Career tenure, continuous forward stationing duration & service dossier logs in HRMS'
+    },
+    {
+      key: 'leave_frequency',
+      name: '2. Leave frequency',
+      weight: 0.14,
+      weightLabel: '14%',
+      sourceBadge: '🏢 HRMS Portal',
+      sourceType: 'HRMS',
+      note: resolvedStressIndicatorsParams.leave_frequency.note,
+      source: resolvedStressIndicatorsParams.leave_frequency.source,
+      available: resolvedStressIndicatorsParams.leave_frequency.available,
+      score: resolvedStressIndicatorsParams.leave_frequency.score,
+      color: 'text-amber-400',
+      bar: 'bg-amber-500',
+      desc: 'Leave application frequency, denied/deferred furloughs & time since last leave in HRMS'
+    },
+    {
+      key: 'workload',
+      name: '3. Workload',
+      weight: 0.15,
+      weightLabel: '15%',
+      sourceBadge: '🏢 HRMS Portal',
+      sourceType: 'HRMS',
+      note: resolvedStressIndicatorsParams.workload.note,
+      source: resolvedStressIndicatorsParams.workload.source,
+      available: resolvedStressIndicatorsParams.workload.available,
+      score: resolvedStressIndicatorsParams.workload.score,
+      color: 'text-rose-400',
+      bar: 'bg-rose-500',
+      desc: 'Operational watch hours, overtime duty log & high-intensity task tempo in HRMS Rosters'
+    },
+    {
+      key: 'missed_assessments',
+      name: '4. Missed assessments',
+      weight: 0.13,
+      weightLabel: '13%',
+      sourceBadge: '💾 Central Database',
+      sourceType: 'DATABASE',
+      note: resolvedStressIndicatorsParams.missed_assessments.note,
+      source: resolvedStressIndicatorsParams.missed_assessments.source,
+      available: resolvedStressIndicatorsParams.missed_assessments.available,
+      score: resolvedStressIndicatorsParams.missed_assessments.score,
+      color: 'text-teal-400',
+      bar: 'bg-teal-500',
+      desc: 'Assessment avoidance index, missed scheduled psychometric check-ins in Central DB log'
+    },
+    {
+      key: 'sleep_pattern',
+      name: '5. Sleep pattern',
+      weight: 0.16,
+      weightLabel: '16%',
+      sourceBadge: '📱 Soldier Mobile App',
+      sourceType: 'MOBILE',
+      note: resolvedStressIndicatorsParams.sleep_pattern.note,
+      source: resolvedStressIndicatorsParams.sleep_pattern.source,
+      available: resolvedStressIndicatorsParams.sleep_pattern.available,
+      score: resolvedStressIndicatorsParams.sleep_pattern.score,
+      color: 'text-rose-400',
+      bar: 'bg-rose-500',
+      desc: 'Total sleep duration (<4.5h deficit), sleep onset latency & fragmentation logged via Mobile'
+    },
+    {
+      key: 'biometric_trends',
+      name: '6. Biometric trends',
+      weight: 0.15,
+      weightLabel: '15%',
+      sourceBadge: '📱 Soldier Mobile App',
+      sourceType: 'MOBILE',
+      note: resolvedStressIndicatorsParams.biometric_trends.note,
+      source: resolvedStressIndicatorsParams.biometric_trends.source,
+      available: resolvedStressIndicatorsParams.biometric_trends.available,
+      score: resolvedStressIndicatorsParams.biometric_trends.score,
+      color: 'text-rose-400',
+      bar: 'bg-rose-500',
+      desc: 'Resting Heart Rate elevation (+bpm), HRV root mean square deviation & autonomic strain'
+    },
+    {
+      key: 'behavioral_changes',
+      name: '7. Behavioral changes',
+      weight: 0.13,
+      weightLabel: '13%',
+      sourceBadge: '📱 Mobile App & Central DB',
+      sourceType: 'MOBILE',
+      note: resolvedStressIndicatorsParams.behavioral_changes.note,
+      source: resolvedStressIndicatorsParams.behavioral_changes.source,
+      available: resolvedStressIndicatorsParams.behavioral_changes.available,
+      score: resolvedStressIndicatorsParams.behavioral_changes.score,
+      color: 'text-teal-400',
+      bar: 'bg-teal-500',
+      desc: 'App interaction volatility, mood variance & unit peer withdrawal flags recorded across sources'
+    },
+  ], [resolvedStressIndicatorsParams]);
+
   return (
     <div className="space-y-6">
       {/* Toast Notification for factor actions */}
@@ -1425,15 +1792,16 @@ export const WelfareDashboard: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
             {filteredPersonnel.map((p) => {
               const isSelected = selectedPersonnelUid === p.uid;
+              const getVal = (val: any) => (typeof val === 'object' && val !== null ? (typeof val.score === 'number' ? val.score : 50) : (typeof val === 'number' ? val : 50));
               const baseScore = Math.round(
-                (0.12 * p.params.leave_patterns +
-                0.14 * p.params.overtime +
-                0.13 * p.params.workload_trend +
-                0.10 * p.params.deployment_duration +
-                0.13 * p.params.duty_schedule +
-                0.15 * p.params.sleep_quality +
-                0.12 * p.params.emotional_exhaustion +
-                0.11 * p.params.assessment_responses) * 10
+                (0.12 * getVal(p.params.leave_patterns) +
+                0.14 * getVal(p.params.overtime) +
+                0.13 * getVal(p.params.workload_trend) +
+                0.10 * getVal(p.params.deployment_duration) +
+                0.13 * getVal(p.params.duty_schedule) +
+                0.15 * getVal(p.params.sleep_quality) +
+                0.12 * getVal(p.params.emotional_exhaustion) +
+                0.11 * getVal(p.params.assessment_responses)) * 10
               ) / 10;
 
               const isCrit = baseScore >= 80;
@@ -2010,6 +2378,158 @@ export const WelfareDashboard: React.FC = () => {
                   </span>
                   <p className="text-xs text-slate-200 leading-relaxed font-medium">
                     {calculatedPsychologicalDistress.recommendation}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : selectedFactorId === 'stress-indicators-detection' ? (
+            <div className="space-y-6 relative z-10">
+              {/* Multi-Source Provenance Header Banner */}
+              <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-mono font-extrabold uppercase px-2.5 py-1 rounded-full bg-rose-950 text-rose-300 border border-rose-800 flex items-center gap-1.5">
+                    <Zap className="w-3.5 h-3.5 text-rose-400" />
+                    <span>Multi-Source Unified Telemetry & Predictive Risk Model</span>
+                  </span>
+                  <span className="text-xs text-slate-300 font-medium">
+                    Evaluating Active Subject: <strong className="text-white">{selectedPersonnel.name}</strong> ({selectedPersonnel.rank}) &bull; <span className="text-blue-300 font-mono">{selectedPersonnel.uid}</span>
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono font-bold">
+                  <span className="px-2.5 py-1 rounded-lg bg-indigo-950 text-indigo-300 border border-indigo-800 flex items-center gap-1">
+                    📱 Mobile App: 3 Params
+                  </span>
+                  <span className="px-2.5 py-1 rounded-lg bg-amber-950 text-amber-300 border border-amber-800 flex items-center gap-1">
+                    🏢 HRMS Portal: 3 Params
+                  </span>
+                  <span className="px-2.5 py-1 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center gap-1">
+                    💾 Central DB / Web: 1 Param
+                  </span>
+                </div>
+              </div>
+
+              {/* Stress Indicators Composite Score Banner */}
+              <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-800 via-slate-800/90 to-slate-900 border border-slate-700 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                <div className="space-y-1.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${calculatedStressIndicators.levelBg}`}>
+                      {calculatedStressIndicators.level} STRESS INDICATORS RISK
+                    </span>
+                    <span className="text-xs font-mono font-semibold text-slate-300">
+                      &bull; {calculatedStressIndicators.tierLabel}
+                    </span>
+                  </div>
+                  <h4 className="text-base sm:text-lg font-black text-white">
+                    Stress Indicators Detection Index: <span className="font-mono text-xl sm:text-2xl text-rose-400 font-black">{calculatedStressIndicators.score} / 100</span>
+                  </h4>
+                  <p className="text-xs text-slate-300 font-medium max-w-3xl leading-relaxed">
+                    <strong className="text-slate-100">Formula:</strong> 0.14(HRMS) + 0.14(Leave) + 0.15(Workload) + 0.13(Missed Assessments) + 0.16(Sleep) + 0.15(Biometrics) + 0.13(Behavioral)
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => handleTriggerAction('Stress Indicators', `Autonomic Biofeedback Protocol for ${selectedPersonnel.name}`)}
+                    className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all shadow-md cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Initiate Biofeedback</span>
+                  </button>
+                  <button
+                    onClick={() => handleTriggerAction('Stress Indicators', `Expedite HRMS Leave Approval for ${selectedPersonnel.name}`)}
+                    className="px-3.5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold border border-slate-600 transition-all cursor-pointer"
+                  >
+                    Expedite Leave
+                  </button>
+                </div>
+              </div>
+
+              {/* 7 Parameters Telemetry Grid with Fixed Progress Meters */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
+                {stressIndicatorsParamDefinitions.map((param) => {
+                  const currentVal = param.score;
+                  return (
+                    <div
+                      key={param.key}
+                      className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-3 relative group hover:border-slate-600 transition-all flex flex-col justify-between"
+                    >
+                      <div className="space-y-2">
+                        {/* Header with weight and source tag */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-mono font-bold text-blue-300 bg-blue-950 px-2 py-0.5 rounded border border-blue-900">
+                            Weight: {param.weightLabel}
+                          </span>
+                          <span
+                            className={`text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded-full flex items-center gap-1 ${
+                              param.available
+                                ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                                : 'bg-rose-950 text-rose-300 border border-rose-800'
+                            }`}
+                          >
+                            <span className={`w-1.5 h-1.5 rounded-full ${param.available ? 'bg-emerald-400' : 'bg-rose-400 animate-ping'}`} />
+                            {param.available ? 'Synchronized' : 'Sync Pending'}
+                          </span>
+                        </div>
+
+                        {/* Title and Origin Source */}
+                        <div>
+                          <h5 className="font-extrabold text-xs text-white leading-snug">
+                            {param.name}
+                          </h5>
+                          <p className="text-[10px] text-slate-400 line-clamp-1 font-medium mt-0.5">
+                            {param.desc}
+                          </p>
+                          <div className="mt-1.5 flex items-center gap-1">
+                            <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-800 font-semibold">
+                              {param.sourceBadge}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Read-only Fixed Telemetry Meter (No editable adjustment bar) */}
+                      <div className="space-y-2 pt-1 border-t border-slate-700/60">
+                        <div className="flex items-center justify-between text-xs font-mono">
+                          <span className="text-[10px] text-slate-400 font-sans">Retrieved Telemetry:</span>
+                          <span className={`font-black text-sm ${param.color}`}>
+                            {currentVal}%
+                          </span>
+                        </div>
+
+                        {/* Fixed Meter Bar */}
+                        <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-700/80 p-0.5">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${param.bar}`}
+                            style={{ width: `${Math.min(100, Math.max(5, currentVal))}%` }}
+                          />
+                        </div>
+
+                        <div className="flex justify-between text-[9px] text-slate-500 font-mono">
+                          <span>0% Nominal</span>
+                          <span className="font-semibold text-slate-300">{currentVal}% Strain</span>
+                          <span>100% Critical</span>
+                        </div>
+
+                        {/* Telemetry Detail Note */}
+                        <p className="text-[10px] text-slate-300 line-clamp-2 leading-relaxed font-medium bg-slate-900/90 p-2 rounded-xl border border-slate-800">
+                          {param.note}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Action Recommendation Card */}
+              <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    <span>Chief Welfare Officer Clinical Protocol for {selectedPersonnel.name}</span>
+                  </span>
+                  <p className="text-xs text-slate-200 leading-relaxed font-medium">
+                    {calculatedStressIndicators.recommendation}
                   </p>
                 </div>
               </div>

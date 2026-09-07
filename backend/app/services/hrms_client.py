@@ -61,6 +61,15 @@ class HRMSClient:
                 "social_isolation": {"score": 70, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Remote forward post isolation score retrieved from Central PostgreSQL DB."},
                 "traumatic_exposure": {"score": 86, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Extreme sub-zero vigil and high-threat avalanche sector records in HRMS Dossier."},
                 "wellness_survey": {"score": 76, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "Periodic comprehensive psychological survey strain retrieved from Database."}
+            },
+            "stress_indicators_params": {
+                "hrms_data": {"score": 88, "available": True, "source": "HRMS Portal (Dossier & Stationing History)", "note": "14 months continuous deployment in high-altitude extreme sector recorded in HRMS dossier."},
+                "leave_frequency": {"score": 82, "available": True, "source": "HRMS Portal (Leave Management System)", "note": "3 consecutive leave applications deferred due to forward vigil operational readiness."},
+                "workload": {"score": 90, "available": True, "source": "HRMS Portal (Command Watch Rosters)", "note": "48 duty hours logged in past 5 days (64% over standard roster threshold)."},
+                "missed_assessments": {"score": 40, "available": True, "source": "Central Database (Compliance Log)", "note": "85% on-time psychometric check-in completion rate logged in central database."},
+                "sleep_pattern": {"score": 92, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "3.8h average sleep recorded with severe circadian irregularity on mobile terminal."},
+                "biometric_trends": {"score": 86, "available": True, "source": "Soldier Mobile App (Biometric & Sensor Engine)", "note": "Resting Heart Rate elevation +14bpm and suppressed HRV (28ms) indicating autonomic strain."},
+                "behavioral_changes": {"score": 80, "available": True, "source": "Soldier Mobile App & Central DB (Behavioral Telemetry)", "note": "Increased somatic irritability and peer withdrawal flags logged across app & unit review."}
             }
         },
         {
@@ -107,6 +116,15 @@ class HRMSClient:
                 "social_isolation": {"score": 55, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Good squad buddy network but domestic isolation recorded in central DB."},
                 "traumatic_exposure": {"score": 74, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Artillery forward battery line counter-fire incident records in HRMS Dossier."},
                 "wellness_survey": {"score": 78, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "High psychological friction index retrieved from monthly survey database."}
+            },
+            "stress_indicators_params": {
+                "hrms_data": {"score": 80, "available": True, "source": "HRMS Portal (Dossier & Stationing History)", "note": "Field artillery command tenure (8 continuous months in active firing line)."},
+                "leave_frequency": {"score": 88, "available": True, "source": "HRMS Portal (Leave Management System)", "note": "Urgent family medical leave application pending approval in HRMS leave system."},
+                "workload": {"score": 82, "available": True, "source": "HRMS Portal (Command Watch Rosters)", "note": "High tactical artillery logistics coordination and battery shift overruns."},
+                "missed_assessments": {"score": 65, "available": True, "source": "Central Database (Compliance Log)", "note": "3 missed daily check-in pulses during hospital communication intervals."},
+                "sleep_pattern": {"score": 82, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "4.2h sleep duration with frequent nocturnal awakenings recorded on mobile."},
+                "biometric_trends": {"score": 78, "available": True, "source": "Soldier Mobile App (Biometric & Sensor Engine)", "note": "Elevated sympathetic baseline (RHR +10bpm over baseline average)."},
+                "behavioral_changes": {"score": 75, "available": True, "source": "Soldier Mobile App & Central DB (Behavioral Telemetry)", "note": "Acute caregiver worry and elevated verbal stress noted in welfare check."}
             }
         },
         {
@@ -153,6 +171,15 @@ class HRMSClient:
                 "social_isolation": {"score": 64, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Rotational night shifts causing detachment from daytime squad activities."},
                 "traumatic_exposure": {"score": 40, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Technical outpost stationed with low direct combat engagement logs in HRMS."},
                 "wellness_survey": {"score": 62, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "Moderate sensory fatigue index in monthly database psychometric archive."}
+            },
+            "stress_indicators_params": {
+                "hrms_data": {"score": 68, "available": True, "source": "HRMS Portal (Dossier & Stationing History)", "note": "6 months border telemetry post service record in HRMS."},
+                "leave_frequency": {"score": 55, "available": True, "source": "HRMS Portal (Leave Management System)", "note": "Annual furlough scheduled next quarter in HRMS leave system."},
+                "workload": {"score": 84, "available": True, "source": "HRMS Portal (Command Watch Rosters)", "note": "Continuous 12-hour communications console monitoring watches."},
+                "missed_assessments": {"score": 50, "available": True, "source": "Central Database (Compliance Log)", "note": "Standard compliance with periodic database survey filings."},
+                "sleep_pattern": {"score": 75, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "5.0h sleep with marked circadian phase shift recorded on mobile app."},
+                "biometric_trends": {"score": 70, "available": True, "source": "Soldier Mobile App (Biometric & Sensor Engine)", "note": "Ocular strain and autonomic heart rate variability dip during night shifts."},
+                "behavioral_changes": {"score": 64, "available": True, "source": "Soldier Mobile App & Central DB (Behavioral Telemetry)", "note": "Sensory fatigue and decreased off-duty social interaction index."}
             }
         },
         {
@@ -199,6 +226,15 @@ class HRMSClient:
                 "social_isolation": {"score": 35, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Exceptional Para SF team cohesion and buddy trust index in central DB."},
                 "traumatic_exposure": {"score": 76, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Special forces high-threat tactical operation logs in HRMS Dossier."},
                 "wellness_survey": {"score": 56, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "Strong resilience and psychological hardiness confirmed in database archive."}
+            },
+            "stress_indicators_params": {
+                "hrms_data": {"score": 72, "available": True, "source": "HRMS Portal (Dossier & Stationing History)", "note": "10 Para SF forward patrol tenure in HRMS operational dossier."},
+                "leave_frequency": {"score": 60, "available": True, "source": "HRMS Portal (Leave Management System)", "note": "Leave scheduled on regular rotation in HRMS leave system."},
+                "workload": {"score": 70, "available": True, "source": "HRMS Portal (Command Watch Rosters)", "note": "Tactical field reconnaissance exercises and combat patrol shifts."},
+                "missed_assessments": {"score": 35, "available": True, "source": "Central Database (Compliance Log)", "note": "High check-in submission compliance in central database log."},
+                "sleep_pattern": {"score": 58, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "5.5h tactical rest logged with normal recovery on mobile app."},
+                "biometric_trends": {"score": 62, "available": True, "source": "Soldier Mobile App (Biometric & Sensor Engine)", "note": "Strong cardiovascular fitness & rapid heart rate recovery."},
+                "behavioral_changes": {"score": 50, "available": True, "source": "Soldier Mobile App & Central DB (Behavioral Telemetry)", "note": "Robust camaraderie and high team morale observed in unit."}
             }
         },
         {
@@ -245,6 +281,15 @@ class HRMSClient:
                 "social_isolation": {"score": 50, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Command level isolation but good officer cadre support in central DB."},
                 "traumatic_exposure": {"score": 82, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Rapid action counter-insurgency command logs in HRMS Dossier."},
                 "wellness_survey": {"score": 72, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "Elevated operational strain score in monthly psychometric database."}
+            },
+            "stress_indicators_params": {
+                "hrms_data": {"score": 78, "available": True, "source": "HRMS Portal (Dossier & Stationing History)", "note": "9 months command post operational deployment log in HRMS."},
+                "leave_frequency": {"score": 72, "available": True, "source": "HRMS Portal (Leave Management System)", "note": "Post-tenure decompression leave deferred in HRMS system."},
+                "workload": {"score": 80, "available": True, "source": "HRMS Portal (Command Watch Rosters)", "note": "Prolonged night sector sweeps and battalion operational reviews."},
+                "missed_assessments": {"score": 45, "available": True, "source": "Central Database (Compliance Log)", "note": "Timely executive assessment logs in central DB."},
+                "sleep_pattern": {"score": 78, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "4.5h average rest with delayed sleep onset on mobile."},
+                "biometric_trends": {"score": 76, "available": True, "source": "Soldier Mobile App (Biometric & Sensor Engine)", "note": "Vigilance-related sympathetic arousal and HRV dip."},
+                "behavioral_changes": {"score": 70, "available": True, "source": "Soldier Mobile App & Central DB (Behavioral Telemetry)", "note": "Executive tension and high decision fatigue index."}
             }
         },
         {
@@ -291,6 +336,15 @@ class HRMSClient:
                 "social_isolation": {"score": 20, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Active peer engagement and squad camaraderie in central DB."},
                 "traumatic_exposure": {"score": 15, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Peace station base duties with zero combat incident logs in HRMS."},
                 "wellness_survey": {"score": 26, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "High resilience and excellent mental hardiness in DB archive."}
+            },
+            "stress_indicators_params": {
+                "hrms_data": {"score": 24, "available": True, "source": "HRMS Portal (Dossier & Stationing History)", "note": "Peace-station base operational posting in HRMS dossier."},
+                "leave_frequency": {"score": 25, "available": True, "source": "HRMS Portal (Leave Management System)", "note": "Full leave quota available and on-schedule in HRMS."},
+                "workload": {"score": 30, "available": True, "source": "HRMS Portal (Command Watch Rosters)", "note": "Standard radar watch schedule with complete rest cycles."},
+                "missed_assessments": {"score": 20, "available": True, "source": "Central Database (Compliance Log)", "note": "100% check-in compliance in central database log."},
+                "sleep_pattern": {"score": 24, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "7.5h restorative sleep logged consistently on mobile."},
+                "biometric_trends": {"score": 22, "available": True, "source": "Soldier Mobile App (Biometric & Sensor Engine)", "note": "Optimal HRV 65ms and resting heart rate equilibrium."},
+                "behavioral_changes": {"score": 20, "available": True, "source": "Soldier Mobile App & Central DB (Behavioral Telemetry)", "note": "High positive morale and enthusiasm in unit reviews."}
             }
         },
         {
@@ -337,6 +391,15 @@ class HRMSClient:
                 "social_isolation": {"score": 42, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Close 2-man buddy pairing active in central DB roster."},
                 "traumatic_exposure": {"score": 54, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Mountain pass border vigilance logs in HRMS Dossier."},
                 "wellness_survey": {"score": 50, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "Healthy baseline resilience in monthly database archive."}
+            },
+            "stress_indicators_params": {
+                "hrms_data": {"score": 58, "available": True, "source": "HRMS Portal (Dossier & Stationing History)", "note": "5 months forward border outpost stationing in HRMS."},
+                "leave_frequency": {"score": 50, "available": True, "source": "HRMS Portal (Leave Management System)", "note": "Furlough approved in HRMS for next cycle."},
+                "workload": {"score": 55, "available": True, "source": "HRMS Portal (Command Watch Rosters)", "note": "Standard 8-hour mountain patrol shifts with buddy pair."},
+                "missed_assessments": {"score": 40, "available": True, "source": "Central Database (Compliance Log)", "note": "Consistent check-in filing in central database."},
+                "sleep_pattern": {"score": 50, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "6.8h rest logged on mobile terminal."},
+                "biometric_trends": {"score": 54, "available": True, "source": "Soldier Mobile App (Biometric & Sensor Engine)", "note": "Normal biometric acclimatization response."},
+                "behavioral_changes": {"score": 45, "available": True, "source": "Soldier Mobile App & Central DB (Behavioral Telemetry)", "note": "Active squad engagement and stable morale."}
             }
         },
         {
@@ -383,6 +446,15 @@ class HRMSClient:
                 "social_isolation": {"score": 40, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Airport squad unit cohesion index retrieved from central DB."},
                 "traumatic_exposure": {"score": 30, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Aviation security zone with zero hostile incident records in HRMS."},
                 "wellness_survey": {"score": 44, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "Baseline wellness survey record retrieved from central DB."}
+            },
+            "stress_indicators_params": {
+                "hrms_data": {"score": 42, "available": True, "source": "HRMS Portal (Dossier & Stationing History)", "note": "4 months metropolitan airport unit posting in HRMS."},
+                "leave_frequency": {"score": 45, "available": True, "source": "HRMS Portal (Leave Management System)", "note": "Casual leave utilized last month in HRMS."},
+                "workload": {"score": 50, "available": True, "source": "HRMS Portal (Command Watch Rosters)", "note": "Terminal surveillance shifts with regular breaks."},
+                "missed_assessments": {"score": 80, "available": False, "source": "Central Database (Pending Sync)", "note": "Missed 4 consecutive check-in pulses in central DB log."},
+                "sleep_pattern": {"score": 46, "available": False, "source": "Soldier Mobile App (Pending Sync)", "note": "Mobile sleep logging pending in last 48 hours."},
+                "biometric_trends": {"score": 48, "available": False, "source": "Soldier Mobile App (Pending Sync)", "note": "Wearable sensor telemetry sync pending."},
+                "behavioral_changes": {"score": 44, "available": True, "source": "Soldier Mobile App & Central DB (Behavioral Telemetry)", "note": "Normal baseline interaction during shift review."}
             }
         },
         {
@@ -429,6 +501,15 @@ class HRMSClient:
                 "social_isolation": {"score": 60, "available": True, "source": "Central Database (Barracks Peer Network)", "note": "Remote forward jungle outpost isolation record in central DB."},
                 "traumatic_exposure": {"score": 78, "available": True, "source": "HRMS Portal (Combat Operations & Incident Dossier)", "note": "Active counter-insurgency cordon and encounter logs in HRMS Dossier."},
                 "wellness_survey": {"score": 70, "available": True, "source": "Central Database (Periodic Psychometric Assessment Archive)", "note": "Elevated fatigue and terrain stress in monthly survey DB archive."}
+            },
+            "stress_indicators_params": {
+                "hrms_data": {"score": 74, "available": True, "source": "HRMS Portal (Dossier & Stationing History)", "note": "8 months dense jungle terrain posting in HRMS."},
+                "leave_frequency": {"score": 75, "available": True, "source": "HRMS Portal (Leave Management System)", "note": "Furlough delayed by 2 months due to cordon duty in HRMS."},
+                "workload": {"score": 76, "available": True, "source": "HRMS Portal (Command Watch Rosters)", "note": "High patrol density and terrain vigilance shifts."},
+                "missed_assessments": {"score": 55, "available": True, "source": "Central Database (Compliance Log)", "note": "Periodic connectivity delays during deep terrain patrols."},
+                "sleep_pattern": {"score": 74, "available": True, "source": "Soldier Mobile App (Sleep Telemetry)", "note": "4.8h fragmented sleep recorded on mobile app."},
+                "biometric_trends": {"score": 72, "available": True, "source": "Soldier Mobile App (Biometric & Sensor Engine)", "note": "Elevated biometric fatigue slope from patrol marches."},
+                "behavioral_changes": {"score": 68, "available": True, "source": "Soldier Mobile App & Central DB (Behavioral Telemetry)", "note": "Tactical tension and environmental fatigue."}
             }
         }
     ]
