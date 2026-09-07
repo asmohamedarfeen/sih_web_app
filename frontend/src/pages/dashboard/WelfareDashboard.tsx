@@ -534,6 +534,26 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
     getRaw(p.psychological_distress_params, key, fb, note, src);
   const getStress = (key: string, fb: number = 50, note: string = 'Stress signal', src: string = 'HRMS Portal') =>
     getRaw(p.stress_indicators_params, key, fb, note, src);
+  const getOverall = (key: string, fb: number = 50, note: string = 'Overall stress metric', src: string = '🏢 HRMS Portal') =>
+    getRaw((p as any).overall_stress_params, key, fb, note, src);
+  const getFatigue = (key: string, fb: number = 50, note: string = 'Fatigue telemetry', src: string = '📱 Soldier Mobile App') =>
+    getRaw((p as any).emotional_fatigue_params, key, fb, note, src);
+  const getWelfareConcern = (key: string, fb: number = 50, note: string = 'Welfare concern metric', src: string = '🏢 HRMS Portal') =>
+    getRaw((p as any).welfare_concern_params, key, fb, note, src);
+  const getPredictiveBehavioral = (key: string, fb: number = 50, note: string = 'Behavioral metric', src: string = '🏢 HRMS Portal') =>
+    getRaw((p as any).predictive_behavioral_params, key, fb, note, src);
+  const getStressBurnoutRisk = (key: string, fb: number = 50, note: string = 'Risk model metric', src: string = '🏢 HRMS Portal') =>
+    getRaw((p as any).stress_burnout_risk_params, key, fb, note, src);
+  const getWelfareIntervention = (key: string, fb: number = 50, note: string = 'Intervention metric', src: string = '💾 Central Database') =>
+    getRaw((p as any).welfare_intervention_params, key, fb, note, src);
+  const getAlerts = (key: string, fb: number = 50, note: string = 'Alert priority metric', src: string = '💾 Central Database') =>
+    getRaw((p as any).automated_alerts_params, key, fb, note, src);
+  const getResilience = (key: string, fb: number = 50, note: string = 'Resilience hardiness metric', src: string = '💾 Central Database') =>
+    getRaw((p as any).mental_resilience_params, key, fb, note, src);
+  const getReadiness = (key: string, fb: number = 50, note: string = 'Readiness suitability metric', src: string = '💾 Central Database') =>
+    getRaw((p as any).operational_readiness_params, key, fb, note, src);
+  const getOccupational = (key: string, fb: number = 50, note: string = 'Occupational stress hazard metric', src: string = '💾 Central Database') =>
+    getRaw((p as any).occupational_stress_params, key, fb, note, src);
 
   let score = 50;
   let formula = '';
@@ -677,19 +697,16 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
 
     case 'overall-stress-prediction': {
       metricLabel = 'Overall Stress';
-      const dh = getP('overtime', 50, 'Watch & duty hours beyond roster in HRMS', 'HRMS Portal (Command Watch Rosters)');
-      const dh_score = dh.score;
-      const dh_param = { ...dh, score: dh_score };
-
-      const dh_dep = getP('deployment_duration', 40, 'Deployment tenure & hostile sector history in HRMS', 'HRMS Portal (Stationing & Postings Dossier)');
-      const wl = getP('workload_trend', 50, 'Operational task allocation & shift tempo in HRMS', 'HRMS Portal (Task Allocation Roster)');
-      const tr = getP('duty_schedule', 50, 'Station postings & frequency of rotational transfers in HRMS', 'HRMS Portal (Posting & Transfer History)');
-      const tl = getP('emotional_exhaustion', 50, 'Live tactical drills & combat conditioning log in DB', 'Central Database (Combat Training & Drills Log)');
-      const wa = getPsych('mood_assessments', 60, 'Periodic psychometric self-assessment pulse on mobile', 'Soldier Mobile App (Psychometric Self-Assessment)');
-      const bm = getStress('biometric_trends', 68, 'Cardiovascular vitals & autonomic load on mobile', 'Soldier Mobile App (Biometric & Sensor Engine)');
+      const dh = getOverall('duty_hours', getP('overtime').score, 'Watch & duty hours beyond roster in HRMS', '🏢 HRMS Portal (Command Watch Rosters)');
+      const dh_dep = getOverall('deployment_history', getP('deployment_duration').score, 'Deployment tenure & hostile sector history in HRMS', '🏢 HRMS Portal (Stationing & Postings Dossier)');
+      const wl = getOverall('workload', getP('workload_trend').score, 'Operational task allocation & shift tempo in HRMS', '🏢 HRMS Portal (Task Allocation Roster)');
+      const tr = getOverall('transfers', getP('duty_schedule').score, 'Station postings & frequency of rotational transfers in HRMS', '🏢 HRMS Portal (Posting & Transfer History)');
+      const tl = getOverall('training_load', getP('emotional_exhaustion').score, 'Live tactical drills & combat conditioning log in DB', '💾 Central Database (Combat Training & Drills Log)');
+      const wa = getOverall('wellness_assessments', getPsych('mood_assessments').score, 'Periodic psychometric self-assessment pulse on mobile', '📱 Soldier Mobile App (Psychometric Self-Assessment)');
+      const bm = getOverall('biometrics', getStress('biometric_trends').score, 'Cardiovascular vitals & autonomic load on mobile', '📱 Soldier Mobile App (Biometric & Sensor Engine)');
 
       score = (
-        0.18 * dh_param.score +
+        0.18 * dh.score +
         0.16 * dh_dep.score +
         0.16 * wl.score +
         0.12 * tr.score +
@@ -704,7 +721,7 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
       secondaryAction = 'Deploy Rest Rotation';
 
       params = [
-        { key: 'duty_hours', name: '1. Duty hours', weight: 0.18, weightLabel: '18%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: dh_param.note, source: dh_param.source, available: dh_param.available, score: dh_param.score, ...getColor(dh_param.score), desc: 'Watch & duty hours logged in HRMS Watch Rosters' },
+        { key: 'duty_hours', name: '1. Duty hours', weight: 0.18, weightLabel: '18%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: dh.note, source: dh.source, available: dh.available, score: dh.score, ...getColor(dh.score), desc: 'Watch & duty hours logged in HRMS Watch Rosters' },
         { key: 'deployment_history', name: '2. Deployment history', weight: 0.16, weightLabel: '16%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: dh_dep.note, source: dh_dep.source, available: dh_dep.available, score: dh_dep.score, ...getColor(dh_dep.score), desc: 'Deployment history in stationing dossier' },
         { key: 'workload', name: '3. Workload', weight: 0.16, weightLabel: '16%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: wl.note, source: wl.source, available: wl.available, score: wl.score, ...getColor(wl.score), desc: 'Task allocation & watch tempo in HRMS' },
         { key: 'transfers', name: '4. Transfers', weight: 0.12, weightLabel: '12%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: tr.note, source: tr.source, available: tr.available, score: tr.score, ...getColor(tr.score), desc: 'Frequency of unit transfers in HRMS' },
@@ -717,12 +734,12 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
 
     case 'emotional-fatigue-prediction': {
       metricLabel = 'Emotional Fatigue';
-      const sq = getP('sleep_quality', 50, 'Total sleep debt & insomnia markers on mobile', 'Soldier Mobile App (Sleep Telemetry)');
-      const md = getPsych('mood_assessments', 60, 'Daily affective valence & mood pulse on mobile', 'Soldier Mobile App (Daily Mood Pulse)');
-      const wl = getP('workload_trend', 50, 'High-intensity operational task tempo in HRMS', 'HRMS Portal (Command Watch Rosters)');
-      const ee = getP('emotional_exhaustion', 50, 'MBI-GS emotional exhaustion domain questions', 'Soldier Mobile App (MBI-GS Exhaustion Domain)');
-      const wb = getPsych('social_isolation', 50, 'Family communication & work-life balance survey in DB', 'Central Database (Family & Work-Life Survey)');
-      const ch = getPsych('wellness_survey', 62, 'Counseling session logs & therapeutic history in DB', 'Central Database (Counseling Case Registry)');
+      const sq = getFatigue('sleep_quality', getP('sleep_quality').score, 'Total sleep debt & insomnia markers on mobile', '📱 Soldier Mobile App (Sleep Telemetry)');
+      const md = getFatigue('mood', getPsych('mood_assessments').score, 'Daily affective valence & mood pulse on mobile', '📱 Soldier Mobile App (Daily Mood Pulse)');
+      const wl = getFatigue('workload', getP('workload_trend').score, 'High-intensity operational task tempo in HRMS', '🏢 HRMS Portal (Command Watch Rosters)');
+      const ee = getFatigue('emotional_exhaustion_questions', getP('emotional_exhaustion').score, 'MBI-GS emotional exhaustion domain questions', '📱 Soldier Mobile App (MBI-GS Exhaustion Domain)');
+      const wb = getFatigue('work_life_balance', getPsych('social_isolation').score, 'Family communication & work-life balance survey in DB', '💾 Central Database (Family & Work-Life Survey)');
+      const ch = getFatigue('counseling_history', getPsych('wellness_survey').score, 'Counseling session logs & therapeutic history in DB', '💾 Central Database (Counseling Case Registry)');
 
       score = (
         0.20 * sq.score +
@@ -751,12 +768,12 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
 
     case 'welfare-concern-detection': {
       metricLabel = 'Welfare Concern';
-      const fc = getStress('leave_frequency', 50, 'Welfare grants & financial support requests in HRMS', 'HRMS Portal (Welfare Claims & Grant Requests)');
-      const fs = getP('deployment_duration', 40, 'Continuous stationing & family separation duration in HRMS', 'HRMS Portal (Stationing & Separation Tenure)');
-      const rl = getP('leave_patterns', 50, 'Repeated and deferred leave applications in HRMS', 'HRMS Portal (Leave Management System)');
-      const si = getPsych('anxiety_questions', 65, 'Self-reported domestic or welfare concerns on mobile', 'Soldier Mobile App (Welfare Feedback Telemetry)');
-      const pw = getPsych('depression_indicators', 58, 'Declining wellness trends across survey intervals in DB', 'Central Database (Wellness Score Trend Archive)');
-      const ih = getPsych('wellness_survey', 62, 'Past welfare intervention case registry records in DB', 'Central Database (Welfare Intervention Logs)');
+      const fc = getWelfareConcern('financial_concerns', getStress('leave_frequency').score, 'Welfare grants & financial support requests in HRMS', '🏢 HRMS Portal (Welfare Claims & Grant Requests)');
+      const fs = getWelfareConcern('family_separation', getP('deployment_duration').score, 'Continuous stationing & family separation duration in HRMS', '🏢 HRMS Portal (Stationing & Separation Tenure)');
+      const rl = getWelfareConcern('repeated_leave_requests', getP('leave_patterns').score, 'Repeated and deferred leave applications in HRMS', '🏢 HRMS Portal (Leave Management System)');
+      const si = getWelfareConcern('self_reported_issues', getPsych('anxiety_questions').score, 'Self-reported domestic or welfare concerns on mobile', '📱 Soldier Mobile App (Welfare Feedback Telemetry)');
+      const pw = getWelfareConcern('poor_wellness_trends', getPsych('depression_indicators').score, 'Declining wellness trends across survey intervals in DB', '💾 Central Database (Wellness Score Trend Archive)');
+      const ih = getWelfareConcern('intervention_history', getPsych('wellness_survey').score, 'Past welfare intervention case registry records in DB', '💾 Central Database (Welfare Intervention Logs)');
 
       score = (
         0.15 * fc.score +
@@ -785,13 +802,13 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
 
     case 'predictive-behavioral-analytics': {
       metricLabel = 'Behavioral Drift';
-      const hr = getStress('hrms_data', 65, 'Longitudinal career & service records in HRMS', 'HRMS Portal (Historical Service Records)');
-      const at = getP('duty_schedule', 50, 'Daily muster & duty watch attendance logs in HRMS', 'HRMS Portal (Daily Muster & Watch Attendance)');
-      const lv = getP('leave_patterns', 50, 'Leave patterns & utilization frequency in HRMS', 'HRMS Portal (Leave Patterns & Utilization)');
-      const dp = getP('deployment_duration', 40, 'Deployment duration & stationing history in HRMS', 'HRMS Portal (Deployment & Stationing Duration)');
-      const as = getStress('missed_assessments', 45, 'Periodic psychometric check-in compliance on mobile', 'Soldier Mobile App (Mobile Psychometric Check-ins)');
-      const bt = getStress('biometric_trends', 68, 'Wearable sensor telemetry & circadian drift on mobile', 'Soldier Mobile App (Wearable Sensor Telemetry)');
-      const bh = getStress('behavioral_changes', 60, 'Behavioral drift archive & peer review records in DB', 'Central Database (Behavioral Drift Archive)');
+      const hr = getPredictiveBehavioral('historical_hrms_records', getStress('hrms_data').score, 'Longitudinal career & service records in HRMS', '🏢 HRMS Portal (Historical Service Records)');
+      const at = getPredictiveBehavioral('attendance', getP('duty_schedule').score, 'Daily muster & duty watch attendance logs in HRMS', '🏢 HRMS Portal (Daily Muster & Watch Attendance)');
+      const lv = getPredictiveBehavioral('leave', getP('leave_patterns').score, 'Leave patterns & utilization frequency in HRMS', '🏢 HRMS Portal (Leave Patterns & Utilization)');
+      const dp = getPredictiveBehavioral('deployment', getP('deployment_duration').score, 'Deployment duration & stationing history in HRMS', '🏢 HRMS Portal (Deployment & Stationing Duration)');
+      const as = getPredictiveBehavioral('assessments', getStress('missed_assessments').score, 'Periodic psychometric check-in compliance on mobile', '📱 Soldier Mobile App (Mobile Psychometric Check-ins)');
+      const bt = getPredictiveBehavioral('biometric_trends', getStress('biometric_trends').score, 'Wearable sensor telemetry & circadian drift on mobile', '📱 Soldier Mobile App (Wearable Sensor Telemetry)');
+      const bh = getPredictiveBehavioral('behavioral_history', getStress('behavioral_changes').score, 'Behavioral drift archive & peer review records in DB', '💾 Central Database (Behavioral Drift Archive)');
 
       score = (
         0.15 * hr.score +
@@ -822,10 +839,10 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
 
     case 'stress-burnout-risk-models': {
       metricLabel = 'Hazard Model';
-      const hrmsData = getStress('hrms_data', 65, 'Workload, stationing tenure & duty rosters in HRMS', '🏢 HRMS Portal (Dossier & Watch Rosters)');
-      const wellnessData = getPsych('wellness_survey', 62, 'Composite wellness profile & psychometrics in DB', '💾 Central Database (Composite Wellness Index)');
-      const biometricData = getStress('biometric_trends', 68, 'Autonomic nervous system & wearable biometrics on mobile', '📱 Soldier Mobile App (Autonomic Biometric Trends)');
-      const assessmentData = getP('assessment_responses', 50, 'Psychometric responses to burnout & stress items on mobile', '📱 Soldier Mobile App (Psychometric Response Telemetry)');
+      const hrmsData = getStressBurnoutRisk('combined_hrms_data', getStress('hrms_data').score, 'Workload, stationing tenure & duty rosters in HRMS', '🏢 HRMS Portal (Dossier & Watch Rosters)');
+      const wellnessData = getStressBurnoutRisk('wellness_data', getPsych('wellness_survey').score, 'Composite wellness profile & psychometrics in DB', '💾 Central Database (Composite Wellness Index)');
+      const biometricData = getStressBurnoutRisk('biometric_data', getStress('biometric_trends').score, 'Autonomic nervous system & wearable biometrics on mobile', '📱 Soldier Mobile App (Autonomic Biometric Trends)');
+      const assessmentData = getStressBurnoutRisk('assessment_data', getP('assessment_responses').score, 'Psychometric responses to burnout & stress items on mobile', '📱 Soldier Mobile App (Psychometric Response Telemetry)');
 
       score = (
         0.28 * hrmsData.score +
@@ -850,11 +867,11 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
 
     case 'welfare-intervention-recommendation': {
       metricLabel = 'Intervention Index';
-      const aiRisk = getPsych('wellness_survey', 62, 'Composite AI risk score & classification in DB', 'Central Database (Composite Risk Engine)');
-      const ah = getP('assessment_responses', 50, 'Historical psychometric check-in scores in DB', 'Central Database (Psychometric Assessment History)');
-      const wl = getP('workload_trend', 50, 'Command operational task tempo & rosters in HRMS', 'HRMS Portal (Command Watch Rosters)');
-      const dp = getP('deployment_duration', 40, 'Hostile terrain & deployment tenure in HRMS', 'HRMS Portal (Deployment & Stationing Dossier)');
-      const pi = getStress('missed_assessments', 45, 'Prior welfare intervention case outcomes in DB', 'Central Database (Welfare Interventions Archive)');
+      const aiRisk = getWelfareIntervention('ai_risk_score', getPsych('wellness_survey').score, 'Composite AI risk score & classification in DB', '💾 Central Database (Composite Risk Engine)');
+      const ah = getWelfareIntervention('assessment_history', getP('assessment_responses').score, 'Historical psychometric check-in scores in DB', '💾 Central Database (Psychometric Assessment History)');
+      const wl = getWelfareIntervention('workload', getP('workload_trend').score, 'Command operational task tempo & rosters in HRMS', '🏢 HRMS Portal (Command Watch Rosters)');
+      const dp = getWelfareIntervention('deployment', getP('deployment_duration').score, 'Hostile terrain & deployment tenure in HRMS', '🏢 HRMS Portal (Deployment & Stationing Dossier)');
+      const pi = getWelfareIntervention('previous_interventions', getStress('missed_assessments').score, 'Prior welfare intervention case outcomes in DB', '💾 Central Database (Welfare Interventions Archive)');
 
       score = (
         0.25 * aiRisk.score +
@@ -881,10 +898,10 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
 
     case 'automated-alerts': {
       metricLabel = 'Alert Priority';
-      const hr = getPsych('wellness_survey', 62, 'AI predictive early warning trigger classification in DB', 'Central Database (AI Early Warning Classifier)');
-      const ss = getStress('biometric_trends', 68, '24h acute stress spike detection logged on mobile', 'Soldier Mobile App (24h Stress Spike Telemetry)');
-      const ma = getStress('missed_assessments', 45, 'Scheduled psychometric assessment avoidance in DB', 'Central Database (Compliance Check-in Log)');
-      const at = getP('sleep_quality', 50, 'Sensor & sleep biometric anomaly patterns on mobile', 'Soldier Mobile App (Sensor & Biometric Anomaly Engine)');
+      const hr = getAlerts('high_risk_predictions', getPsych('wellness_survey').score, 'AI predictive early warning trigger classification in DB', '💾 Central Database (AI Early Warning Classifier)');
+      const ss = getAlerts('sudden_score_increase', getStress('biometric_trends').score, '24h acute stress spike detection logged on mobile', '📱 Soldier Mobile App (24h Stress Spike Telemetry)');
+      const ma = getAlerts('missed_assessments', getStress('missed_assessments').score, 'Scheduled psychometric assessment avoidance in DB', '💾 Central Database (Compliance Check-in Log)');
+      const at = getAlerts('abnormal_trends', getP('sleep_quality').score, 'Sensor & sleep biometric anomaly patterns on mobile', '📱 Soldier Mobile App (Sensor & Biometric Anomaly Engine)');
 
       score = (
         0.30 * hr.score +
@@ -914,17 +931,17 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
       const isRamesh = p.uid === 'UID-EMP-012';
       const isGurpreet = p.uid === 'UID-EMP-013';
 
-      const wsScore = isAmit ? 88 : isSarah ? 90 : isRamesh ? 24 : isGurpreet ? 32 : Math.max(15, Math.min(95, 110 - getPsych('wellness_survey', 62).score));
-      const ioScore = isAmit ? 92 : isSarah ? 88 : isRamesh ? 28 : isGurpreet ? 36 : Math.max(15, Math.min(95, 110 - getPsych('social_isolation', 50).score));
-      const asScore = isAmit ? 86 : isSarah ? 85 : isRamesh ? 22 : isGurpreet ? 30 : Math.max(15, Math.min(95, 110 - getPsych('mood_assessments', 60).score));
-      const atScore = isAmit ? 90 : isSarah ? 92 : isRamesh ? 40 : isGurpreet ? 50 : Math.max(15, Math.min(95, 110 - getP('duty_schedule', 50).score));
-      const ptScore = isAmit ? 85 : isSarah ? 86 : isRamesh ? 20 : isGurpreet ? 28 : Math.max(15, Math.min(95, 110 - getP('workload_trend', 50).score));
+      const fbWs = isAmit ? 88 : isSarah ? 90 : isRamesh ? 24 : isGurpreet ? 32 : Math.max(15, Math.min(95, 110 - getPsych('wellness_survey', 62).score));
+      const fbIo = isAmit ? 92 : isSarah ? 88 : isRamesh ? 28 : isGurpreet ? 36 : Math.max(15, Math.min(95, 110 - getPsych('social_isolation', 50).score));
+      const fbAs = isAmit ? 86 : isSarah ? 85 : isRamesh ? 22 : isGurpreet ? 30 : Math.max(15, Math.min(95, 110 - getPsych('mood_assessments', 60).score));
+      const fbAt = isAmit ? 90 : isSarah ? 92 : isRamesh ? 40 : isGurpreet ? 50 : Math.max(15, Math.min(95, 110 - getP('duty_schedule', 50).score));
+      const fbPt = isAmit ? 85 : isSarah ? 86 : isRamesh ? 20 : isGurpreet ? 28 : Math.max(15, Math.min(95, 110 - getP('workload_trend', 50).score));
 
-      const ws = { score: wsScore, note: 'Longitudinal wellness metric & psychological tracking in DB', source: 'Central Database (Historical Wellness Metric)', available: true };
-      const io = { score: ioScore, note: 'Clinical recovery & positive outcome registry in DB', source: 'Central Database (Clinical Outcome Registry)', available: true };
-      const as = { score: asScore, note: 'Resilience & CD-RISC hardiness check-in scores on mobile', source: 'Soldier Mobile App (Resilience Check-in)', available: true };
-      const at = { score: atScore, note: 'Operational muster & duty attendance logs in HRMS', source: 'HRMS Portal (Muster & Operational Attendance)', available: true };
-      const pt = { score: ptScore, note: 'Task completion & operational productivity trends in DB', source: 'Central Database (Productivity Trends)', available: true };
+      const ws = getResilience('wellness_score_history', fbWs, 'Longitudinal wellness metric & psychological tracking in DB', '💾 Central Database (Historical Wellness Metric)');
+      const io = getResilience('intervention_outcomes', fbIo, 'Clinical recovery & positive outcome registry in DB', '💾 Central Database (Clinical Outcome Registry)');
+      const as = getResilience('assessments', fbAs, 'Resilience & CD-RISC hardiness check-in scores on mobile', '📱 Soldier Mobile App (Resilience Check-in)');
+      const at = getResilience('attendance', fbAt, 'Operational muster & duty attendance logs in HRMS', '🏢 HRMS Portal (Muster & Operational Attendance)');
+      const pt = getResilience('productivity_trends', fbPt, 'Task completion & operational productivity trends in DB', '💾 Central Database (Productivity Trends)');
 
       score = (
         0.24 * ws.score +
@@ -956,19 +973,19 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
       const isRamesh = p.uid === 'UID-EMP-012';
       const isGurpreet = p.uid === 'UID-EMP-013';
 
-      const wsScore = isAmit ? 88 : isSarah ? 90 : isRamesh ? 22 : isGurpreet ? 36 : Math.max(15, Math.min(95, 110 - getPsych('wellness_survey', 62).score));
-      const ftScore = isAmit ? 86 : isSarah ? 88 : isRamesh ? 18 : isGurpreet ? 30 : Math.max(15, Math.min(95, 110 - getP('sleep_quality', 50).score));
-      const dlScore = isAmit ? 90 : isSarah ? 92 : isRamesh ? 20 : isGurpreet ? 40 : Math.max(15, Math.min(95, 110 - getP('deployment_duration', 40).score));
-      const lvScore = isAmit ? 85 : isSarah ? 86 : isRamesh ? 25 : isGurpreet ? 42 : Math.max(15, Math.min(95, 110 - getP('leave_patterns', 50).score));
-      const atScore = isAmit ? 92 : isSarah ? 90 : isRamesh ? 30 : isGurpreet ? 45 : Math.max(15, Math.min(95, 110 - getP('duty_schedule', 50).score));
-      const aiScore = isAmit ? 88 : isSarah ? 86 : isRamesh ? 20 : isGurpreet ? 34 : Math.max(15, Math.min(95, 110 - getP('emotional_exhaustion', 50).score));
+      const fbWs = isAmit ? 88 : isSarah ? 90 : isRamesh ? 22 : isGurpreet ? 36 : Math.max(15, Math.min(95, 110 - getPsych('wellness_survey', 62).score));
+      const fbFt = isAmit ? 86 : isSarah ? 88 : isRamesh ? 18 : isGurpreet ? 30 : Math.max(15, Math.min(95, 110 - getP('sleep_quality', 50).score));
+      const fbDl = isAmit ? 90 : isSarah ? 92 : isRamesh ? 20 : isGurpreet ? 40 : Math.max(15, Math.min(95, 110 - getP('deployment_duration', 40).score));
+      const fbLv = isAmit ? 85 : isSarah ? 86 : isRamesh ? 25 : isGurpreet ? 42 : Math.max(15, Math.min(95, 110 - getP('leave_patterns', 50).score));
+      const fbAt = isAmit ? 92 : isSarah ? 90 : isRamesh ? 30 : isGurpreet ? 45 : Math.max(15, Math.min(95, 110 - getP('duty_schedule', 50).score));
+      const fbAi = isAmit ? 88 : isSarah ? 86 : isRamesh ? 20 : isGurpreet ? 34 : Math.max(15, Math.min(95, 110 - getP('emotional_exhaustion', 50).score));
 
-      const ws = { score: wsScore, note: 'Composite psychological wellness score in DB', source: 'Central Database (Composite Wellness Index)', available: true };
-      const ft = { score: ftScore, note: 'Cognitive & sleep fatigue telemetry logged on mobile', source: 'Soldier Mobile App (Fatigue Telemetry)', available: true };
-      const dl = { score: dlScore, note: 'Operational sector deployment load in HRMS', source: 'HRMS Portal (Deployment Load Archive)', available: true };
-      const lv = { score: lvScore, note: 'Leave balance & furlough readiness status in HRMS', source: 'HRMS Portal (Leave Management System)', available: true };
-      const at = { score: atScore, note: 'Muster & operational combat attendance in HRMS', source: 'HRMS Portal (Combat Readiness Attendance)', available: true };
-      const ai = { score: aiScore, note: 'Multi-modal predictive AI operational risk model in DB', source: 'Central Database (Predictive AI Risk Model)', available: true };
+      const ws = getReadiness('wellness_score', fbWs, 'Composite psychological wellness score in DB', '💾 Central Database (Composite Wellness Index)');
+      const ft = getReadiness('fatigue', fbFt, 'Cognitive & sleep fatigue telemetry logged on mobile', '📱 Soldier Mobile App (Fatigue Telemetry)');
+      const dl = getReadiness('deployment_load', fbDl, 'Operational sector deployment load in HRMS', '🏢 HRMS Portal (Deployment Load Archive)');
+      const lv = getReadiness('leave', fbLv, 'Leave balance & furlough readiness status in HRMS', '🏢 HRMS Portal (Leave Management System)');
+      const at = getReadiness('attendance', fbAt, 'Muster & operational combat attendance in HRMS', '🏢 HRMS Portal (Combat Readiness Attendance)');
+      const ai = getReadiness('ai_risk_predictions', fbAi, 'Multi-modal predictive AI operational risk model in DB', '💾 Central Database (Predictive AI Risk Model)');
 
       score = (
         0.20 * ws.score +
@@ -988,7 +1005,7 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
         { key: 'wellness_score', name: '1. Wellness score', weight: 0.20, weightLabel: '20%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ws.note, source: ws.source, available: ws.available, score: ws.score, ...getColor(ws.score, true), desc: 'Composite wellness index in Central DB' },
         { key: 'fatigue', name: '2. Fatigue', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ft.note, source: ft.source, available: ft.available, score: ft.score, ...getColor(ft.score, true), desc: 'Cognitive & sleep fatigue on mobile' },
         { key: 'deployment_load', name: '3. Deployment load', weight: 0.18, weightLabel: '18%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: dl.note, source: dl.source, available: dl.available, score: dl.score, ...getColor(dl.score, true), desc: 'Operational sector deployment load in HRMS' },
-        { key: 'leave', name: '4. Leave', weight: 0.15, weightLabel: '15%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: lv.note, source: lv.source, available: lv.available, score: lv.score, ...getColor(lv.score, true), desc: 'Furlough & leave readiness in HRMS' },
+        { key: 'leave', name: '4. Leave', weight: 0.15, weightLabel: '15%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: lv.note, source: lv.source, available: lv.available, score: lv.score, ...getColor(lv.score), desc: 'Furlough & leave readiness in HRMS' },
         { key: 'attendance', name: '5. Attendance', weight: 0.15, weightLabel: '15%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: at.note, source: at.source, available: at.available, score: at.score, ...getColor(at.score, true), desc: 'Muster & combat attendance in HRMS' },
         { key: 'ai_risk_predictions', name: '6. AI risk predictions', weight: 0.12, weightLabel: '12%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ai.note, source: ai.source, available: ai.available, score: ai.score, ...getColor(ai.score, true), desc: 'Predictive AI risk model in Central DB' },
       ];
@@ -997,12 +1014,12 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
 
     case 'occupational-stress-risk': {
       metricLabel = 'Occupational Hazard';
-      const lt = getPsych('wellness_survey', 62, 'Longitudinal stress trend registry in DB', 'Central Database (Longitudinal Stress Registry)');
-      const bh = getP('emotional_exhaustion', 50, 'Historical burnout episodes & affective strain in DB', 'Central Database (Burnout History Archive)');
-      const wl = getP('workload_trend', 50, 'Command watch hours & overtime load in HRMS', 'HRMS Portal (Command Watch Rosters)');
-      const dp = getP('deployment_duration', 40, 'Hostile terrain & continuous forward sector tenure in HRMS', 'HRMS Portal (Deployment Tenure Dossier)');
-      const ps = getP('sleep_quality', 50, 'Sleep fragmentation & nocturnal rest deficit on mobile', 'Soldier Mobile App (Sleep Deficit Telemetry)');
-      const ef = getPsych('mood_assessments', 60, 'Cognitive exhaustion & affective weariness on mobile', 'Soldier Mobile App (Affective Fatigue Telemetry)');
+      const lt = getOccupational('long_term_stress_trends', getPsych('wellness_survey').score, 'Longitudinal stress trend registry in DB', '💾 Central Database (Longitudinal Stress Registry)');
+      const bh = getOccupational('burnout_history', getP('emotional_exhaustion').score, 'Historical burnout episodes & affective strain in DB', '💾 Central Database (Burnout History Archive)');
+      const wl = getOccupational('workload', getP('workload_trend').score, 'Command watch hours & overtime load in HRMS', '🏢 HRMS Portal (Command Watch Rosters)');
+      const dp = getOccupational('deployments', getP('deployment_duration').score, 'Hostile terrain & continuous forward sector tenure in HRMS', '🏢 HRMS Portal (Deployment Tenure Dossier)');
+      const ps = getOccupational('poor_sleep', getP('sleep_quality').score, 'Sleep fragmentation & nocturnal rest deficit on mobile', '📱 Soldier Mobile App (Sleep Deficit Telemetry)');
+      const ef = getOccupational('emotional_fatigue', getPsych('mood_assessments').score, 'Cognitive exhaustion & affective weariness on mobile', '📱 Soldier Mobile App (Affective Fatigue Telemetry)');
 
       score = (
         0.18 * lt.score +
