@@ -677,220 +677,232 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
 
     case 'overall-stress-prediction': {
       metricLabel = 'Overall Stress';
-      const bt = getStress('biometric_trends', 68, 'Cardiovascular & autonomic load on mobile', 'Soldier Mobile App (Biometric Sensor Engine)');
-      const wt = getP('workload_trend', 50, 'Command operational task tempo in HRMS', 'HRMS Portal (Command Watch Rosters)');
-      const sq = getP('sleep_quality', 50, 'Total sleep debt & insomnia markers on mobile', 'Soldier Mobile App (Sleep Telemetry)');
-      const sr = getPsych('mood_assessments', 60, 'Self-reported stress & daily pulse on mobile', 'Soldier Mobile App (Daily Self-Assessment)');
-      const ds = getP('duty_schedule', 50, 'Duty cycle rotation & watch hours in HRMS', 'HRMS Portal (Battalion Rosters)');
-      const dd = getP('deployment_duration', 40, 'Hostile terrain & environmental severity in DB', 'Central Database (Sector Severity Archive)');
+      const dh = getP('overtime', 50, 'Watch & duty hours beyond roster in HRMS', 'HRMS Portal (Command Watch Rosters)');
+      const dh_score = dh.score;
+      const dh_param = { ...dh, score: dh_score };
+
+      const dh_dep = getP('deployment_duration', 40, 'Deployment tenure & hostile sector history in HRMS', 'HRMS Portal (Stationing & Postings Dossier)');
+      const wl = getP('workload_trend', 50, 'Operational task allocation & shift tempo in HRMS', 'HRMS Portal (Task Allocation Roster)');
+      const tr = getP('duty_schedule', 50, 'Station postings & frequency of rotational transfers in HRMS', 'HRMS Portal (Posting & Transfer History)');
+      const tl = getP('emotional_exhaustion', 50, 'Live tactical drills & combat conditioning log in DB', 'Central Database (Combat Training & Drills Log)');
+      const wa = getPsych('mood_assessments', 60, 'Periodic psychometric self-assessment pulse on mobile', 'Soldier Mobile App (Psychometric Self-Assessment)');
+      const bm = getStress('biometric_trends', 68, 'Cardiovascular vitals & autonomic load on mobile', 'Soldier Mobile App (Biometric & Sensor Engine)');
 
       score = (
-        0.20 * bt.score +
-        0.20 * wt.score +
-        0.18 * sq.score +
-        0.16 * sr.score +
-        0.14 * ds.score +
-        0.12 * dd.score
+        0.18 * dh_param.score +
+        0.16 * dh_dep.score +
+        0.16 * wl.score +
+        0.12 * tr.score +
+        0.12 * tl.score +
+        0.13 * wa.score +
+        0.13 * bm.score
       );
 
-      formula = '0.20(Biometrics) + 0.20(Ops Tempo) + 0.18(Sleep) + 0.16(Self-Report) + 0.14(Duty Cycle) + 0.12(Env Severity)';
-      mobileCount = 3; hrmsCount = 2; databaseCount = 1;
+      formula = '0.18(Duty hours) + 0.16(Deployment history) + 0.16(Workload) + 0.12(Transfers) + 0.12(Training load) + 0.13(Wellness assessments) + 0.13(Biometrics)';
+      mobileCount = 2; hrmsCount = 4; databaseCount = 1;
       primaryAction = 'Unit Tempo Modulation';
       secondaryAction = 'Deploy Rest Rotation';
 
       params = [
-        { key: 'biometric_strain', name: '1. Biometric strain', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: bt.note, source: bt.source, available: bt.available, score: bt.score, ...getColor(bt.score), desc: 'Cardiovascular autonomic load on mobile' },
-        { key: 'operational_tempo', name: '2. Operational tempo', weight: 0.20, weightLabel: '20%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: wt.note, source: wt.source, available: wt.available, score: wt.score, ...getColor(wt.score), desc: 'Command operational task tempo in HRMS' },
-        { key: 'sleep_deficit', name: '3. Sleep deficit', weight: 0.18, weightLabel: '18%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: sq.note, source: sq.source, available: sq.available, score: sq.score, ...getColor(sq.score), desc: 'Total sleep deficit & insomnia markers on mobile' },
-        { key: 'self_reported_stress', name: '4. Self-reported stress', weight: 0.16, weightLabel: '16%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: sr.note, source: sr.source, available: sr.available, score: sr.score, ...getColor(sr.score), desc: 'Daily self-reported psychometric strain on mobile' },
-        { key: 'duty_cycle_load', name: '5. Duty cycle load', weight: 0.14, weightLabel: '14%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: ds.note, source: ds.source, available: ds.available, score: ds.score, ...getColor(ds.score), desc: 'Night shift concentration & rotation in HRMS' },
-        { key: 'environmental_severity', name: '6. Environmental severity', weight: 0.12, weightLabel: '12%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: dd.note, source: dd.source, available: dd.available, score: dd.score, ...getColor(dd.score), desc: 'Sector difficulty & terrain hostile index in DB' },
+        { key: 'duty_hours', name: '1. Duty hours', weight: 0.18, weightLabel: '18%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: dh_param.note, source: dh_param.source, available: dh_param.available, score: dh_param.score, ...getColor(dh_param.score), desc: 'Watch & duty hours logged in HRMS Watch Rosters' },
+        { key: 'deployment_history', name: '2. Deployment history', weight: 0.16, weightLabel: '16%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: dh_dep.note, source: dh_dep.source, available: dh_dep.available, score: dh_dep.score, ...getColor(dh_dep.score), desc: 'Deployment history in stationing dossier' },
+        { key: 'workload', name: '3. Workload', weight: 0.16, weightLabel: '16%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: wl.note, source: wl.source, available: wl.available, score: wl.score, ...getColor(wl.score), desc: 'Task allocation & watch tempo in HRMS' },
+        { key: 'transfers', name: '4. Transfers', weight: 0.12, weightLabel: '12%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: tr.note, source: tr.source, available: tr.available, score: tr.score, ...getColor(tr.score), desc: 'Frequency of unit transfers in HRMS' },
+        { key: 'training_load', name: '5. Training load', weight: 0.12, weightLabel: '12%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: tl.note, source: tl.source, available: tl.available, score: tl.score, ...getColor(tl.score), desc: 'Tactical drills & combat training load in DB' },
+        { key: 'wellness_assessments', name: '6. Wellness assessments', weight: 0.13, weightLabel: '13%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: wa.note, source: wa.source, available: wa.available, score: wa.score, ...getColor(wa.score), desc: 'Psychometric self-assessment pulse on mobile' },
+        { key: 'biometrics', name: '7. Biometrics', weight: 0.13, weightLabel: '13%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: bm.note, source: bm.source, available: bm.available, score: bm.score, ...getColor(bm.score), desc: 'Wearable biometric sensor stream on mobile' },
       ];
       break;
     }
 
     case 'emotional-fatigue-prediction': {
       metricLabel = 'Emotional Fatigue';
-      const ee = getP('emotional_exhaustion', 50, 'Affective blunting & emotional numbing', 'Soldier Mobile App (Affective Telemetry)');
-      const cf = getPsych('depression_indicators', 58, 'Compassion fatigue & emotional detachment in DB', 'Central Database (Psychiatric Registry)');
-      const sw = getPsych('social_isolation', 50, 'Social withdrawal & squad detachment on mobile', 'Soldier Mobile App (Peer Pulse)');
-      const sm = getP('duty_schedule', 50, 'Monotonous watch shifts & sensory routine in HRMS', 'HRMS Portal (Shift Rosters)');
-      const rd = getP('sleep_quality', 50, 'Rest recovery deficit & REM latency on mobile', 'Soldier Mobile App (Sleep Telemetry)');
+      const sq = getP('sleep_quality', 50, 'Total sleep debt & insomnia markers on mobile', 'Soldier Mobile App (Sleep Telemetry)');
+      const md = getPsych('mood_assessments', 60, 'Daily affective valence & mood pulse on mobile', 'Soldier Mobile App (Daily Mood Pulse)');
+      const wl = getP('workload_trend', 50, 'High-intensity operational task tempo in HRMS', 'HRMS Portal (Command Watch Rosters)');
+      const ee = getP('emotional_exhaustion', 50, 'MBI-GS emotional exhaustion domain questions', 'Soldier Mobile App (MBI-GS Exhaustion Domain)');
+      const wb = getPsych('social_isolation', 50, 'Family communication & work-life balance survey in DB', 'Central Database (Family & Work-Life Survey)');
+      const ch = getPsych('wellness_survey', 62, 'Counseling session logs & therapeutic history in DB', 'Central Database (Counseling Case Registry)');
 
       score = (
-        0.25 * ee.score +
-        0.22 * cf.score +
-        0.20 * sw.score +
-        0.18 * sm.score +
-        0.15 * rd.score
+        0.20 * sq.score +
+        0.18 * md.score +
+        0.16 * wl.score +
+        0.20 * ee.score +
+        0.14 * wb.score +
+        0.12 * ch.score
       );
 
-      formula = '0.25(Affective Blunting) + 0.22(Compassion Fatigue) + 0.20(Social Withdrawal) + 0.18(Shift Monotony) + 0.15(Rest Deficit)';
-      mobileCount = 3; hrmsCount = 1; databaseCount = 1;
+      formula = '0.20(Sleep quality) + 0.18(Mood) + 0.16(Workload) + 0.20(Emotional exhaustion questions) + 0.14(Work-life balance) + 0.12(Counseling history)';
+      mobileCount = 3; hrmsCount = 1; databaseCount = 2;
       primaryAction = 'Schedule Peer Support';
       secondaryAction = 'Task Rotation';
 
       params = [
-        { key: 'affective_blunting', name: '1. Affective blunting', weight: 0.25, weightLabel: '25%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ee.note, source: ee.source, available: ee.available, score: ee.score, ...getColor(ee.score), desc: 'Affective numbness & emotional blunting' },
-        { key: 'compassion_fatigue', name: '2. Compassion fatigue', weight: 0.22, weightLabel: '22%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: cf.note, source: cf.source, available: cf.available, score: cf.score, ...getColor(cf.score), desc: 'Depersonalization & empathy weariness in DB' },
-        { key: 'social_withdrawal', name: '3. Social withdrawal', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: sw.note, source: sw.source, available: sw.available, score: sw.score, ...getColor(sw.score), desc: 'Barracks detachment logged on mobile' },
-        { key: 'shift_monotony', name: '4. Shift monotony', weight: 0.18, weightLabel: '18%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: sm.note, source: sm.source, available: sm.available, score: sm.score, ...getColor(sm.score), desc: 'Sensory monotony & console duty in HRMS' },
-        { key: 'rest_deficit', name: '5. Rest recovery deficit', weight: 0.15, weightLabel: '15%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: rd.note, source: rd.source, available: rd.available, score: rd.score, ...getColor(rd.score), desc: 'Sleep recovery deficit logged via mobile' },
+        { key: 'sleep_quality', name: '1. Sleep quality', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: sq.note, source: sq.source, available: sq.available, score: sq.score, ...getColor(sq.score), desc: 'Sleep quality & restorative hours on mobile' },
+        { key: 'mood', name: '2. Mood', weight: 0.18, weightLabel: '18%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: md.note, source: md.source, available: md.available, score: md.score, ...getColor(md.score), desc: 'Daily mood valence pulse on mobile' },
+        { key: 'workload', name: '3. Workload', weight: 0.16, weightLabel: '16%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: wl.note, source: wl.source, available: wl.available, score: wl.score, ...getColor(wl.score), desc: 'Watch roster task tempo in HRMS' },
+        { key: 'emotional_exhaustion_questions', name: '4. Emotional exhaustion questions', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ee.note, source: ee.source, available: ee.available, score: ee.score, ...getColor(ee.score), desc: 'MBI-GS exhaustion domain questions on mobile' },
+        { key: 'work_life_balance', name: '5. Work-life balance', weight: 0.14, weightLabel: '14%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: wb.note, source: wb.source, available: wb.available, score: wb.score, ...getColor(wb.score), desc: 'Work-life balance survey score in DB' },
+        { key: 'counseling_history', name: '6. Counseling history', weight: 0.12, weightLabel: '12%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ch.note, source: ch.source, available: ch.available, score: ch.score, ...getColor(ch.score), desc: 'Past counseling session records in DB' },
       ];
       break;
     }
 
     case 'welfare-concern-detection': {
       metricLabel = 'Welfare Concern';
-      const el = getP('leave_patterns', 50, 'Emergency & compassionate leave applications in HRMS', 'HRMS Portal (Leave Management System)');
-      const fd = getPsych('anxiety_questions', 65, 'Family medical emergency & caregiver burden in HRMS', 'HRMS Portal (Family Welfare Cell)');
-      const fq = getStress('leave_frequency', 50, 'Financial distress & education grant queries in HRMS', 'HRMS Portal (Benefits & Claims Archive)');
-      const ch = getStress('behavioral_changes', 60, 'Call-home communication pattern volatility on mobile', 'Soldier Mobile App (Family Telemetry)');
-      const ds = getPsych('social_isolation', 50, 'Subdued demeanor & post-contact retreat in DB', 'Central Database (Unit Welfare Officer Log)');
+      const fc = getStress('leave_frequency', 50, 'Welfare grants & financial support requests in HRMS', 'HRMS Portal (Welfare Claims & Grant Requests)');
+      const fs = getP('deployment_duration', 40, 'Continuous stationing & family separation duration in HRMS', 'HRMS Portal (Stationing & Separation Tenure)');
+      const rl = getP('leave_patterns', 50, 'Repeated and deferred leave applications in HRMS', 'HRMS Portal (Leave Management System)');
+      const si = getPsych('anxiety_questions', 65, 'Self-reported domestic or welfare concerns on mobile', 'Soldier Mobile App (Welfare Feedback Telemetry)');
+      const pw = getPsych('depression_indicators', 58, 'Declining wellness trends across survey intervals in DB', 'Central Database (Wellness Score Trend Archive)');
+      const ih = getPsych('wellness_survey', 62, 'Past welfare intervention case registry records in DB', 'Central Database (Welfare Intervention Logs)');
 
       score = (
-        0.28 * el.score +
-        0.25 * fd.score +
-        0.20 * fq.score +
-        0.15 * ch.score +
-        0.12 * ds.score
+        0.15 * fc.score +
+        0.20 * fs.score +
+        0.20 * rl.score +
+        0.18 * si.score +
+        0.15 * pw.score +
+        0.12 * ih.score
       );
 
-      formula = '0.28(Emerg Leave) + 0.25(Family Distress) + 0.20(Financial Queries) + 0.15(Call-Home) + 0.12(Demeanor Shift)';
-      mobileCount = 1; hrmsCount = 3; databaseCount = 1;
+      formula = '0.15(Financial concerns) + 0.20(Family separation) + 0.20(Repeated leave requests) + 0.18(Self-reported issues) + 0.15(Poor wellness trends) + 0.12(Intervention history)';
+      mobileCount = 1; hrmsCount = 3; databaseCount = 2;
       primaryAction = 'Sanction Emergency Grant';
       secondaryAction = 'Dispatch Family Liaison';
 
       params = [
-        { key: 'emergency_leave', name: '1. Emergency leave requests', weight: 0.28, weightLabel: '28%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: el.note, source: el.source, available: el.available, score: el.score, ...getColor(el.score), desc: 'Emergency leave applications logged in HRMS' },
-        { key: 'family_distress', name: '2. Family medical distress', weight: 0.25, weightLabel: '25%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: fd.note, source: fd.source, available: fd.available, score: fd.score, ...getColor(fd.score), desc: 'Family illness & caregiver distress in HRMS' },
-        { key: 'financial_queries', name: '3. Financial & grant queries', weight: 0.20, weightLabel: '20%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: fq.note, source: fq.source, available: fq.available, score: fq.score, ...getColor(fq.score), desc: 'Welfare financial grant queries in HRMS' },
-        { key: 'call_home', name: '4. Call-home volatility', weight: 0.15, weightLabel: '15%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ch.note, source: ch.source, available: ch.available, score: ch.score, ...getColor(ch.score), desc: 'Domestic communication strain on mobile' },
-        { key: 'demeanor_shift', name: '5. Demeanor shift', weight: 0.12, weightLabel: '12%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ds.note, source: ds.source, available: ds.available, score: ds.score, ...getColor(ds.score), desc: 'Subdued behavior post-call logged in DB' },
+        { key: 'financial_concerns', name: '1. Financial concerns (optional)', weight: 0.15, weightLabel: '15%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: fc.note, source: fc.source, available: fc.available, score: fc.score, ...getColor(fc.score), desc: 'Financial & grant assistance requests in HRMS' },
+        { key: 'family_separation', name: '2. Family separation', weight: 0.20, weightLabel: '20%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: fs.note, source: fs.source, available: fs.available, score: fs.score, ...getColor(fs.score), desc: 'Family separation tenure in HRMS' },
+        { key: 'repeated_leave_requests', name: '3. Repeated leave requests', weight: 0.20, weightLabel: '20%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: rl.note, source: rl.source, available: rl.available, score: rl.score, ...getColor(rl.score), desc: 'Repeated furlough requests in HRMS' },
+        { key: 'self_reported_issues', name: '4. Self-reported issues', weight: 0.18, weightLabel: '18%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: si.note, source: si.source, available: si.available, score: si.score, ...getColor(si.score), desc: 'Self-reported concerns logged on mobile' },
+        { key: 'poor_wellness_trends', name: '5. Poor wellness trends', weight: 0.15, weightLabel: '15%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: pw.note, source: pw.source, available: pw.available, score: pw.score, ...getColor(pw.score), desc: 'Declining wellness score trends in DB' },
+        { key: 'intervention_history', name: '6. Intervention history', weight: 0.12, weightLabel: '12%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ih.note, source: ih.source, available: ih.available, score: ih.score, ...getColor(ih.score), desc: 'Prior welfare intervention case logs in DB' },
       ];
       break;
     }
 
     case 'predictive-behavioral-analytics': {
       metricLabel = 'Behavioral Drift';
-      const ci = getStress('missed_assessments', 45, 'Daily psychometric check-in skips on mobile', 'Soldier Mobile App (Check-in Telemetry)');
-      const st = getStress('sleep_pattern', 50, 'Step count & physical mobility decline on mobile', 'Soldier Mobile App (Activity Sensor)');
-      const sj = getStress('behavioral_changes', 60, 'Screen interaction latency & UI touch jitter on mobile', 'Soldier Mobile App (Touch Dynamics Engine)');
-      const ad = getStress('biometric_trends', 68, 'Voice acoustic pitch volatility & pulse drift on mobile', 'Soldier Mobile App (Acoustic AI Engine)');
-      const ts = getP('workload_trend', 50, '30-day LSTM recurrent behavioral drift slope in DB', 'Central Database (AI Predictive Store)');
+      const hr = getStress('hrms_data', 65, 'Longitudinal career & service records in HRMS', 'HRMS Portal (Historical Service Records)');
+      const at = getP('duty_schedule', 50, 'Daily muster & duty watch attendance logs in HRMS', 'HRMS Portal (Daily Muster & Watch Attendance)');
+      const lv = getP('leave_patterns', 50, 'Leave patterns & utilization frequency in HRMS', 'HRMS Portal (Leave Patterns & Utilization)');
+      const dp = getP('deployment_duration', 40, 'Deployment duration & stationing history in HRMS', 'HRMS Portal (Deployment & Stationing Duration)');
+      const as = getStress('missed_assessments', 45, 'Periodic psychometric check-in compliance on mobile', 'Soldier Mobile App (Mobile Psychometric Check-ins)');
+      const bt = getStress('biometric_trends', 68, 'Wearable sensor telemetry & circadian drift on mobile', 'Soldier Mobile App (Wearable Sensor Telemetry)');
+      const bh = getStress('behavioral_changes', 60, 'Behavioral drift archive & peer review records in DB', 'Central Database (Behavioral Drift Archive)');
 
       score = (
-        0.24 * ci.score +
-        0.22 * st.score +
-        0.18 * sj.score +
-        0.18 * ad.score +
-        0.18 * ts.score
+        0.15 * hr.score +
+        0.14 * at.score +
+        0.15 * lv.score +
+        0.14 * dp.score +
+        0.15 * as.score +
+        0.14 * bt.score +
+        0.13 * bh.score
       );
 
-      formula = '0.24(Check-in Skips) + 0.22(Mobility Drop) + 0.18(Screen Jitter) + 0.18(Acoustic Drift) + 0.18(Trend Slope)';
-      mobileCount = 4; hrmsCount = 0; databaseCount = 1;
+      formula = '0.15(Historical HRMS records) + 0.14(Attendance) + 0.15(Leave) + 0.14(Deployment) + 0.15(Assessments) + 0.14(Biometric trends) + 0.13(Behavioral history)';
+      mobileCount = 2; hrmsCount = 4; databaseCount = 1;
       primaryAction = 'Prophylactic Wellness Review';
       secondaryAction = 'Trigger Sensor Calibration';
 
       params = [
-        { key: 'checkin_skips', name: '1. App check-in skips', weight: 0.24, weightLabel: '24%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ci.note, source: ci.source, available: ci.available, score: ci.score, ...getColor(ci.score), desc: 'Check-in skips & app avoidance on mobile' },
-        { key: 'mobility_drop', name: '2. Mobility telemetry drop', weight: 0.22, weightLabel: '22%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: st.note, source: st.source, available: st.available, score: st.score, ...getColor(st.score), desc: 'Step count & mobility decline on mobile' },
-        { key: 'screen_jitter', name: '3. Screen interaction jitter', weight: 0.18, weightLabel: '18%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: sj.note, source: sj.source, available: sj.available, score: sj.score, ...getColor(sj.score), desc: 'UI touch latency & response jitter on mobile' },
-        { key: 'acoustic_drift', name: '4. Voice acoustic drift', weight: 0.18, weightLabel: '18%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ad.note, source: ad.source, available: ad.available, score: ad.score, ...getColor(ad.score), desc: 'Voice pitch volatility logged on mobile' },
-        { key: 'trend_slope', name: '5. Behavioral trend slope', weight: 0.18, weightLabel: '18%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ts.note, source: ts.source, available: ts.available, score: ts.score, ...getColor(ts.score), desc: '30-day LSTM model behavioral drift slope' },
+        { key: 'historical_hrms_records', name: '1. Historical HRMS records', weight: 0.15, weightLabel: '15%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: hr.note, source: hr.source, available: hr.available, score: hr.score, ...getColor(hr.score), desc: 'Historical service dossier in HRMS' },
+        { key: 'attendance', name: '2. Attendance', weight: 0.14, weightLabel: '14%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: at.note, source: at.source, available: at.available, score: at.score, ...getColor(at.score), desc: 'Daily muster & watch attendance in HRMS' },
+        { key: 'leave', name: '3. Leave', weight: 0.15, weightLabel: '15%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: lv.note, source: lv.source, available: lv.available, score: lv.score, ...getColor(lv.score), desc: 'Leave utilization frequency in HRMS' },
+        { key: 'deployment', name: '4. Deployment', weight: 0.14, weightLabel: '14%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: dp.note, source: dp.source, available: dp.available, score: dp.score, ...getColor(dp.score), desc: 'Stationing & deployment tenure in HRMS' },
+        { key: 'assessments', name: '5. Assessments', weight: 0.15, weightLabel: '15%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: as.note, source: as.source, available: as.available, score: as.score, ...getColor(as.score), desc: 'Psychometric check-ins on mobile' },
+        { key: 'biometric_trends', name: '6. Biometric trends', weight: 0.14, weightLabel: '14%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: bt.note, source: bt.source, available: bt.available, score: bt.score, ...getColor(bt.score), desc: 'Wearable sensor trend stream on mobile' },
+        { key: 'behavioral_history', name: '7. Behavioral history', weight: 0.13, weightLabel: '13%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: bh.note, source: bh.source, available: bh.available, score: bh.score, ...getColor(bh.score), desc: 'Behavioral drift & review records in DB' },
       ];
       break;
     }
 
     case 'stress-burnout-risk-models': {
       metricLabel = 'Hazard Model';
-      const ac = getP('overtime', 50, 'Acute-to-chronic workload ratio in HRMS', 'HRMS Portal (Command Watch Rosters)');
-      const so = getStress('biometric_trends', 68, 'Prolonged sympathetic activation on mobile', 'Soldier Mobile App (Autonomic Engine)');
-      const pe = getP('emotional_exhaustion', 50, 'Maslach emotional exhaustion on mobile', 'Soldier Mobile App (MBI-GS Telemetry)');
-      const rd = getP('sleep_quality', 50, 'Severe rest deficit & REM deprivation on mobile', 'Soldier Mobile App (Sleep Telemetry)');
-      const th = getP('deployment_duration', 40, 'Tenure hazard ratio & continuous sector duty in HRMS', 'HRMS Portal (Service Dossier)');
+      const hrmsData = getStress('hrms_data', 65, 'Workload, stationing tenure & duty rosters in HRMS', '🏢 HRMS Portal (Dossier & Watch Rosters)');
+      const wellnessData = getPsych('wellness_survey', 62, 'Composite wellness profile & psychometrics in DB', '💾 Central Database (Composite Wellness Index)');
+      const biometricData = getStress('biometric_trends', 68, 'Autonomic nervous system & wearable biometrics on mobile', '📱 Soldier Mobile App (Autonomic Biometric Trends)');
+      const assessmentData = getP('assessment_responses', 50, 'Psychometric responses to burnout & stress items on mobile', '📱 Soldier Mobile App (Psychometric Response Telemetry)');
 
       score = (
-        0.25 * ac.score +
-        0.25 * so.score +
-        0.20 * pe.score +
-        0.15 * rd.score +
-        0.15 * th.score
+        0.28 * hrmsData.score +
+        0.24 * wellnessData.score +
+        0.25 * biometricData.score +
+        0.23 * assessmentData.score
       );
 
-      formula = '0.25(ACWR) + 0.25(Sympathetic Overdrive) + 0.20(Psych Exhaustion) + 0.15(Rest Deficit) + 0.15(Tenure Hazard)';
-      mobileCount = 3; hrmsCount = 2; databaseCount = 0;
+      formula = '0.28(Combined HRMS data) + 0.24(Wellness data) + 0.25(Biometric data) + 0.23(Assessment data)';
+      mobileCount = 2; hrmsCount = 1; databaseCount = 1;
       primaryAction = 'CWO Command Case Review';
       secondaryAction = 'Mandate Stand-Down';
 
       params = [
-        { key: 'acwr', name: '1. Acute-to-chronic workload (ACWR)', weight: 0.25, weightLabel: '25%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: ac.note, source: ac.source, available: ac.available, score: ac.score, ...getColor(ac.score), desc: 'Acute-to-chronic workload ratio in HRMS' },
-        { key: 'sympathetic_overdrive', name: '2. Sympathetic overdrive', weight: 0.25, weightLabel: '25%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: so.note, source: so.source, available: so.available, score: so.score, ...getColor(so.score), desc: 'Sustained autonomic overdrive on mobile' },
-        { key: 'psych_exhaustion', name: '3. Psychometric exhaustion', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: pe.note, source: pe.source, available: pe.available, score: pe.score, ...getColor(pe.score), desc: 'Cognitive exhaustion score on mobile' },
-        { key: 'rest_deficit', name: '4. Rest deficit index', weight: 0.15, weightLabel: '15%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: rd.note, source: rd.source, available: rd.available, score: rd.score, ...getColor(rd.score), desc: 'Cumulative sleep deficit on mobile' },
-        { key: 'tenure_hazard', name: '5. Tenure hazard exposure', weight: 0.15, weightLabel: '15%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: th.note, source: th.source, available: th.available, score: th.score, ...getColor(th.score), desc: 'Continuous forward sector tenure in HRMS' },
+        { key: 'combined_hrms_data', name: '1. Combined HRMS data', weight: 0.28, weightLabel: '28%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: hrmsData.note, source: hrmsData.source, available: hrmsData.available, score: hrmsData.score, ...getColor(hrmsData.score), desc: 'HRMS workload, stationing tenure & rosters' },
+        { key: 'wellness_data', name: '2. Wellness data', weight: 0.24, weightLabel: '24%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: wellnessData.note, source: wellnessData.source, available: wellnessData.available, score: wellnessData.score, ...getColor(wellnessData.score), desc: 'Composite wellness profile in Central DB' },
+        { key: 'biometric_data', name: '3. Biometric data', weight: 0.25, weightLabel: '25%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: biometricData.note, source: biometricData.source, available: biometricData.available, score: biometricData.score, ...getColor(biometricData.score), desc: 'Wearable biometric sensor stream on mobile' },
+        { key: 'assessment_data', name: '4. Assessment data', weight: 0.23, weightLabel: '23%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: assessmentData.note, source: assessmentData.source, available: assessmentData.available, score: assessmentData.score, ...getColor(assessmentData.score), desc: 'Psychometric assessment items on mobile' },
       ];
       break;
     }
 
     case 'welfare-intervention-recommendation': {
       metricLabel = 'Intervention Index';
-      const un = getPsych('wellness_survey', 62, 'Urgent clinical need intensity in DB', 'Central Database (Welfare Need Registry)');
-      const cr = getP('assessment_responses', 50, 'Counseling receptivity & willingness on mobile', 'Soldier Mobile App (Therapy Alignment)');
-      const lu = getP('leave_patterns', 50, 'Leave grant urgency & compassionate priority in HRMS', 'HRMS Portal (Leave System)');
-      const tf = getPsych('mood_assessments', 60, 'Clinical cognitive therapy suitability fit in DB', 'Central Database (Clinical Protocols Archive)');
-      const pr = getPsych('social_isolation', 50, 'Peer buddy pairing readiness on mobile', 'Soldier Mobile App (Peer Matching)');
+      const aiRisk = getPsych('wellness_survey', 62, 'Composite AI risk score & classification in DB', 'Central Database (Composite Risk Engine)');
+      const ah = getP('assessment_responses', 50, 'Historical psychometric check-in scores in DB', 'Central Database (Psychometric Assessment History)');
+      const wl = getP('workload_trend', 50, 'Command operational task tempo & rosters in HRMS', 'HRMS Portal (Command Watch Rosters)');
+      const dp = getP('deployment_duration', 40, 'Hostile terrain & deployment tenure in HRMS', 'HRMS Portal (Deployment & Stationing Dossier)');
+      const pi = getStress('missed_assessments', 45, 'Prior welfare intervention case outcomes in DB', 'Central Database (Welfare Interventions Archive)');
 
       score = (
-        0.26 * un.score +
-        0.22 * cr.score +
-        0.20 * lu.score +
-        0.18 * tf.score +
-        0.14 * pr.score
+        0.25 * aiRisk.score +
+        0.20 * ah.score +
+        0.20 * wl.score +
+        0.20 * dp.score +
+        0.15 * pi.score
       );
 
-      formula = '0.26(Need Intensity) + 0.22(Counseling Receptivity) + 0.20(Leave Urgency) + 0.18(Therapy Fit) + 0.14(Peer Support)';
-      mobileCount = 2; hrmsCount = 1; databaseCount = 2;
+      formula = '0.25(AI risk score) + 0.20(Assessment history) + 0.20(Workload) + 0.20(Deployment) + 0.15(Previous interventions)';
+      mobileCount = 0; hrmsCount = 2; databaseCount = 3;
       primaryAction = 'Execute Welfare Workflow';
       secondaryAction = 'Notify Unit Commander';
 
       params = [
-        { key: 'need_intensity', name: '1. Urgent need intensity', weight: 0.26, weightLabel: '26%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: un.note, source: un.source, available: un.available, score: un.score, ...getColor(un.score), desc: 'Composite welfare priority index in DB' },
-        { key: 'counseling_receptivity', name: '2. Counseling receptivity', weight: 0.22, weightLabel: '22%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: cr.note, source: cr.source, available: cr.available, score: cr.score, ...getColor(cr.score), desc: 'Receptivity score logged via mobile' },
-        { key: 'leave_urgency', name: '3. Leave grant urgency', weight: 0.20, weightLabel: '20%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: lu.note, source: lu.source, available: lu.available, score: lu.score, ...getColor(lu.score), desc: 'Compassionate leave urgency in HRMS' },
-        { key: 'therapy_fit', name: '4. Clinical therapy fit', weight: 0.18, weightLabel: '18%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: tf.note, source: tf.source, available: tf.available, score: tf.score, ...getColor(tf.score), desc: 'Evidence-based therapy protocol fit in DB' },
-        { key: 'peer_support', name: '5. Peer buddy readiness', weight: 0.14, weightLabel: '14%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: pr.note, source: pr.source, available: pr.available, score: pr.score, ...getColor(pr.score), desc: 'Squad peer support pairing readiness' },
+        { key: 'ai_risk_score', name: '1. AI risk score', weight: 0.25, weightLabel: '25%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: aiRisk.note, source: aiRisk.source, available: aiRisk.available, score: aiRisk.score, ...getColor(aiRisk.score), desc: 'Composite AI risk score in Central DB' },
+        { key: 'assessment_history', name: '2. Assessment history', weight: 0.20, weightLabel: '20%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ah.note, source: ah.source, available: ah.available, score: ah.score, ...getColor(ah.score), desc: 'Historical psychometric scores in DB' },
+        { key: 'workload', name: '3. Workload', weight: 0.20, weightLabel: '20%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: wl.note, source: wl.source, available: wl.available, score: wl.score, ...getColor(wl.score), desc: 'Command watch roster load in HRMS' },
+        { key: 'deployment', name: '4. Deployment', weight: 0.20, weightLabel: '20%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: dp.note, source: dp.source, available: dp.available, score: dp.score, ...getColor(dp.score), desc: 'Deployment tenure in HRMS Dossier' },
+        { key: 'previous_interventions', name: '5. Previous interventions', weight: 0.15, weightLabel: '15%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: pi.note, source: pi.source, available: pi.available, score: pi.score, ...getColor(pi.score), desc: 'Past welfare intervention logs in DB' },
       ];
       break;
     }
 
     case 'automated-alerts': {
       metricLabel = 'Alert Priority';
-      const ss = getStress('biometric_trends', 68, 'Acute 24h stress score spike rate on mobile', 'Soldier Mobile App (Realtime Alert Engine)');
-      const hd = getP('sleep_quality', 50, 'HRV critical drop (<20ms) breach on mobile', 'Soldier Mobile App (Biometric Telemetry)');
-      const kw = getPsych('anxiety_questions', 65, 'Emergency distress keyword trigger on mobile', 'Soldier Mobile App (NLP Semantic Filter)');
-      const wb = getP('overtime', 50, 'Consecutive watch hours limit breach in HRMS', 'HRMS Portal (Roster Watch Engine)');
-      const oc = getStress('missed_assessments', 45, 'Overdue compliance check-in alert in DB', 'Central Database (Alert Dispatch Archive)');
+      const hr = getPsych('wellness_survey', 62, 'AI predictive early warning trigger classification in DB', 'Central Database (AI Early Warning Classifier)');
+      const ss = getStress('biometric_trends', 68, '24h acute stress spike detection logged on mobile', 'Soldier Mobile App (24h Stress Spike Telemetry)');
+      const ma = getStress('missed_assessments', 45, 'Scheduled psychometric assessment avoidance in DB', 'Central Database (Compliance Check-in Log)');
+      const at = getP('sleep_quality', 50, 'Sensor & sleep biometric anomaly patterns on mobile', 'Soldier Mobile App (Sensor & Biometric Anomaly Engine)');
 
       score = (
-        0.28 * ss.score +
-        0.25 * hd.score +
-        0.20 * kw.score +
-        0.15 * wb.score +
-        0.12 * oc.score
+        0.30 * hr.score +
+        0.25 * ss.score +
+        0.22 * ma.score +
+        0.23 * at.score
       );
 
-      formula = '0.28(Stress Spike) + 0.25(HRV Drop) + 0.20(Keywords) + 0.15(Watch Breach) + 0.12(Overdue Check-in)';
-      mobileCount = 3; hrmsCount = 1; databaseCount = 1;
+      formula = '0.30(High-risk predictions) + 0.25(Sudden score increase) + 0.22(Missed assessments) + 0.23(Abnormal trends)';
+      mobileCount = 2; hrmsCount = 0; databaseCount = 2;
       primaryAction = 'Dispatch SMS/Radio Alert';
       secondaryAction = 'Confirm Medic Contact';
 
       params = [
-        { key: 'stress_spike', name: '1. Acute stress spike rate', weight: 0.28, weightLabel: '28%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ss.note, source: ss.source, available: ss.available, score: ss.score, ...getColor(ss.score), desc: 'Instant spike detection on mobile' },
-        { key: 'hrv_drop', name: '2. HRV critical drop', weight: 0.25, weightLabel: '25%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: hd.note, source: hd.source, available: hd.available, score: hd.score, ...getColor(hd.score), desc: 'Autonomic HRV threshold breach on mobile' },
-        { key: 'keywords', name: '3. Distress keyword trigger', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: kw.note, source: kw.source, available: kw.available, score: kw.score, ...getColor(kw.score), desc: 'Emergency keyword detection on mobile' },
-        { key: 'watch_breach', name: '4. Watch hours breach', weight: 0.15, weightLabel: '15%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: wb.note, source: wb.source, available: wb.available, score: wb.score, ...getColor(wb.score), desc: 'Continuous duty breach in HRMS' },
-        { key: 'overdue_checkin', name: '5. Overdue check-in flag', weight: 0.12, weightLabel: '12%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: oc.note, source: oc.source, available: oc.available, score: oc.score, ...getColor(oc.score), desc: 'Overdue check-in alert in DB' },
+        { key: 'high_risk_predictions', name: '1. High-risk predictions', weight: 0.30, weightLabel: '30%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: hr.note, source: hr.source, available: hr.available, score: hr.score, ...getColor(hr.score), desc: 'AI early warning predictions in DB' },
+        { key: 'sudden_score_increase', name: '2. Sudden score increase', weight: 0.25, weightLabel: '25%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ss.note, source: ss.source, available: ss.available, score: ss.score, ...getColor(ss.score), desc: 'Acute stress spike rate on mobile' },
+        { key: 'missed_assessments', name: '3. Missed assessments', weight: 0.22, weightLabel: '22%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ma.note, source: ma.source, available: ma.available, score: ma.score, ...getColor(ma.score), desc: 'Missed assessment compliance in DB' },
+        { key: 'abnormal_trends', name: '4. Abnormal trends', weight: 0.23, weightLabel: '23%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: at.note, source: at.source, available: at.available, score: at.score, ...getColor(at.score), desc: 'Biometric & sensor anomalies on mobile' },
       ];
       break;
     }
@@ -902,37 +914,37 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
       const isRamesh = p.uid === 'UID-EMP-012';
       const isGurpreet = p.uid === 'UID-EMP-013';
 
-      const hdScore = isAmit ? 88 : isSarah ? 86 : isRamesh ? 24 : isGurpreet ? 32 : Math.max(15, Math.min(95, 110 - getPsych('anxiety_questions', 65).score));
-      const scScore = isAmit ? 92 : isSarah ? 85 : isRamesh ? 30 : isGurpreet ? 45 : Math.max(15, Math.min(95, 110 - getPsych('social_isolation', 50).score));
-      const pmScore = isAmit ? 86 : isSarah ? 90 : isRamesh ? 22 : isGurpreet ? 28 : Math.max(15, Math.min(95, 110 - getPsych('mood_assessments', 60).score));
-      const cfScore = isAmit ? 84 : isSarah ? 82 : isRamesh ? 28 : isGurpreet ? 35 : Math.max(15, Math.min(95, 110 - getP('emotional_exhaustion', 50).score));
-      const rvScore = isAmit ? 85 : isSarah ? 88 : isRamesh ? 20 : isGurpreet ? 30 : Math.max(15, Math.min(95, 110 - getStress('biometric_trends', 68).score));
+      const wsScore = isAmit ? 88 : isSarah ? 90 : isRamesh ? 24 : isGurpreet ? 32 : Math.max(15, Math.min(95, 110 - getPsych('wellness_survey', 62).score));
+      const ioScore = isAmit ? 92 : isSarah ? 88 : isRamesh ? 28 : isGurpreet ? 36 : Math.max(15, Math.min(95, 110 - getPsych('social_isolation', 50).score));
+      const asScore = isAmit ? 86 : isSarah ? 85 : isRamesh ? 22 : isGurpreet ? 30 : Math.max(15, Math.min(95, 110 - getPsych('mood_assessments', 60).score));
+      const atScore = isAmit ? 90 : isSarah ? 92 : isRamesh ? 40 : isGurpreet ? 50 : Math.max(15, Math.min(95, 110 - getP('duty_schedule', 50).score));
+      const ptScore = isAmit ? 85 : isSarah ? 86 : isRamesh ? 20 : isGurpreet ? 28 : Math.max(15, Math.min(95, 110 - getP('workload_trend', 50).score));
 
-      const hd = { score: hdScore, note: 'Connor-Davidson Resilience (CD-RISC) hardiness score', source: 'Soldier Mobile App (CD-RISC)', available: true };
-      const sc = { score: scScore, note: 'Squad camaraderie & mutual trust index in DB', source: 'Central Database (Barracks Peer Network)', available: true };
-      const pm = { score: pmScore, note: 'Positive outlook & mission alignment on mobile', source: 'Soldier Mobile App (Daily Positive Pulse)', available: true };
-      const cf = { score: cfScore, note: 'Adaptive coping flexibility & mental elasticity', source: 'Soldier Mobile App (Coping Inventory)', available: true };
-      const rv = { score: rvScore, note: 'Post-stress recovery velocity & cardiovascular bounce-back in DB', source: 'Central Database (Physiological Recovery)', available: true };
+      const ws = { score: wsScore, note: 'Longitudinal wellness metric & psychological tracking in DB', source: 'Central Database (Historical Wellness Metric)', available: true };
+      const io = { score: ioScore, note: 'Clinical recovery & positive outcome registry in DB', source: 'Central Database (Clinical Outcome Registry)', available: true };
+      const as = { score: asScore, note: 'Resilience & CD-RISC hardiness check-in scores on mobile', source: 'Soldier Mobile App (Resilience Check-in)', available: true };
+      const at = { score: atScore, note: 'Operational muster & duty attendance logs in HRMS', source: 'HRMS Portal (Muster & Operational Attendance)', available: true };
+      const pt = { score: ptScore, note: 'Task completion & operational productivity trends in DB', source: 'Central Database (Productivity Trends)', available: true };
 
       score = (
-        0.26 * hd.score +
-        0.24 * sc.score +
-        0.20 * pm.score +
-        0.15 * cf.score +
-        0.15 * rv.score
+        0.24 * ws.score +
+        0.20 * io.score +
+        0.22 * as.score +
+        0.18 * at.score +
+        0.16 * pt.score
       );
 
-      formula = '0.26(Hardiness) + 0.24(Squad Cohesion) + 0.20(Positive Morale) + 0.15(Coping) + 0.15(Recovery Velocity)';
-      mobileCount = 3; hrmsCount = 0; databaseCount = 2;
+      formula = '0.24(Wellness score history) + 0.20(Intervention outcomes) + 0.22(Assessments) + 0.18(Attendance) + 0.16(Productivity trends)';
+      mobileCount = 1; hrmsCount = 1; databaseCount = 3;
       primaryAction = 'Morning Parade Briefing';
       secondaryAction = 'Squad Cohesion Award';
 
       params = [
-        { key: 'hardiness', name: '1. Psychological hardiness (CD-RISC)', weight: 0.26, weightLabel: '26%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: hd.note, source: hd.source, available: hd.available, score: hd.score, ...getColor(hd.score, true), desc: 'CD-RISC hardiness index on mobile' },
-        { key: 'squad_cohesion', name: '2. Squad camaraderie & cohesion', weight: 0.24, weightLabel: '24%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: sc.note, source: sc.source, available: sc.available, score: sc.score, ...getColor(sc.score, true), desc: 'Squad mutual trust index in DB' },
-        { key: 'positive_morale', name: '3. Positive affect & morale', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: pm.note, source: pm.source, available: pm.available, score: pm.score, ...getColor(pm.score, true), desc: 'Optimism & vocational pride on mobile' },
-        { key: 'coping_flexibility', name: '4. Adaptive coping flexibility', weight: 0.15, weightLabel: '15%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: cf.note, source: cf.source, available: cf.available, score: cf.score, ...getColor(cf.score, true), desc: 'Psychological elasticity on mobile' },
-        { key: 'recovery_velocity', name: '5. Post-stress recovery velocity', weight: 0.15, weightLabel: '15%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: rv.note, source: rv.source, available: rv.available, score: rv.score, ...getColor(rv.score, true), desc: 'Cardiovascular bounce-back in DB' },
+        { key: 'wellness_score_history', name: '1. Wellness score history', weight: 0.24, weightLabel: '24%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ws.note, source: ws.source, available: ws.available, score: ws.score, ...getColor(ws.score, true), desc: 'Historical wellness metric in DB' },
+        { key: 'intervention_outcomes', name: '2. Intervention outcomes', weight: 0.20, weightLabel: '20%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: io.note, source: io.source, available: io.available, score: io.score, ...getColor(io.score, true), desc: 'Clinical recovery outcomes in DB' },
+        { key: 'assessments', name: '3. Assessments', weight: 0.22, weightLabel: '22%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: as.note, source: as.source, available: as.available, score: as.score, ...getColor(as.score, true), desc: 'Resilience check-in items on mobile' },
+        { key: 'attendance', name: '4. Attendance', weight: 0.18, weightLabel: '18%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: at.note, source: at.source, available: at.available, score: at.score, ...getColor(at.score, true), desc: 'Muster & operational attendance in HRMS' },
+        { key: 'productivity_trends', name: '5. Productivity trends', weight: 0.16, weightLabel: '16%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: pt.note, source: pt.source, available: pt.available, score: pt.score, ...getColor(pt.score, true), desc: 'Task completion & productivity in DB' },
       ];
       break;
     }
@@ -944,68 +956,75 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
       const isRamesh = p.uid === 'UID-EMP-012';
       const isGurpreet = p.uid === 'UID-EMP-013';
 
-      const csScore = isAmit ? 88 : isSarah ? 86 : isRamesh ? 20 : isGurpreet ? 36 : Math.max(15, Math.min(95, 110 - getP('emotional_exhaustion', 50).score));
-      const pvScore = isAmit ? 92 : isSarah ? 88 : isRamesh ? 25 : isGurpreet ? 40 : Math.max(15, Math.min(95, 110 - getStress('biometric_trends', 68).score));
-      const ecScore = isAmit ? 86 : isSarah ? 85 : isRamesh ? 22 : isGurpreet ? 34 : Math.max(15, Math.min(95, 110 - getPsych('anxiety_questions', 65).score));
-      const msScore = isAmit ? 90 : isSarah ? 92 : isRamesh ? 18 : isGurpreet ? 44 : Math.max(15, Math.min(95, 110 - getP('overtime', 50).score));
-      const frScore = isAmit ? 84 : isSarah ? 86 : isRamesh ? 16 : isGurpreet ? 32 : Math.max(15, Math.min(95, 110 - getP('sleep_quality', 50).score));
+      const wsScore = isAmit ? 88 : isSarah ? 90 : isRamesh ? 22 : isGurpreet ? 36 : Math.max(15, Math.min(95, 110 - getPsych('wellness_survey', 62).score));
+      const ftScore = isAmit ? 86 : isSarah ? 88 : isRamesh ? 18 : isGurpreet ? 30 : Math.max(15, Math.min(95, 110 - getP('sleep_quality', 50).score));
+      const dlScore = isAmit ? 90 : isSarah ? 92 : isRamesh ? 20 : isGurpreet ? 40 : Math.max(15, Math.min(95, 110 - getP('deployment_duration', 40).score));
+      const lvScore = isAmit ? 85 : isSarah ? 86 : isRamesh ? 25 : isGurpreet ? 42 : Math.max(15, Math.min(95, 110 - getP('leave_patterns', 50).score));
+      const atScore = isAmit ? 92 : isSarah ? 90 : isRamesh ? 30 : isGurpreet ? 45 : Math.max(15, Math.min(95, 110 - getP('duty_schedule', 50).score));
+      const aiScore = isAmit ? 88 : isSarah ? 86 : isRamesh ? 20 : isGurpreet ? 34 : Math.max(15, Math.min(95, 110 - getP('emotional_exhaustion', 50).score));
 
-      const cs = { score: csScore, note: 'Cognitive reaction sharpness & mental stamina on mobile', source: 'Soldier Mobile App (Cognitive Reaction Test)', available: true };
-      const pv = { score: pvScore, note: 'Physical fitness & autonomic recovery vitals on mobile', source: 'Soldier Mobile App (Vitals Engine)', available: true };
-      const ec = { score: ecScore, note: 'Emotional composure under tactical pressure in DB', source: 'Central Database (Tactical Composure)', available: true };
-      const ms = { score: msScore, note: 'Mission suitability rating & deployment clearance in HRMS', source: 'HRMS Portal (Deployment Suitability)', available: true };
-      const fr = { score: frScore, note: 'Fatigue recovery index & sleep debt rebound on mobile', source: 'Soldier Mobile App (Recovery Telemetry)', available: true };
+      const ws = { score: wsScore, note: 'Composite psychological wellness score in DB', source: 'Central Database (Composite Wellness Index)', available: true };
+      const ft = { score: ftScore, note: 'Cognitive & sleep fatigue telemetry logged on mobile', source: 'Soldier Mobile App (Fatigue Telemetry)', available: true };
+      const dl = { score: dlScore, note: 'Operational sector deployment load in HRMS', source: 'HRMS Portal (Deployment Load Archive)', available: true };
+      const lv = { score: lvScore, note: 'Leave balance & furlough readiness status in HRMS', source: 'HRMS Portal (Leave Management System)', available: true };
+      const at = { score: atScore, note: 'Muster & operational combat attendance in HRMS', source: 'HRMS Portal (Combat Readiness Attendance)', available: true };
+      const ai = { score: aiScore, note: 'Multi-modal predictive AI operational risk model in DB', source: 'Central Database (Predictive AI Risk Model)', available: true };
 
       score = (
-        0.26 * cs.score +
-        0.24 * pv.score +
-        0.20 * ec.score +
-        0.15 * ms.score +
-        0.15 * fr.score
+        0.20 * ws.score +
+        0.20 * ft.score +
+        0.18 * dl.score +
+        0.15 * lv.score +
+        0.15 * at.score +
+        0.12 * ai.score
       );
 
-      formula = '0.26(Cognitive Sharpness) + 0.24(Physical Vitals) + 0.20(Emotional Composure) + 0.15(Mission Rating) + 0.15(Fatigue Recovery)';
-      mobileCount = 3; hrmsCount = 1; databaseCount = 1;
+      formula = '0.20(Wellness score) + 0.20(Fatigue) + 0.18(Deployment load) + 0.15(Leave) + 0.15(Attendance) + 0.12(AI risk predictions)';
+      mobileCount = 1; hrmsCount = 3; databaseCount = 2;
       primaryAction = 'Certify Combat Clearance';
       secondaryAction = 'Assign Tactical Rest';
 
       params = [
-        { key: 'cognitive_sharpness', name: '1. Cognitive reaction sharpness', weight: 0.26, weightLabel: '26%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: cs.note, source: cs.source, available: cs.available, score: cs.score, ...getColor(cs.score, true), desc: 'Reaction time & sharpness on mobile' },
-        { key: 'physical_vitals', name: '2. Physical fitness & vitals', weight: 0.24, weightLabel: '24%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: pv.note, source: pv.source, available: pv.available, score: pv.score, ...getColor(pv.score, true), desc: 'Cardiovascular endurance vitals on mobile' },
-        { key: 'emotional_composure', name: '3. Emotional composure', weight: 0.20, weightLabel: '20%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ec.note, source: ec.source, available: ec.available, score: ec.score, ...getColor(ec.score, true), desc: 'Tactical composure rating in DB' },
-        { key: 'mission_suitability', name: '4. Mission suitability rating', weight: 0.15, weightLabel: '15%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: ms.note, source: ms.source, available: ms.available, score: ms.score, ...getColor(ms.score, true), desc: 'Deployment clearance status in HRMS' },
-        { key: 'fatigue_recovery', name: '5. Fatigue recovery index', weight: 0.15, weightLabel: '15%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: fr.note, source: fr.source, available: fr.available, score: fr.score, ...getColor(fr.score, true), desc: 'Sleep debt rebound curve on mobile' },
+        { key: 'wellness_score', name: '1. Wellness score', weight: 0.20, weightLabel: '20%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ws.note, source: ws.source, available: ws.available, score: ws.score, ...getColor(ws.score, true), desc: 'Composite wellness index in Central DB' },
+        { key: 'fatigue', name: '2. Fatigue', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ft.note, source: ft.source, available: ft.available, score: ft.score, ...getColor(ft.score, true), desc: 'Cognitive & sleep fatigue on mobile' },
+        { key: 'deployment_load', name: '3. Deployment load', weight: 0.18, weightLabel: '18%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: dl.note, source: dl.source, available: dl.available, score: dl.score, ...getColor(dl.score, true), desc: 'Operational sector deployment load in HRMS' },
+        { key: 'leave', name: '4. Leave', weight: 0.15, weightLabel: '15%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: lv.note, source: lv.source, available: lv.available, score: lv.score, ...getColor(lv.score, true), desc: 'Furlough & leave readiness in HRMS' },
+        { key: 'attendance', name: '5. Attendance', weight: 0.15, weightLabel: '15%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: at.note, source: at.source, available: at.available, score: at.score, ...getColor(at.score, true), desc: 'Muster & combat attendance in HRMS' },
+        { key: 'ai_risk_predictions', name: '6. AI risk predictions', weight: 0.12, weightLabel: '12%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ai.note, source: ai.source, available: ai.available, score: ai.score, ...getColor(ai.score, true), desc: 'Predictive AI risk model in Central DB' },
       ];
       break;
     }
 
     case 'occupational-stress-risk': {
       metricLabel = 'Occupational Hazard';
-      const ah = getP('deployment_duration', 40, 'High altitude (>11,000 ft) & extreme sub-zero sector tenure in HRMS', 'HRMS Portal (Terrain Exposure Matrix)');
-      const nw = getP('duty_schedule', 50, 'Consecutive night watch cycles & circadian disruptions in HRMS', 'HRMS Portal (Watch Schedule Matrix)');
-      const ms = getP('sleep_quality', 50, 'Micro-sleep latency drop during duty hours on mobile', 'Soldier Mobile App (Micro-Sleep Detector)');
-      const ts = getP('workload_trend', 50, 'Environmental temperature & hostile station severity in DB', 'Central Database (Hostile Station DB)');
-      const po = getStress('biometric_trends', 68, 'Cumulative physical overexertion & muscle strain on mobile', 'Soldier Mobile App (Biomechanics Engine)');
+      const lt = getPsych('wellness_survey', 62, 'Longitudinal stress trend registry in DB', 'Central Database (Longitudinal Stress Registry)');
+      const bh = getP('emotional_exhaustion', 50, 'Historical burnout episodes & affective strain in DB', 'Central Database (Burnout History Archive)');
+      const wl = getP('workload_trend', 50, 'Command watch hours & overtime load in HRMS', 'HRMS Portal (Command Watch Rosters)');
+      const dp = getP('deployment_duration', 40, 'Hostile terrain & continuous forward sector tenure in HRMS', 'HRMS Portal (Deployment Tenure Dossier)');
+      const ps = getP('sleep_quality', 50, 'Sleep fragmentation & nocturnal rest deficit on mobile', 'Soldier Mobile App (Sleep Deficit Telemetry)');
+      const ef = getPsych('mood_assessments', 60, 'Cognitive exhaustion & affective weariness on mobile', 'Soldier Mobile App (Affective Fatigue Telemetry)');
 
       score = (
-        0.26 * ah.score +
-        0.24 * nw.score +
-        0.20 * ms.score +
-        0.15 * ts.score +
-        0.15 * po.score
+        0.18 * lt.score +
+        0.16 * bh.score +
+        0.18 * wl.score +
+        0.18 * dp.score +
+        0.16 * ps.score +
+        0.14 * ef.score
       );
 
-      formula = '0.26(Altitude Hazard) + 0.24(Night Watch) + 0.20(Micro-Sleep) + 0.15(Temp Strain) + 0.15(Physical Overexertion)';
-      mobileCount = 2; hrmsCount = 2; databaseCount = 1;
+      formula = '0.18(Long-term stress trends) + 0.16(Burnout history) + 0.18(Workload) + 0.18(Deployments) + 0.16(Poor sleep) + 0.14(Emotional fatigue)';
+      mobileCount = 2; hrmsCount = 2; databaseCount = 2;
       primaryAction = 'Mandate Altitude Rotation';
       secondaryAction = 'Shift to Daylight Watch';
 
       params = [
-        { key: 'altitude_hazard', name: '1. High altitude / terrain hazard', weight: 0.26, weightLabel: '26%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: ah.note, source: ah.source, available: ah.available, score: ah.score, ...getColor(ah.score), desc: 'High altitude hypoxia hazard in HRMS' },
-        { key: 'night_watch', name: '2. Consecutive night watch index', weight: 0.24, weightLabel: '24%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: nw.note, source: nw.source, available: nw.available, score: nw.score, ...getColor(nw.score), desc: 'Circadian shift hazards in HRMS' },
-        { key: 'micro_sleep', name: '3. Micro-sleep vulnerability', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ms.note, source: ms.source, available: ms.available, score: ms.score, ...getColor(ms.score), desc: 'Micro-sleep latency drop on mobile' },
-        { key: 'temp_strain', name: '4. Environmental temperature strain', weight: 0.15, weightLabel: '15%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ts.note, source: ts.source, available: ts.available, score: ts.score, ...getColor(ts.score), desc: 'Extreme temperature stress in DB' },
-        { key: 'physical_overexertion', name: '5. Physical overexertion', weight: 0.15, weightLabel: '15%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: po.note, source: po.source, available: po.available, score: po.score, ...getColor(po.score), desc: 'Biomechanic load & physical fatigue on mobile' },
+        { key: 'long_term_stress_trends', name: '1. Long-term stress trends', weight: 0.18, weightLabel: '18%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: lt.note, source: lt.source, available: lt.available, score: lt.score, ...getColor(lt.score), desc: 'Longitudinal stress trend registry in DB' },
+        { key: 'burnout_history', name: '2. Burnout history', weight: 0.16, weightLabel: '16%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: bh.note, source: bh.source, available: bh.available, score: bh.score, ...getColor(bh.score), desc: 'Historical burnout episodes in DB' },
+        { key: 'workload', name: '3. Workload', weight: 0.18, weightLabel: '18%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: wl.note, source: wl.source, available: wl.available, score: wl.score, ...getColor(wl.score), desc: 'Command watch roster load in HRMS' },
+        { key: 'deployments', name: '4. Deployments', weight: 0.18, weightLabel: '18%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: dp.note, source: dp.source, available: dp.available, score: dp.score, ...getColor(dp.score), desc: 'Sector deployment tenure in HRMS' },
+        { key: 'poor_sleep', name: '5. Poor sleep', weight: 0.16, weightLabel: '16%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ps.note, source: ps.source, available: ps.available, score: ps.score, ...getColor(ps.score), desc: 'Sleep debt & latency on mobile' },
+        { key: 'emotional_fatigue', name: '6. Emotional fatigue', weight: 0.14, weightLabel: '14%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ef.note, source: ef.source, available: ef.available, score: ef.score, ...getColor(ef.score), desc: 'Cognitive & affective fatigue on mobile' },
       ];
       break;
     }
@@ -1340,7 +1359,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'overall-stress-prediction',
       num: 4,
       title: 'Overall Stress Prediction',
-      shortDesc: '6-Parameter Multi-Source Composite Operational Strain & Trendline',
+      shortDesc: '7-Parameter Multi-Source Duty, Deployment, Workload & Biometric Model',
       category: 'Predictive Modeling',
       riskLevel: 'HIGH',
       metricLabel: 'Unit Stress Score',
@@ -1349,11 +1368,19 @@ export const WelfareDashboard: React.FC = () => {
       color: 'text-amber-600',
       bg: 'bg-amber-50',
       border: 'border-amber-200',
-      clinicalSignificance: 'Synthesizes self-reports, biometric check-ins, mission difficulty, and environmental factors into a unified predictive trajectory.',
-      biomarkers: ['Cumulative watch tempo', 'Elevated emotional reactivity', 'Appetite & hydration irregularity', 'Inter-shift rest deficit'],
+      clinicalSignificance: 'Multivariate 7-Parameter Predictive Model: 0.18(Duty hours) + 0.16(Deployment history) + 0.16(Workload) + 0.12(Transfers) + 0.12(Training load) + 0.13(Wellness assessments) + 0.13(Biometrics). Unified across HRMS Portal, Soldier Mobile App, and Central Database.',
+      biomarkers: [
+        '1. Duty hours (18%) - HRMS Portal Watch Rosters',
+        '2. Deployment history (16%) - HRMS Stationing Dossier',
+        '3. Workload (16%) - HRMS Task Allocation Roster',
+        '4. Transfers (12%) - HRMS Posting & Transfer History',
+        '5. Training load (12%) - Central DB Combat Drills Log',
+        '6. Wellness assessments (13%) - Soldier Mobile App Pulse',
+        '7. Biometrics (13%) - Soldier Mobile App Sensors'
+      ],
       flaggedPersonnel: [
-        { name: 'Major Alex Morgan', uid: 'UID-EMP-010', rank: 'Major', unit: 'Rapid Action Bn 1', score: 78.0, risk: 'HIGH', trigger: 'Night duty cardiovascular recovery deficit' },
-        { name: 'Sepoy Amit Kumar', uid: 'UID-SLD-015', rank: 'Sepoy', unit: '10 Para SF', score: 57.2, risk: 'MODERATE', trigger: 'Prolonged forward sector recon duty' },
+        { name: 'Major Alex Morgan', uid: 'UID-EMP-010', rank: 'Major', unit: 'Rapid Action Bn 1', score: 78.0, risk: 'HIGH', trigger: 'Night duty cardiovascular recovery deficit + high watch load' },
+        { name: 'Sepoy Amit Kumar', uid: 'UID-SLD-015', rank: 'Sepoy', unit: '10 Para SF', score: 57.2, risk: 'MODERATE', trigger: 'Prolonged forward sector recon duty + tactical drills' },
       ],
       actionProtocol: 'Unit-level wellness review and structured 72-hour operational tempo modulation.',
       modelConfidence: '95.4% ROC-AUC'
@@ -1362,7 +1389,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'emotional-fatigue-prediction',
       num: 5,
       title: 'Emotional Fatigue Prediction',
-      shortDesc: '5-Parameter Compassion Fatigue, Emotional Blunting & Monotony Model',
+      shortDesc: '6-Parameter Multi-Source Sleep, Mood, Workload & Exhaustion Model',
       category: 'Affective Telemetry',
       riskLevel: 'HIGH',
       metricLabel: 'Fatigue Severity',
@@ -1371,11 +1398,18 @@ export const WelfareDashboard: React.FC = () => {
       color: 'text-amber-600',
       bg: 'bg-amber-50',
       border: 'border-amber-200',
-      clinicalSignificance: 'Measures psychological numbness, cognitive exhaustion, and reduced empathy resulting from acute operational stressors.',
-      biomarkers: ['Flat affective tone during check-ins', 'Social withdrawal indices', 'Delayed response reaction time', 'Reduced recreational engagement'],
+      clinicalSignificance: 'Multivariate 6-Parameter Predictive Model: 0.20(Sleep quality) + 0.18(Mood) + 0.16(Workload) + 0.20(Emotional exhaustion questions) + 0.14(Work-life balance) + 0.12(Counseling history). Unified across Soldier Mobile App, HRMS Portal, and Central Database.',
+      biomarkers: [
+        '1. Sleep quality (20%) - Soldier Mobile App (Sleep Telemetry)',
+        '2. Mood (18%) - Soldier Mobile App (Daily Mood Pulse)',
+        '3. Workload (16%) - HRMS Portal (Command Watch Rosters)',
+        '4. Emotional exhaustion questions (20%) - Soldier Mobile App (MBI-GS Items)',
+        '5. Work-life balance (14%) - Central DB (Family & Work-Life Survey)',
+        '6. Counseling history (12%) - Central DB (Counseling Case Registry)'
+      ],
       flaggedPersonnel: [
-        { name: 'Subedar Gurpreet Singh', uid: 'UID-EMP-013', rank: 'Subedar', unit: 'Field Artillery 3rd Bn', score: 80.0, risk: 'HIGH', trigger: 'Chronic duty alertness with domestic concern' },
-        { name: 'Naik Sandeep Patil', uid: 'UID-EMP-014', rank: 'Naik', unit: 'Signals & Telemetry', score: 68.0, risk: 'HIGH', trigger: 'Screen glare and sensory monotony fatigue' },
+        { name: 'Subedar Gurpreet Singh', uid: 'UID-EMP-013', rank: 'Subedar', unit: 'Field Artillery 3rd Bn', score: 80.0, risk: 'HIGH', trigger: 'Chronic duty alertness + caregiver domestic concern' },
+        { name: 'Naik Sandeep Patil', uid: 'UID-EMP-014', rank: 'Naik', unit: 'Signals & Telemetry', score: 68.0, risk: 'HIGH', trigger: 'Continuous console night duty + sleep fragmentation' },
       ],
       actionProtocol: 'Facilitate peer support contact and positive behavioral engagement activities.',
       modelConfidence: '93.7% ROC-AUC'
@@ -1384,7 +1418,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'welfare-concern-detection',
       num: 6,
       title: 'Welfare Concern Detection',
-      shortDesc: '5-Parameter Family Welfare, Medical Distress & Grants Model',
+      shortDesc: '6-Parameter Multi-Source Grants, Separation, Leave & Trends Model',
       category: 'Social Determinants',
       riskLevel: 'CRITICAL',
       metricLabel: 'Active Alerts',
@@ -1393,8 +1427,15 @@ export const WelfareDashboard: React.FC = () => {
       color: 'text-rose-600',
       bg: 'bg-rose-50',
       border: 'border-rose-200',
-      clinicalSignificance: 'Captures non-operational domestic pressures including family medical emergencies, children education, and compensation claims.',
-      biomarkers: ['Emergency leave applications', 'Financial assistance queries', 'Irregular call-home communication patterns', 'Subdued demeanor post-contact'],
+      clinicalSignificance: 'Multivariate 6-Parameter Predictive Model: 0.15(Financial concerns) + 0.20(Family separation) + 0.20(Repeated leave requests) + 0.18(Self-reported issues) + 0.15(Poor wellness trends) + 0.12(Intervention history). Unified across HRMS Portal, Soldier Mobile App, and Central Database.',
+      biomarkers: [
+        '1. Financial concerns (optional) (15%) - HRMS Portal Grants',
+        '2. Family separation (20%) - HRMS Portal Separation Tenure',
+        '3. Repeated leave requests (20%) - HRMS Leave Management',
+        '4. Self-reported issues (18%) - Soldier Mobile App Feedback',
+        '5. Poor wellness trends (15%) - Central DB Trend Archive',
+        '6. Intervention history (12%) - Central DB Case Registry'
+      ],
       flaggedPersonnel: [
         { name: 'Subedar Gurpreet Singh', uid: 'UID-EMP-013', rank: 'Subedar', unit: 'Field Artillery 3rd Bn', score: 88.0, risk: 'CRITICAL', trigger: 'Wife hospitalization in native village pending grant' },
         { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 72.0, risk: 'HIGH', trigger: 'High school transition support for children' },
@@ -1406,7 +1447,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'predictive-behavioral-analytics',
       num: 7,
       title: 'Predictive Behavioral Analytics',
-      shortDesc: '5-Parameter Machine-Learning Trajectory Forecasting & Sensor Drift',
+      shortDesc: '7-Parameter Multi-Source Longitudinal Service, Biometrics & Drift Model',
       category: 'AI Forecasting',
       riskLevel: 'MODERATE',
       metricLabel: 'Trend Direction',
@@ -1415,8 +1456,16 @@ export const WelfareDashboard: React.FC = () => {
       color: 'text-blue-600',
       bg: 'bg-blue-50',
       border: 'border-blue-200',
-      clinicalSignificance: 'Applies recurrent neural networks (LSTM) to predict individual behavioral drift over 14, 30, and 90-day time horizons.',
-      biomarkers: ['Step count reduction > 30%', 'Screen interaction jitter', 'App check-in skips', 'Voice acoustic pitch volatility'],
+      clinicalSignificance: 'Multivariate 7-Parameter Predictive Model: 0.15(Historical HRMS records) + 0.14(Attendance) + 0.15(Leave) + 0.14(Deployment) + 0.15(Assessments) + 0.14(Biometric trends) + 0.13(Behavioral history). Unified across HRMS Portal, Soldier Mobile App, and Central Database.',
+      biomarkers: [
+        '1. Historical HRMS records (15%) - HRMS Service Dossier',
+        '2. Attendance (14%) - HRMS Muster & Watch Attendance',
+        '3. Leave (15%) - HRMS Leave Utilization History',
+        '4. Deployment (14%) - HRMS Deployment & Stationing Dossier',
+        '5. Assessments (15%) - Soldier Mobile App Check-ins',
+        '6. Biometric trends (14%) - Soldier Mobile App Sensors',
+        '7. Behavioral history (13%) - Central DB Behavioral Archive'
+      ],
       flaggedPersonnel: [
         { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 79.0, risk: 'HIGH', trigger: 'Behavioral latency drift over last 14 days' },
         { name: 'Sepoy Amit Kumar', uid: 'UID-SLD-015', rank: 'Sepoy', unit: '10 Para SF', score: 48.0, risk: 'NOMINAL', trigger: 'Stable behavioral baseline trajectory' },
@@ -1428,7 +1477,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'stress-burnout-risk-models',
       num: 8,
       title: 'Stress & Burnout Risk Models',
-      shortDesc: '5-Parameter Multi-Modal Hazard Indices (ACWR + Autonomic)',
+      shortDesc: '4-Parameter Multi-Source Unified HRMS, Wellness, Biometrics & Assessment Model',
       category: 'Multi-Modal Modeling',
       riskLevel: 'CRITICAL',
       metricLabel: 'Hazard Index',
@@ -1437,8 +1486,13 @@ export const WelfareDashboard: React.FC = () => {
       color: 'text-rose-600',
       bg: 'bg-rose-50',
       border: 'border-rose-200',
-      clinicalSignificance: 'Combines Maslach, Kessler-10, and autonomic biometric indicators into a single unified risk classifier for leadership command.',
-      biomarkers: ['High acute-to-chronic workload ratio', 'Prolonged sympathetic activation', 'Low psychological detachment', 'Cognitive exhaustion'],
+      clinicalSignificance: 'Multivariate 4-Parameter Predictive Model: 0.28(Combined HRMS data) + 0.24(Wellness data) + 0.25(Biometric data) + 0.23(Assessment data). Unified across HRMS Portal, Central Database, and Soldier Mobile App.',
+      biomarkers: [
+        '1. Combined HRMS data (28%) - HRMS Workload & Stationing',
+        '2. Wellness data (24%) - Central DB Composite Profile',
+        '3. Biometric data (25%) - Soldier Mobile App Sensor Stream',
+        '4. Assessment data (23%) - Soldier Mobile App Psychometrics'
+      ],
       flaggedPersonnel: [
         { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 86.4, risk: 'CRITICAL', trigger: 'Simultaneous high autonomic strain + psychometric exhaustion' },
         { name: 'Major Alex Morgan', uid: 'UID-EMP-010', rank: 'Major', unit: 'Rapid Action Bn 1', score: 74.8, risk: 'HIGH', trigger: 'Command sleep deficit + continuous night shift vigil' },
@@ -1450,7 +1504,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'welfare-intervention-recommendation',
       num: 9,
       title: 'Welfare Intervention Recommendation',
-      shortDesc: '5-Parameter Prescriptive Therapies, Leave Grants & Rest Rotations',
+      shortDesc: '5-Parameter Multi-Source AI Risk, Assessment History & Workload Model',
       category: 'Prescriptive Analytics',
       riskLevel: 'MODERATE',
       metricLabel: 'Intervention Fit',
@@ -1459,8 +1513,14 @@ export const WelfareDashboard: React.FC = () => {
       color: 'text-teal-600',
       bg: 'bg-teal-50',
       border: 'border-teal-200',
-      clinicalSignificance: 'Generates evidence-based clinical protocols, automated leave allocations, and specialized counseling pathways tailored to root-causes.',
-      biomarkers: ['Intervention response velocity', 'Counseling follow-up compliance', 'Somatic recovery after leave', 'Peer support integration'],
+      clinicalSignificance: 'Multivariate 5-Parameter Predictive Model: 0.25(AI risk score) + 0.20(Assessment history) + 0.20(Workload) + 0.20(Deployment) + 0.15(Previous interventions). Unified across Central Database and HRMS Portal.',
+      biomarkers: [
+        '1. AI risk score (25%) - Central DB Composite AI Engine',
+        '2. Assessment history (20%) - Central DB Assessment Archive',
+        '3. Workload (20%) - HRMS Command Watch Rosters',
+        '4. Deployment (20%) - HRMS Deployment Tenure Dossier',
+        '5. Previous interventions (15%) - Central DB Interventions Log'
+      ],
       flaggedPersonnel: [
         { name: 'Subedar Gurpreet Singh', uid: 'UID-EMP-013', rank: 'Subedar', unit: 'Field Artillery 3rd Bn', score: 82.0, risk: 'HIGH', trigger: 'Recommended: 10-day compassionate leave + tele-counseling' },
         { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 88.0, risk: 'CRITICAL', trigger: 'Recommended: Oxygen therapy + 48h sleep replenishment' },
@@ -1472,7 +1532,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'automated-alerts',
       num: 10,
       title: 'Automated Alerts',
-      shortDesc: '5-Parameter Early Warning Triggers, HRV Breaches & Dispatches',
+      shortDesc: '4-Parameter Multi-Source AI Early Warning, Spike Detection & Anomaly Model',
       category: 'Early Warning System',
       riskLevel: 'CRITICAL',
       metricLabel: 'Urgent Alerts',
@@ -1481,8 +1541,13 @@ export const WelfareDashboard: React.FC = () => {
       color: 'text-rose-600',
       bg: 'bg-rose-50',
       border: 'border-rose-200',
-      clinicalSignificance: 'Real-time alert engine delivering instant SMS/telemetry dispatches to Welfare Officers and Unit Medical Officers when risk bounds are exceeded.',
-      biomarkers: ['Stress score spike > 25 pts in 24h', 'HRV dropping below 20ms baseline', 'Emergency trigger word detection', 'Consecutive duty breach'],
+      clinicalSignificance: 'Multivariate 4-Parameter Predictive Model: 0.30(High-risk predictions) + 0.25(Sudden score increase) + 0.22(Missed assessments) + 0.23(Abnormal trends). Unified across Central Database and Soldier Mobile App.',
+      biomarkers: [
+        '1. High-risk predictions (30%) - Central DB AI Early Warning',
+        '2. Sudden score increase (25%) - Soldier Mobile App Spike Telemetry',
+        '3. Missed assessments (22%) - Central DB Compliance Log',
+        '4. Abnormal trends (23%) - Soldier Mobile App Biometric Anomalies'
+      ],
       flaggedPersonnel: [
         { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 92.0, risk: 'CRITICAL', trigger: 'Instant Alert: Sleep deficit threshold breached (<3.8h)' },
         { name: 'Major Alex Morgan', uid: 'UID-EMP-010', rank: 'Major', unit: 'Rapid Action Bn 1', score: 80.0, risk: 'HIGH', trigger: 'Alert: 4th consecutive night patrol duty logged' },
@@ -1494,7 +1559,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'mental-wellbeing-resilience',
       num: 11,
       title: 'Mental Well-being & Workforce Resilience',
-      shortDesc: '5-Parameter Hardiness (CD-RISC), Squad Cohesion & Coping Model',
+      shortDesc: '5-Parameter Multi-Source Wellness History, Outcomes & Coping Model',
       category: 'Positive Psychology',
       riskLevel: 'NOMINAL',
       metricLabel: 'Unit Resilience',
@@ -1503,10 +1568,16 @@ export const WelfareDashboard: React.FC = () => {
       color: 'text-emerald-600',
       bg: 'bg-emerald-50',
       border: 'border-emerald-200',
-      clinicalSignificance: 'Measures adaptive psychological coping, mission alignment, optimism, and squad camaraderie across the formation.',
-      biomarkers: ['CD-RISC hardiness score > 75%', 'Squad trust index > 85%', 'Post-incident recovery velocity', 'Vocational pride & purpose'],
+      clinicalSignificance: 'Multivariate 5-Parameter Predictive Model: 0.24(Wellness score history) + 0.20(Intervention outcomes) + 0.22(Assessments) + 0.18(Attendance) + 0.16(Productivity trends). Unified across Central DB, Soldier Mobile App, and HRMS Portal.',
+      biomarkers: [
+        '1. Wellness score history (24%) - Central DB Wellness Archive',
+        '2. Intervention outcomes (20%) - Central DB Outcome Registry',
+        '3. Assessments (22%) - Soldier Mobile App Resilience Items',
+        '4. Attendance (18%) - HRMS Portal Muster & Watch Logs',
+        '5. Productivity trends (16%) - Central DB Productivity Metrics'
+      ],
       flaggedPersonnel: [
-        { name: 'Sepoy Amit Kumar', uid: 'UID-SLD-015', rank: 'Sepoy', unit: '10 Para SF', score: 86.0, risk: 'NOMINAL', trigger: 'High tactical bounce-back & camaraderie' },
+        { name: 'Sepoy Amit Kumar', uid: 'UID-SLD-015', rank: 'Sepoy', unit: '10 Para SF', score: 86.0, risk: 'NOMINAL', trigger: 'High tactical bounce-back & squad camaraderie' },
         { name: 'Major Alex Morgan', uid: 'UID-EMP-010', rank: 'Major', unit: 'Rapid Action Bn 1', score: 72.0, risk: 'NOMINAL', trigger: 'Demonstrated command resilience under stress' },
       ],
       actionProtocol: 'Incorporate positive psychology conditioning into regular morning parade brief.',
@@ -1516,7 +1587,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'operational-readiness',
       num: 12,
       title: 'Operational Readiness',
-      shortDesc: '5-Parameter Cognitive Sharpness, Reaction Stamina & Suitability Fit',
+      shortDesc: '6-Parameter Multi-Source Wellness, Fatigue, Deployment, Leave & AI Model',
       category: 'Mission Readiness',
       riskLevel: 'NOMINAL',
       metricLabel: 'Deployment Fit',
@@ -1525,8 +1596,15 @@ export const WelfareDashboard: React.FC = () => {
       color: 'text-blue-600',
       bg: 'bg-blue-50',
       border: 'border-blue-200',
-      clinicalSignificance: 'Calculates combat fitness and cognitive reaction capacity, identifying personnel primed for mission deployment vs. those requiring recovery.',
-      biomarkers: ['Cognitive reaction sharpness > 80%', 'Somatic endurance index', 'Zero absent-minded error telemetry', 'Alertness stability'],
+      clinicalSignificance: 'Multivariate 6-Parameter Predictive Model: 0.20(Wellness score) + 0.20(Fatigue) + 0.18(Deployment load) + 0.15(Leave) + 0.15(Attendance) + 0.12(AI risk predictions). Unified across Central DB, Soldier Mobile App, and HRMS Portal.',
+      biomarkers: [
+        '1. Wellness score (20%) - Central DB Composite Index',
+        '2. Fatigue (20%) - Soldier Mobile App Fatigue Telemetry',
+        '3. Deployment load (18%) - HRMS Deployment Load Archive',
+        '4. Leave (15%) - HRMS Leave Management System',
+        '5. Attendance (15%) - HRMS Combat Readiness Attendance',
+        '6. AI risk predictions (12%) - Central DB Predictive Model'
+      ],
       flaggedPersonnel: [
         { name: 'Sepoy Amit Kumar', uid: 'UID-SLD-015', rank: 'Sepoy', unit: '10 Para SF', score: 84.0, risk: 'NOMINAL', trigger: 'Combat Ready: High focus & physical fitness' },
         { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 46.0, risk: 'CRITICAL', trigger: 'Unfit for frontline duty pending 48h rest' },
@@ -1538,7 +1616,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'occupational-stress-risk',
       num: 13,
       title: 'Occupational Stress Incident Risk',
-      shortDesc: '5-Parameter Extreme Terrain, Hypoxia, Shift Hazard & Micro-Sleep',
+      shortDesc: '6-Parameter Multi-Source Stress Trends, Burnout History, Workload & Sleep Model',
       category: 'Safety & Risk Engineering',
       riskLevel: 'HIGH',
       metricLabel: 'Incident Risk Index',
@@ -1547,14 +1625,21 @@ export const WelfareDashboard: React.FC = () => {
       color: 'text-amber-600',
       bg: 'bg-amber-50',
       border: 'border-amber-200',
-      clinicalSignificance: 'Identifies environment-driven occupational hazards such as extreme altitude hypoxia, continuous night duties, and micro-sleep vulnerabilities.',
-      biomarkers: ['Continuous night duty > 5 cycles', 'High altitude exposure (>11,000 ft)', 'Micro-sleep latency drop during duty', 'Cumulative physical fatigue'],
-      flaggedPersonnel: [
-        { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 86.0, risk: 'CRITICAL', trigger: 'Hypoxia + night vigil safety hazard flag' },
-        { name: 'Naik Sandeep Patil', uid: 'UID-EMP-014', rank: 'Naik', unit: 'Signals & Telemetry', score: 72.0, risk: 'HIGH', trigger: 'Nocturnal screen fatigue & micro-sleep risk' },
+      clinicalSignificance: 'Multivariate 6-Parameter Predictive Model: 0.18(Long-term stress trends) + 0.16(Burnout history) + 0.18(Workload) + 0.18(Deployments) + 0.16(Poor sleep) + 0.14(Emotional fatigue). Unified across Central DB, HRMS Portal, and Soldier Mobile App.',
+      biomarkers: [
+        '1. Long-term stress trends (18%) - Central DB Longitudinal Registry',
+        '2. Burnout history (16%) - Central DB Burnout History Archive',
+        '3. Workload (18%) - HRMS Command Watch Rosters',
+        '4. Deployments (18%) - HRMS Sector Deployment Tenure',
+        '5. Poor sleep (16%) - Soldier Mobile App Sleep Deficit',
+        '6. Emotional fatigue (14%) - Soldier Mobile App Fatigue'
       ],
-      actionProtocol: 'Implement environmental rotation out of high altitude; mandate daylight duty shift transfers.',
-      modelConfidence: '95.8% ROC-AUC'
+      flaggedPersonnel: [
+        { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 84.8, risk: 'CRITICAL', trigger: 'Continuous night duty > 8 cycles + extreme hypoxia sector' },
+        { name: 'Subedar Gurpreet Singh', uid: 'UID-EMP-013', rank: 'Subedar', unit: 'Field Artillery 3rd Bn', score: 76.5, risk: 'HIGH', trigger: 'High cumulative physical fatigue + command watch load' },
+      ],
+      actionProtocol: 'Mandate altitude rotation, shift to daylight watch, and schedule clinical decompression.',
+      modelConfidence: '96.2% ROC-AUC'
     },
   ];
 
