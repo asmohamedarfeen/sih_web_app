@@ -89,6 +89,41 @@ export interface PersonnelBurnoutProfile {
   };
 }
 
+export interface FactorParamDisplay {
+  key: string;
+  name: string;
+  weight: number;
+  weightLabel: string;
+  sourceBadge: string;
+  sourceType: 'MOBILE' | 'HRMS' | 'DATABASE';
+  note: string;
+  source: string;
+  available: boolean;
+  score: number;
+  color: string;
+  bar: string;
+  desc: string;
+}
+
+export interface FactorEvaluationResult {
+  factorId: string;
+  factorTitle: string;
+  metricLabel: string;
+  score: number;
+  level: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'NOMINAL';
+  levelColor: string;
+  levelBg: string;
+  tierLabel: string;
+  formula: string;
+  recommendation: string;
+  primaryAction: string;
+  secondaryAction: string;
+  mobileCount: number;
+  hrmsCount: number;
+  databaseCount: number;
+  parameters: FactorParamDisplay[];
+}
+
 const ALL_PERSONNEL: PersonnelBurnoutProfile[] = [
   {
     uid: 'UID-EMP-012',
@@ -487,6 +522,579 @@ const parseParam = (raw: any, fallbackScore: number, fallbackNote: string, defau
   };
 };
 
+export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile): FactorEvaluationResult => {
+  const getRaw = (obj: any, key: string, fallback: number = 50, note: string = 'Operational telemetry', src: string = 'Central Database') => {
+    if (!obj) return { score: fallback, available: true, source: src, note };
+    return parseParam(obj[key], fallback, note, src);
+  };
+
+  const getP = (key: string, fb: number = 50, note: string = 'Standard roster', src: string = 'HRMS Portal') =>
+    getRaw(p.params, key, fb, note, src);
+  const getPsych = (key: string, fb: number = 50, note: string = 'Psychometric pulse', src: string = 'Soldier Mobile App') =>
+    getRaw(p.psychological_distress_params, key, fb, note, src);
+  const getStress = (key: string, fb: number = 50, note: string = 'Stress signal', src: string = 'HRMS Portal') =>
+    getRaw(p.stress_indicators_params, key, fb, note, src);
+
+  let score = 50;
+  let formula = '';
+  let metricLabel = 'Metric Est';
+  let tierLabel = 'Standard Telemetry Status';
+  let recommendation = 'Maintain routine monitoring and duty cadence.';
+  let primaryAction = 'Initiate Protocol';
+  let secondaryAction = 'Export Dossier';
+  let mobileCount = 0;
+  let hrmsCount = 0;
+  let databaseCount = 0;
+  let params: FactorParamDisplay[] = [];
+
+  const getColor = (s: number, isInverted: boolean = false) => {
+    if (isInverted) {
+      if (s >= 75) return { color: 'text-emerald-400', bar: 'bg-emerald-500' };
+      if (s >= 60) return { color: 'text-blue-400', bar: 'bg-blue-500' };
+      if (s >= 45) return { color: 'text-amber-400', bar: 'bg-amber-500' };
+      return { color: 'text-rose-400', bar: 'bg-rose-500' };
+    }
+    if (s >= 80) return { color: 'text-rose-400', bar: 'bg-rose-500' };
+    if (s >= 70) return { color: 'text-amber-400', bar: 'bg-amber-500' };
+    if (s >= 50) return { color: 'text-blue-400', bar: 'bg-blue-500' };
+    return { color: 'text-emerald-400', bar: 'bg-emerald-500' };
+  };
+
+  switch (factorId) {
+    case 'burnout-prediction': {
+      metricLabel = 'Burnout Est';
+      const lp = getP('leave_patterns', 50, '3 consecutive leaves deferred', 'HRMS Leave Portal');
+      const ot = getP('overtime', 50, 'Overtime watch hours rostered in HRMS', 'HRMS Watch Roster');
+      const wt = getP('workload_trend', 50, 'Operational task escalation slope', 'Command Operations Log');
+      const dd = getP('deployment_duration', 40, 'Stationing duration in sector', 'Service Dossier Database');
+      const ds = getP('duty_schedule', 50, 'Rotational night vigil schedule', 'Battalion Roster');
+      const sq = getP('sleep_quality', 50, 'Sleep hours and restorative depth', 'Soldier Mobile App (Sleep Telemetry)');
+      const ee = getP('emotional_exhaustion', 50, 'Maslach MBI-GS affective depletion', 'Clinical MBI-GS Telemetry');
+      const ar = getP('assessment_responses', 50, 'Mobile app burnout questions result', 'Soldier Mobile App (Burnout Questions)');
+
+      score = (
+        0.12 * lp.score +
+        0.14 * ot.score +
+        0.13 * wt.score +
+        0.10 * dd.score +
+        0.13 * ds.score +
+        0.15 * sq.score +
+        0.12 * ee.score +
+        0.11 * ar.score
+      );
+
+      formula = '0.12(Leave) + 0.14(Overtime) + 0.13(Workload) + 0.10(Deployment) + 0.13(Schedule) + 0.15(Sleep) + 0.12(Exhaustion) + 0.11(Assessment)';
+      mobileCount = 2; hrmsCount = 4; databaseCount = 2;
+      primaryAction = 'Dispatch 48h Rest Rotation';
+      secondaryAction = 'Book Counselor';
+
+      params = [
+        { key: 'leave_patterns', name: '1. Leave patterns', weight: 0.12, weightLabel: '12%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: lp.note, source: lp.source, available: lp.available, score: lp.score, ...getColor(lp.score), desc: 'Leave denial frequency & deferred furloughs' },
+        { key: 'overtime', name: '2. Overtime', weight: 0.14, weightLabel: '14%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: ot.note, source: ot.source, available: ot.available, score: ot.score, ...getColor(ot.score), desc: 'Duty hours beyond standard watch cycle' },
+        { key: 'workload_trend', name: '3. Workload trend', weight: 0.13, weightLabel: '13%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: wt.note, source: wt.source, available: wt.available, score: wt.score, ...getColor(wt.score), desc: '14-day task escalation slope' },
+        { key: 'deployment_duration', name: '4. Deployment duration', weight: 0.10, weightLabel: '10%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: dd.note, source: dd.source, available: dd.available, score: dd.score, ...getColor(dd.score), desc: 'Continuous months stationed in extreme sector' },
+        { key: 'duty_schedule', name: '5. Duty schedule', weight: 0.13, weightLabel: '13%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: ds.note, source: ds.source, available: ds.available, score: ds.score, ...getColor(ds.score), desc: 'Consecutive night vigils & irregular rotation' },
+        { key: 'sleep_quality', name: '6. Sleep quality', weight: 0.15, weightLabel: '15%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: sq.note, source: sq.source, available: sq.available, score: sq.score, ...getColor(sq.score), desc: 'Restorative hours logged via Mobile App' },
+        { key: 'emotional_exhaustion', name: '7. Emotional exhaustion score', weight: 0.12, weightLabel: '12%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ee.note, source: ee.source, available: ee.available, score: ee.score, ...getColor(ee.score), desc: 'Maslach affective depletion index' },
+        { key: 'assessment_responses', name: '8. Assessment responses', weight: 0.11, weightLabel: '11%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ar.note, source: ar.source, available: ar.available, score: ar.score, ...getColor(ar.score), desc: 'Mobile app psychometric burnout domain questions' },
+      ];
+      break;
+    }
+
+    case 'psychological-distress': {
+      metricLabel = 'Distress Est';
+      const ma = getPsych('mood_assessments', 60, 'Daily affective valence recorded via mobile', 'Soldier Mobile App (Daily Mood Pulse)');
+      const aq = getPsych('anxiety_questions', 65, 'GAD-7 hypervigilance strain on mobile', 'Soldier Mobile App (GAD-7 Anxiety Screening)');
+      const di = getPsych('depression_indicators', 58, 'PHQ-9 anhedonia and somatic energy score', 'Soldier Mobile App (PHQ-9 Depression Inventory)');
+      const sq = getPsych('sleep_quality', getP('sleep_quality').score, 'Sleep debt and fragmentation on mobile', 'Soldier Mobile App (Sleep Telemetry)');
+      const si = getPsych('social_isolation', 50, 'Barracks buddy network & detachment in DB', 'Central Database (Barracks Peer Network)');
+      const te = getPsych('traumatic_exposure', 55, 'High-threat incident log in HRMS Dossier', 'HRMS Portal (Combat Operations & Incident Dossier)');
+      const ws = getPsych('wellness_survey', 62, 'Monthly psychometric survey index in DB', 'Central Database (Periodic Psychometric Assessment Archive)');
+
+      score = (
+        0.15 * ma.score +
+        0.16 * aq.score +
+        0.18 * di.score +
+        0.14 * sq.score +
+        0.12 * si.score +
+        0.13 * te.score +
+        0.12 * ws.score
+      );
+
+      formula = '0.15(Mood) + 0.16(Anxiety) + 0.18(Depression) + 0.14(Sleep) + 0.12(Isolation) + 0.13(Trauma) + 0.12(Wellness)';
+      mobileCount = 4; hrmsCount = 1; databaseCount = 2;
+      primaryAction = 'Dispatch Clinical Counselor';
+      secondaryAction = 'Pair Peer Buddy';
+
+      params = [
+        { key: 'mood_assessments', name: '1. Mood assessments', weight: 0.15, weightLabel: '15%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ma.note, source: ma.source, available: ma.available, score: ma.score, ...getColor(ma.score), desc: 'Daily affective valence & mood stability' },
+        { key: 'anxiety_questions', name: '2. Anxiety questions', weight: 0.16, weightLabel: '16%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: aq.note, source: aq.source, available: aq.available, score: aq.score, ...getColor(aq.score), desc: 'GAD-7 anxiety & hypervigilance screening' },
+        { key: 'depression_indicators', name: '3. Depression indicators', weight: 0.18, weightLabel: '18%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: di.note, source: di.source, available: di.available, score: di.score, ...getColor(di.score), desc: 'PHQ-9 anhedonia & mood deficit markers' },
+        { key: 'sleep_quality', name: '4. Sleep quality', weight: 0.14, weightLabel: '14%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: sq.note, source: sq.source, available: sq.available, score: sq.score, ...getColor(sq.score), desc: 'Sleep deficit & latency recorded on mobile' },
+        { key: 'social_isolation', name: '5. Social isolation', weight: 0.12, weightLabel: '12%', sourceBadge: '💾 Central Database', sourceType: 'DATABASE', note: si.note, source: si.source, available: si.available, score: si.score, ...getColor(si.score), desc: 'Barracks detachment & peer connection index' },
+        { key: 'traumatic_exposure', name: '6. Traumatic exposure', weight: 0.13, weightLabel: '13%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: te.note, source: te.source, available: te.available, score: te.score, ...getColor(te.score), desc: 'High-threat incident & combat logs in HRMS' },
+        { key: 'wellness_survey', name: '7. Wellness survey', weight: 0.12, weightLabel: '12%', sourceBadge: '💾 Central Database', sourceType: 'DATABASE', note: ws.note, source: ws.source, available: ws.available, score: ws.score, ...getColor(ws.score), desc: 'Periodic multi-domain psychometric survey' },
+      ];
+      break;
+    }
+
+    case 'stress-indicators-detection': {
+      metricLabel = 'Stress Indicators';
+      const hd = getStress('hrms_data', 65, 'Continuous stationing tenure in HRMS', 'HRMS Portal (Dossier & Stationing History)');
+      const lf = getStress('leave_frequency', getP('leave_patterns').score, 'Leave applications deferred in HRMS', 'HRMS Portal (Leave Management System)');
+      const wl = getStress('workload', getP('workload_trend').score, 'Command watch roster overtime in HRMS', 'HRMS Portal (Command Watch Rosters)');
+      const ma = getStress('missed_assessments', 45, 'Check-in delay compliance rate in DB', 'Central Database (Compliance Log)');
+      const sp = getStress('sleep_pattern', getP('sleep_quality').score, 'Sleep fragmentation logged on mobile', 'Soldier Mobile App (Sleep Telemetry)');
+      const bt = getStress('biometric_trends', 68, 'Resting HR & HRV autonomic strain', 'Soldier Mobile App (Biometric & Sensor Engine)');
+      const bc = getStress('behavioral_changes', 60, 'Irritability & interaction volatility', 'Soldier Mobile App & Central DB (Behavioral Telemetry)');
+
+      score = (
+        0.14 * hd.score +
+        0.14 * lf.score +
+        0.15 * wl.score +
+        0.13 * ma.score +
+        0.16 * sp.score +
+        0.15 * bt.score +
+        0.13 * bc.score
+      );
+
+      formula = '0.14(HRMS) + 0.14(Leave) + 0.15(Workload) + 0.13(Missed Assessments) + 0.16(Sleep) + 0.15(Biometrics) + 0.13(Behavioral)';
+      mobileCount = 3; hrmsCount = 3; databaseCount = 1;
+      primaryAction = 'Initiate Biofeedback';
+      secondaryAction = 'Expedite Leave';
+
+      params = [
+        { key: 'hrms_data', name: '1. HRMS data', weight: 0.14, weightLabel: '14%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: hd.note, source: hd.source, available: hd.available, score: hd.score, ...getColor(hd.score), desc: 'Career tenure & stationing logs in HRMS' },
+        { key: 'leave_frequency', name: '2. Leave frequency', weight: 0.14, weightLabel: '14%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: lf.note, source: lf.source, available: lf.available, score: lf.score, ...getColor(lf.score), desc: 'Leave requests & deferred furloughs in HRMS' },
+        { key: 'workload', name: '3. Workload', weight: 0.15, weightLabel: '15%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: wl.note, source: wl.source, available: wl.available, score: wl.score, ...getColor(wl.score), desc: 'Operational watch hours & shift tempo in HRMS' },
+        { key: 'missed_assessments', name: '4. Missed assessments', weight: 0.13, weightLabel: '13%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ma.note, source: ma.source, available: ma.available, score: ma.score, ...getColor(ma.score), desc: 'Assessment avoidance & compliance logs in DB' },
+        { key: 'sleep_pattern', name: '5. Sleep pattern', weight: 0.16, weightLabel: '16%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: sp.note, source: sp.source, available: sp.available, score: sp.score, ...getColor(sp.score), desc: 'Total sleep duration & deficit on Mobile' },
+        { key: 'biometric_trends', name: '6. Biometric trends', weight: 0.15, weightLabel: '15%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: bt.note, source: bt.source, available: bt.available, score: bt.score, ...getColor(bt.score), desc: 'Resting HR & HRV autonomic strain' },
+        { key: 'behavioral_changes', name: '7. Behavioral changes', weight: 0.13, weightLabel: '13%', sourceBadge: '📱 Mobile & Central DB', sourceType: 'MOBILE', note: bc.note, source: bc.source, available: bc.available, score: bc.score, ...getColor(bc.score), desc: 'App interaction volatility & peer flags' },
+      ];
+      break;
+    }
+
+    case 'overall-stress-prediction': {
+      metricLabel = 'Overall Stress';
+      const bt = getStress('biometric_trends', 68, 'Cardiovascular & autonomic load on mobile', 'Soldier Mobile App (Biometric Sensor Engine)');
+      const wt = getP('workload_trend', 50, 'Command operational task tempo in HRMS', 'HRMS Portal (Command Watch Rosters)');
+      const sq = getP('sleep_quality', 50, 'Total sleep debt & insomnia markers on mobile', 'Soldier Mobile App (Sleep Telemetry)');
+      const sr = getPsych('mood_assessments', 60, 'Self-reported stress & daily pulse on mobile', 'Soldier Mobile App (Daily Self-Assessment)');
+      const ds = getP('duty_schedule', 50, 'Duty cycle rotation & watch hours in HRMS', 'HRMS Portal (Battalion Rosters)');
+      const dd = getP('deployment_duration', 40, 'Hostile terrain & environmental severity in DB', 'Central Database (Sector Severity Archive)');
+
+      score = (
+        0.20 * bt.score +
+        0.20 * wt.score +
+        0.18 * sq.score +
+        0.16 * sr.score +
+        0.14 * ds.score +
+        0.12 * dd.score
+      );
+
+      formula = '0.20(Biometrics) + 0.20(Ops Tempo) + 0.18(Sleep) + 0.16(Self-Report) + 0.14(Duty Cycle) + 0.12(Env Severity)';
+      mobileCount = 3; hrmsCount = 2; databaseCount = 1;
+      primaryAction = 'Unit Tempo Modulation';
+      secondaryAction = 'Deploy Rest Rotation';
+
+      params = [
+        { key: 'biometric_strain', name: '1. Biometric strain', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: bt.note, source: bt.source, available: bt.available, score: bt.score, ...getColor(bt.score), desc: 'Cardiovascular autonomic load on mobile' },
+        { key: 'operational_tempo', name: '2. Operational tempo', weight: 0.20, weightLabel: '20%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: wt.note, source: wt.source, available: wt.available, score: wt.score, ...getColor(wt.score), desc: 'Command operational task tempo in HRMS' },
+        { key: 'sleep_deficit', name: '3. Sleep deficit', weight: 0.18, weightLabel: '18%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: sq.note, source: sq.source, available: sq.available, score: sq.score, ...getColor(sq.score), desc: 'Total sleep deficit & insomnia markers on mobile' },
+        { key: 'self_reported_stress', name: '4. Self-reported stress', weight: 0.16, weightLabel: '16%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: sr.note, source: sr.source, available: sr.available, score: sr.score, ...getColor(sr.score), desc: 'Daily self-reported psychometric strain on mobile' },
+        { key: 'duty_cycle_load', name: '5. Duty cycle load', weight: 0.14, weightLabel: '14%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: ds.note, source: ds.source, available: ds.available, score: ds.score, ...getColor(ds.score), desc: 'Night shift concentration & rotation in HRMS' },
+        { key: 'environmental_severity', name: '6. Environmental severity', weight: 0.12, weightLabel: '12%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: dd.note, source: dd.source, available: dd.available, score: dd.score, ...getColor(dd.score), desc: 'Sector difficulty & terrain hostile index in DB' },
+      ];
+      break;
+    }
+
+    case 'emotional-fatigue-prediction': {
+      metricLabel = 'Emotional Fatigue';
+      const ee = getP('emotional_exhaustion', 50, 'Affective blunting & emotional numbing', 'Soldier Mobile App (Affective Telemetry)');
+      const cf = getPsych('depression_indicators', 58, 'Compassion fatigue & emotional detachment in DB', 'Central Database (Psychiatric Registry)');
+      const sw = getPsych('social_isolation', 50, 'Social withdrawal & squad detachment on mobile', 'Soldier Mobile App (Peer Pulse)');
+      const sm = getP('duty_schedule', 50, 'Monotonous watch shifts & sensory routine in HRMS', 'HRMS Portal (Shift Rosters)');
+      const rd = getP('sleep_quality', 50, 'Rest recovery deficit & REM latency on mobile', 'Soldier Mobile App (Sleep Telemetry)');
+
+      score = (
+        0.25 * ee.score +
+        0.22 * cf.score +
+        0.20 * sw.score +
+        0.18 * sm.score +
+        0.15 * rd.score
+      );
+
+      formula = '0.25(Affective Blunting) + 0.22(Compassion Fatigue) + 0.20(Social Withdrawal) + 0.18(Shift Monotony) + 0.15(Rest Deficit)';
+      mobileCount = 3; hrmsCount = 1; databaseCount = 1;
+      primaryAction = 'Schedule Peer Support';
+      secondaryAction = 'Task Rotation';
+
+      params = [
+        { key: 'affective_blunting', name: '1. Affective blunting', weight: 0.25, weightLabel: '25%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ee.note, source: ee.source, available: ee.available, score: ee.score, ...getColor(ee.score), desc: 'Affective numbness & emotional blunting' },
+        { key: 'compassion_fatigue', name: '2. Compassion fatigue', weight: 0.22, weightLabel: '22%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: cf.note, source: cf.source, available: cf.available, score: cf.score, ...getColor(cf.score), desc: 'Depersonalization & empathy weariness in DB' },
+        { key: 'social_withdrawal', name: '3. Social withdrawal', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: sw.note, source: sw.source, available: sw.available, score: sw.score, ...getColor(sw.score), desc: 'Barracks detachment logged on mobile' },
+        { key: 'shift_monotony', name: '4. Shift monotony', weight: 0.18, weightLabel: '18%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: sm.note, source: sm.source, available: sm.available, score: sm.score, ...getColor(sm.score), desc: 'Sensory monotony & console duty in HRMS' },
+        { key: 'rest_deficit', name: '5. Rest recovery deficit', weight: 0.15, weightLabel: '15%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: rd.note, source: rd.source, available: rd.available, score: rd.score, ...getColor(rd.score), desc: 'Sleep recovery deficit logged via mobile' },
+      ];
+      break;
+    }
+
+    case 'welfare-concern-detection': {
+      metricLabel = 'Welfare Concern';
+      const el = getP('leave_patterns', 50, 'Emergency & compassionate leave applications in HRMS', 'HRMS Portal (Leave Management System)');
+      const fd = getPsych('anxiety_questions', 65, 'Family medical emergency & caregiver burden in HRMS', 'HRMS Portal (Family Welfare Cell)');
+      const fq = getStress('leave_frequency', 50, 'Financial distress & education grant queries in HRMS', 'HRMS Portal (Benefits & Claims Archive)');
+      const ch = getStress('behavioral_changes', 60, 'Call-home communication pattern volatility on mobile', 'Soldier Mobile App (Family Telemetry)');
+      const ds = getPsych('social_isolation', 50, 'Subdued demeanor & post-contact retreat in DB', 'Central Database (Unit Welfare Officer Log)');
+
+      score = (
+        0.28 * el.score +
+        0.25 * fd.score +
+        0.20 * fq.score +
+        0.15 * ch.score +
+        0.12 * ds.score
+      );
+
+      formula = '0.28(Emerg Leave) + 0.25(Family Distress) + 0.20(Financial Queries) + 0.15(Call-Home) + 0.12(Demeanor Shift)';
+      mobileCount = 1; hrmsCount = 3; databaseCount = 1;
+      primaryAction = 'Sanction Emergency Grant';
+      secondaryAction = 'Dispatch Family Liaison';
+
+      params = [
+        { key: 'emergency_leave', name: '1. Emergency leave requests', weight: 0.28, weightLabel: '28%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: el.note, source: el.source, available: el.available, score: el.score, ...getColor(el.score), desc: 'Emergency leave applications logged in HRMS' },
+        { key: 'family_distress', name: '2. Family medical distress', weight: 0.25, weightLabel: '25%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: fd.note, source: fd.source, available: fd.available, score: fd.score, ...getColor(fd.score), desc: 'Family illness & caregiver distress in HRMS' },
+        { key: 'financial_queries', name: '3. Financial & grant queries', weight: 0.20, weightLabel: '20%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: fq.note, source: fq.source, available: fq.available, score: fq.score, ...getColor(fq.score), desc: 'Welfare financial grant queries in HRMS' },
+        { key: 'call_home', name: '4. Call-home volatility', weight: 0.15, weightLabel: '15%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ch.note, source: ch.source, available: ch.available, score: ch.score, ...getColor(ch.score), desc: 'Domestic communication strain on mobile' },
+        { key: 'demeanor_shift', name: '5. Demeanor shift', weight: 0.12, weightLabel: '12%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ds.note, source: ds.source, available: ds.available, score: ds.score, ...getColor(ds.score), desc: 'Subdued behavior post-call logged in DB' },
+      ];
+      break;
+    }
+
+    case 'predictive-behavioral-analytics': {
+      metricLabel = 'Behavioral Drift';
+      const ci = getStress('missed_assessments', 45, 'Daily psychometric check-in skips on mobile', 'Soldier Mobile App (Check-in Telemetry)');
+      const st = getStress('sleep_pattern', 50, 'Step count & physical mobility decline on mobile', 'Soldier Mobile App (Activity Sensor)');
+      const sj = getStress('behavioral_changes', 60, 'Screen interaction latency & UI touch jitter on mobile', 'Soldier Mobile App (Touch Dynamics Engine)');
+      const ad = getStress('biometric_trends', 68, 'Voice acoustic pitch volatility & pulse drift on mobile', 'Soldier Mobile App (Acoustic AI Engine)');
+      const ts = getP('workload_trend', 50, '30-day LSTM recurrent behavioral drift slope in DB', 'Central Database (AI Predictive Store)');
+
+      score = (
+        0.24 * ci.score +
+        0.22 * st.score +
+        0.18 * sj.score +
+        0.18 * ad.score +
+        0.18 * ts.score
+      );
+
+      formula = '0.24(Check-in Skips) + 0.22(Mobility Drop) + 0.18(Screen Jitter) + 0.18(Acoustic Drift) + 0.18(Trend Slope)';
+      mobileCount = 4; hrmsCount = 0; databaseCount = 1;
+      primaryAction = 'Prophylactic Wellness Review';
+      secondaryAction = 'Trigger Sensor Calibration';
+
+      params = [
+        { key: 'checkin_skips', name: '1. App check-in skips', weight: 0.24, weightLabel: '24%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ci.note, source: ci.source, available: ci.available, score: ci.score, ...getColor(ci.score), desc: 'Check-in skips & app avoidance on mobile' },
+        { key: 'mobility_drop', name: '2. Mobility telemetry drop', weight: 0.22, weightLabel: '22%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: st.note, source: st.source, available: st.available, score: st.score, ...getColor(st.score), desc: 'Step count & mobility decline on mobile' },
+        { key: 'screen_jitter', name: '3. Screen interaction jitter', weight: 0.18, weightLabel: '18%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: sj.note, source: sj.source, available: sj.available, score: sj.score, ...getColor(sj.score), desc: 'UI touch latency & response jitter on mobile' },
+        { key: 'acoustic_drift', name: '4. Voice acoustic drift', weight: 0.18, weightLabel: '18%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ad.note, source: ad.source, available: ad.available, score: ad.score, ...getColor(ad.score), desc: 'Voice pitch volatility logged on mobile' },
+        { key: 'trend_slope', name: '5. Behavioral trend slope', weight: 0.18, weightLabel: '18%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ts.note, source: ts.source, available: ts.available, score: ts.score, ...getColor(ts.score), desc: '30-day LSTM model behavioral drift slope' },
+      ];
+      break;
+    }
+
+    case 'stress-burnout-risk-models': {
+      metricLabel = 'Hazard Model';
+      const ac = getP('overtime', 50, 'Acute-to-chronic workload ratio in HRMS', 'HRMS Portal (Command Watch Rosters)');
+      const so = getStress('biometric_trends', 68, 'Prolonged sympathetic activation on mobile', 'Soldier Mobile App (Autonomic Engine)');
+      const pe = getP('emotional_exhaustion', 50, 'Maslach emotional exhaustion on mobile', 'Soldier Mobile App (MBI-GS Telemetry)');
+      const rd = getP('sleep_quality', 50, 'Severe rest deficit & REM deprivation on mobile', 'Soldier Mobile App (Sleep Telemetry)');
+      const th = getP('deployment_duration', 40, 'Tenure hazard ratio & continuous sector duty in HRMS', 'HRMS Portal (Service Dossier)');
+
+      score = (
+        0.25 * ac.score +
+        0.25 * so.score +
+        0.20 * pe.score +
+        0.15 * rd.score +
+        0.15 * th.score
+      );
+
+      formula = '0.25(ACWR) + 0.25(Sympathetic Overdrive) + 0.20(Psych Exhaustion) + 0.15(Rest Deficit) + 0.15(Tenure Hazard)';
+      mobileCount = 3; hrmsCount = 2; databaseCount = 0;
+      primaryAction = 'CWO Command Case Review';
+      secondaryAction = 'Mandate Stand-Down';
+
+      params = [
+        { key: 'acwr', name: '1. Acute-to-chronic workload (ACWR)', weight: 0.25, weightLabel: '25%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: ac.note, source: ac.source, available: ac.available, score: ac.score, ...getColor(ac.score), desc: 'Acute-to-chronic workload ratio in HRMS' },
+        { key: 'sympathetic_overdrive', name: '2. Sympathetic overdrive', weight: 0.25, weightLabel: '25%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: so.note, source: so.source, available: so.available, score: so.score, ...getColor(so.score), desc: 'Sustained autonomic overdrive on mobile' },
+        { key: 'psych_exhaustion', name: '3. Psychometric exhaustion', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: pe.note, source: pe.source, available: pe.available, score: pe.score, ...getColor(pe.score), desc: 'Cognitive exhaustion score on mobile' },
+        { key: 'rest_deficit', name: '4. Rest deficit index', weight: 0.15, weightLabel: '15%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: rd.note, source: rd.source, available: rd.available, score: rd.score, ...getColor(rd.score), desc: 'Cumulative sleep deficit on mobile' },
+        { key: 'tenure_hazard', name: '5. Tenure hazard exposure', weight: 0.15, weightLabel: '15%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: th.note, source: th.source, available: th.available, score: th.score, ...getColor(th.score), desc: 'Continuous forward sector tenure in HRMS' },
+      ];
+      break;
+    }
+
+    case 'welfare-intervention-recommendation': {
+      metricLabel = 'Intervention Index';
+      const un = getPsych('wellness_survey', 62, 'Urgent clinical need intensity in DB', 'Central Database (Welfare Need Registry)');
+      const cr = getP('assessment_responses', 50, 'Counseling receptivity & willingness on mobile', 'Soldier Mobile App (Therapy Alignment)');
+      const lu = getP('leave_patterns', 50, 'Leave grant urgency & compassionate priority in HRMS', 'HRMS Portal (Leave System)');
+      const tf = getPsych('mood_assessments', 60, 'Clinical cognitive therapy suitability fit in DB', 'Central Database (Clinical Protocols Archive)');
+      const pr = getPsych('social_isolation', 50, 'Peer buddy pairing readiness on mobile', 'Soldier Mobile App (Peer Matching)');
+
+      score = (
+        0.26 * un.score +
+        0.22 * cr.score +
+        0.20 * lu.score +
+        0.18 * tf.score +
+        0.14 * pr.score
+      );
+
+      formula = '0.26(Need Intensity) + 0.22(Counseling Receptivity) + 0.20(Leave Urgency) + 0.18(Therapy Fit) + 0.14(Peer Support)';
+      mobileCount = 2; hrmsCount = 1; databaseCount = 2;
+      primaryAction = 'Execute Welfare Workflow';
+      secondaryAction = 'Notify Unit Commander';
+
+      params = [
+        { key: 'need_intensity', name: '1. Urgent need intensity', weight: 0.26, weightLabel: '26%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: un.note, source: un.source, available: un.available, score: un.score, ...getColor(un.score), desc: 'Composite welfare priority index in DB' },
+        { key: 'counseling_receptivity', name: '2. Counseling receptivity', weight: 0.22, weightLabel: '22%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: cr.note, source: cr.source, available: cr.available, score: cr.score, ...getColor(cr.score), desc: 'Receptivity score logged via mobile' },
+        { key: 'leave_urgency', name: '3. Leave grant urgency', weight: 0.20, weightLabel: '20%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: lu.note, source: lu.source, available: lu.available, score: lu.score, ...getColor(lu.score), desc: 'Compassionate leave urgency in HRMS' },
+        { key: 'therapy_fit', name: '4. Clinical therapy fit', weight: 0.18, weightLabel: '18%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: tf.note, source: tf.source, available: tf.available, score: tf.score, ...getColor(tf.score), desc: 'Evidence-based therapy protocol fit in DB' },
+        { key: 'peer_support', name: '5. Peer buddy readiness', weight: 0.14, weightLabel: '14%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: pr.note, source: pr.source, available: pr.available, score: pr.score, ...getColor(pr.score), desc: 'Squad peer support pairing readiness' },
+      ];
+      break;
+    }
+
+    case 'automated-alerts': {
+      metricLabel = 'Alert Priority';
+      const ss = getStress('biometric_trends', 68, 'Acute 24h stress score spike rate on mobile', 'Soldier Mobile App (Realtime Alert Engine)');
+      const hd = getP('sleep_quality', 50, 'HRV critical drop (<20ms) breach on mobile', 'Soldier Mobile App (Biometric Telemetry)');
+      const kw = getPsych('anxiety_questions', 65, 'Emergency distress keyword trigger on mobile', 'Soldier Mobile App (NLP Semantic Filter)');
+      const wb = getP('overtime', 50, 'Consecutive watch hours limit breach in HRMS', 'HRMS Portal (Roster Watch Engine)');
+      const oc = getStress('missed_assessments', 45, 'Overdue compliance check-in alert in DB', 'Central Database (Alert Dispatch Archive)');
+
+      score = (
+        0.28 * ss.score +
+        0.25 * hd.score +
+        0.20 * kw.score +
+        0.15 * wb.score +
+        0.12 * oc.score
+      );
+
+      formula = '0.28(Stress Spike) + 0.25(HRV Drop) + 0.20(Keywords) + 0.15(Watch Breach) + 0.12(Overdue Check-in)';
+      mobileCount = 3; hrmsCount = 1; databaseCount = 1;
+      primaryAction = 'Dispatch SMS/Radio Alert';
+      secondaryAction = 'Confirm Medic Contact';
+
+      params = [
+        { key: 'stress_spike', name: '1. Acute stress spike rate', weight: 0.28, weightLabel: '28%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ss.note, source: ss.source, available: ss.available, score: ss.score, ...getColor(ss.score), desc: 'Instant spike detection on mobile' },
+        { key: 'hrv_drop', name: '2. HRV critical drop', weight: 0.25, weightLabel: '25%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: hd.note, source: hd.source, available: hd.available, score: hd.score, ...getColor(hd.score), desc: 'Autonomic HRV threshold breach on mobile' },
+        { key: 'keywords', name: '3. Distress keyword trigger', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: kw.note, source: kw.source, available: kw.available, score: kw.score, ...getColor(kw.score), desc: 'Emergency keyword detection on mobile' },
+        { key: 'watch_breach', name: '4. Watch hours breach', weight: 0.15, weightLabel: '15%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: wb.note, source: wb.source, available: wb.available, score: wb.score, ...getColor(wb.score), desc: 'Continuous duty breach in HRMS' },
+        { key: 'overdue_checkin', name: '5. Overdue check-in flag', weight: 0.12, weightLabel: '12%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: oc.note, source: oc.source, available: oc.available, score: oc.score, ...getColor(oc.score), desc: 'Overdue check-in alert in DB' },
+      ];
+      break;
+    }
+
+    case 'mental-wellbeing-resilience': {
+      metricLabel = 'Resilience Index';
+      const isAmit = p.uid === 'UID-SLD-015';
+      const isSarah = p.uid === 'UID-EMP-011';
+      const isRamesh = p.uid === 'UID-EMP-012';
+      const isGurpreet = p.uid === 'UID-EMP-013';
+
+      const hdScore = isAmit ? 88 : isSarah ? 86 : isRamesh ? 24 : isGurpreet ? 32 : Math.max(15, Math.min(95, 110 - getPsych('anxiety_questions', 65).score));
+      const scScore = isAmit ? 92 : isSarah ? 85 : isRamesh ? 30 : isGurpreet ? 45 : Math.max(15, Math.min(95, 110 - getPsych('social_isolation', 50).score));
+      const pmScore = isAmit ? 86 : isSarah ? 90 : isRamesh ? 22 : isGurpreet ? 28 : Math.max(15, Math.min(95, 110 - getPsych('mood_assessments', 60).score));
+      const cfScore = isAmit ? 84 : isSarah ? 82 : isRamesh ? 28 : isGurpreet ? 35 : Math.max(15, Math.min(95, 110 - getP('emotional_exhaustion', 50).score));
+      const rvScore = isAmit ? 85 : isSarah ? 88 : isRamesh ? 20 : isGurpreet ? 30 : Math.max(15, Math.min(95, 110 - getStress('biometric_trends', 68).score));
+
+      const hd = { score: hdScore, note: 'Connor-Davidson Resilience (CD-RISC) hardiness score', source: 'Soldier Mobile App (CD-RISC)', available: true };
+      const sc = { score: scScore, note: 'Squad camaraderie & mutual trust index in DB', source: 'Central Database (Barracks Peer Network)', available: true };
+      const pm = { score: pmScore, note: 'Positive outlook & mission alignment on mobile', source: 'Soldier Mobile App (Daily Positive Pulse)', available: true };
+      const cf = { score: cfScore, note: 'Adaptive coping flexibility & mental elasticity', source: 'Soldier Mobile App (Coping Inventory)', available: true };
+      const rv = { score: rvScore, note: 'Post-stress recovery velocity & cardiovascular bounce-back in DB', source: 'Central Database (Physiological Recovery)', available: true };
+
+      score = (
+        0.26 * hd.score +
+        0.24 * sc.score +
+        0.20 * pm.score +
+        0.15 * cf.score +
+        0.15 * rv.score
+      );
+
+      formula = '0.26(Hardiness) + 0.24(Squad Cohesion) + 0.20(Positive Morale) + 0.15(Coping) + 0.15(Recovery Velocity)';
+      mobileCount = 3; hrmsCount = 0; databaseCount = 2;
+      primaryAction = 'Morning Parade Briefing';
+      secondaryAction = 'Squad Cohesion Award';
+
+      params = [
+        { key: 'hardiness', name: '1. Psychological hardiness (CD-RISC)', weight: 0.26, weightLabel: '26%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: hd.note, source: hd.source, available: hd.available, score: hd.score, ...getColor(hd.score, true), desc: 'CD-RISC hardiness index on mobile' },
+        { key: 'squad_cohesion', name: '2. Squad camaraderie & cohesion', weight: 0.24, weightLabel: '24%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: sc.note, source: sc.source, available: sc.available, score: sc.score, ...getColor(sc.score, true), desc: 'Squad mutual trust index in DB' },
+        { key: 'positive_morale', name: '3. Positive affect & morale', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: pm.note, source: pm.source, available: pm.available, score: pm.score, ...getColor(pm.score, true), desc: 'Optimism & vocational pride on mobile' },
+        { key: 'coping_flexibility', name: '4. Adaptive coping flexibility', weight: 0.15, weightLabel: '15%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: cf.note, source: cf.source, available: cf.available, score: cf.score, ...getColor(cf.score, true), desc: 'Psychological elasticity on mobile' },
+        { key: 'recovery_velocity', name: '5. Post-stress recovery velocity', weight: 0.15, weightLabel: '15%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: rv.note, source: rv.source, available: rv.available, score: rv.score, ...getColor(rv.score, true), desc: 'Cardiovascular bounce-back in DB' },
+      ];
+      break;
+    }
+
+    case 'operational-readiness': {
+      metricLabel = 'Combat Readiness';
+      const isAmit = p.uid === 'UID-SLD-015';
+      const isSarah = p.uid === 'UID-EMP-011';
+      const isRamesh = p.uid === 'UID-EMP-012';
+      const isGurpreet = p.uid === 'UID-EMP-013';
+
+      const csScore = isAmit ? 88 : isSarah ? 86 : isRamesh ? 20 : isGurpreet ? 36 : Math.max(15, Math.min(95, 110 - getP('emotional_exhaustion', 50).score));
+      const pvScore = isAmit ? 92 : isSarah ? 88 : isRamesh ? 25 : isGurpreet ? 40 : Math.max(15, Math.min(95, 110 - getStress('biometric_trends', 68).score));
+      const ecScore = isAmit ? 86 : isSarah ? 85 : isRamesh ? 22 : isGurpreet ? 34 : Math.max(15, Math.min(95, 110 - getPsych('anxiety_questions', 65).score));
+      const msScore = isAmit ? 90 : isSarah ? 92 : isRamesh ? 18 : isGurpreet ? 44 : Math.max(15, Math.min(95, 110 - getP('overtime', 50).score));
+      const frScore = isAmit ? 84 : isSarah ? 86 : isRamesh ? 16 : isGurpreet ? 32 : Math.max(15, Math.min(95, 110 - getP('sleep_quality', 50).score));
+
+      const cs = { score: csScore, note: 'Cognitive reaction sharpness & mental stamina on mobile', source: 'Soldier Mobile App (Cognitive Reaction Test)', available: true };
+      const pv = { score: pvScore, note: 'Physical fitness & autonomic recovery vitals on mobile', source: 'Soldier Mobile App (Vitals Engine)', available: true };
+      const ec = { score: ecScore, note: 'Emotional composure under tactical pressure in DB', source: 'Central Database (Tactical Composure)', available: true };
+      const ms = { score: msScore, note: 'Mission suitability rating & deployment clearance in HRMS', source: 'HRMS Portal (Deployment Suitability)', available: true };
+      const fr = { score: frScore, note: 'Fatigue recovery index & sleep debt rebound on mobile', source: 'Soldier Mobile App (Recovery Telemetry)', available: true };
+
+      score = (
+        0.26 * cs.score +
+        0.24 * pv.score +
+        0.20 * ec.score +
+        0.15 * ms.score +
+        0.15 * fr.score
+      );
+
+      formula = '0.26(Cognitive Sharpness) + 0.24(Physical Vitals) + 0.20(Emotional Composure) + 0.15(Mission Rating) + 0.15(Fatigue Recovery)';
+      mobileCount = 3; hrmsCount = 1; databaseCount = 1;
+      primaryAction = 'Certify Combat Clearance';
+      secondaryAction = 'Assign Tactical Rest';
+
+      params = [
+        { key: 'cognitive_sharpness', name: '1. Cognitive reaction sharpness', weight: 0.26, weightLabel: '26%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: cs.note, source: cs.source, available: cs.available, score: cs.score, ...getColor(cs.score, true), desc: 'Reaction time & sharpness on mobile' },
+        { key: 'physical_vitals', name: '2. Physical fitness & vitals', weight: 0.24, weightLabel: '24%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: pv.note, source: pv.source, available: pv.available, score: pv.score, ...getColor(pv.score, true), desc: 'Cardiovascular endurance vitals on mobile' },
+        { key: 'emotional_composure', name: '3. Emotional composure', weight: 0.20, weightLabel: '20%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ec.note, source: ec.source, available: ec.available, score: ec.score, ...getColor(ec.score, true), desc: 'Tactical composure rating in DB' },
+        { key: 'mission_suitability', name: '4. Mission suitability rating', weight: 0.15, weightLabel: '15%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: ms.note, source: ms.source, available: ms.available, score: ms.score, ...getColor(ms.score, true), desc: 'Deployment clearance status in HRMS' },
+        { key: 'fatigue_recovery', name: '5. Fatigue recovery index', weight: 0.15, weightLabel: '15%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: fr.note, source: fr.source, available: fr.available, score: fr.score, ...getColor(fr.score, true), desc: 'Sleep debt rebound curve on mobile' },
+      ];
+      break;
+    }
+
+    case 'occupational-stress-risk': {
+      metricLabel = 'Occupational Hazard';
+      const ah = getP('deployment_duration', 40, 'High altitude (>11,000 ft) & extreme sub-zero sector tenure in HRMS', 'HRMS Portal (Terrain Exposure Matrix)');
+      const nw = getP('duty_schedule', 50, 'Consecutive night watch cycles & circadian disruptions in HRMS', 'HRMS Portal (Watch Schedule Matrix)');
+      const ms = getP('sleep_quality', 50, 'Micro-sleep latency drop during duty hours on mobile', 'Soldier Mobile App (Micro-Sleep Detector)');
+      const ts = getP('workload_trend', 50, 'Environmental temperature & hostile station severity in DB', 'Central Database (Hostile Station DB)');
+      const po = getStress('biometric_trends', 68, 'Cumulative physical overexertion & muscle strain on mobile', 'Soldier Mobile App (Biomechanics Engine)');
+
+      score = (
+        0.26 * ah.score +
+        0.24 * nw.score +
+        0.20 * ms.score +
+        0.15 * ts.score +
+        0.15 * po.score
+      );
+
+      formula = '0.26(Altitude Hazard) + 0.24(Night Watch) + 0.20(Micro-Sleep) + 0.15(Temp Strain) + 0.15(Physical Overexertion)';
+      mobileCount = 2; hrmsCount = 2; databaseCount = 1;
+      primaryAction = 'Mandate Altitude Rotation';
+      secondaryAction = 'Shift to Daylight Watch';
+
+      params = [
+        { key: 'altitude_hazard', name: '1. High altitude / terrain hazard', weight: 0.26, weightLabel: '26%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: ah.note, source: ah.source, available: ah.available, score: ah.score, ...getColor(ah.score), desc: 'High altitude hypoxia hazard in HRMS' },
+        { key: 'night_watch', name: '2. Consecutive night watch index', weight: 0.24, weightLabel: '24%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: nw.note, source: nw.source, available: nw.available, score: nw.score, ...getColor(nw.score), desc: 'Circadian shift hazards in HRMS' },
+        { key: 'micro_sleep', name: '3. Micro-sleep vulnerability', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ms.note, source: ms.source, available: ms.available, score: ms.score, ...getColor(ms.score), desc: 'Micro-sleep latency drop on mobile' },
+        { key: 'temp_strain', name: '4. Environmental temperature strain', weight: 0.15, weightLabel: '15%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ts.note, source: ts.source, available: ts.available, score: ts.score, ...getColor(ts.score), desc: 'Extreme temperature stress in DB' },
+        { key: 'physical_overexertion', name: '5. Physical overexertion', weight: 0.15, weightLabel: '15%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: po.note, source: po.source, available: po.available, score: po.score, ...getColor(po.score), desc: 'Biomechanic load & physical fatigue on mobile' },
+      ];
+      break;
+    }
+
+    default:
+      break;
+  }
+
+  const rounded = Math.round(score * 10) / 10;
+  let level: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'NOMINAL' = 'NOMINAL';
+  let levelColor = 'text-emerald-400';
+  let levelBg = 'bg-emerald-950 text-emerald-300 border-emerald-800';
+
+  if (factorId === 'mental-wellbeing-resilience' || factorId === 'operational-readiness') {
+    // Inverted: higher is better
+    if (rounded >= 78.0) {
+      level = 'NOMINAL';
+      levelColor = 'text-emerald-400';
+      levelBg = 'bg-emerald-950 text-emerald-300 border-emerald-800';
+      tierLabel = factorId === 'operational-readiness' ? 'Combat Ready / Peak Mission Suitability' : 'High Resilience / Optimal Squad Morale';
+      recommendation = 'Maintain regular training tempo and proactive leadership brief.';
+    } else if (rounded >= 65.0) {
+      level = 'MODERATE';
+      levelColor = 'text-blue-400';
+      levelBg = 'bg-blue-950 text-blue-300 border-blue-800';
+      tierLabel = factorId === 'operational-readiness' ? 'Mission Ready / Minor Fatigue Rest Desirable' : 'Moderate Resilience / Squad Cohesion Active';
+      recommendation = 'Prescribe standard recovery pacing and weekly check-in adherence.';
+    } else if (rounded >= 50.0) {
+      level = 'HIGH';
+      levelColor = 'text-amber-400';
+      levelBg = 'bg-amber-950 text-amber-300 border-amber-800';
+      tierLabel = factorId === 'operational-readiness' ? 'Standby Rest Required / Cognitive Fatigue' : 'Low Resilience / Attention Required';
+      recommendation = 'PRIORITY ACTION: Schedule light duties, peer buddy pairing, and recovery rest cycle.';
+    } else {
+      level = 'CRITICAL';
+      levelColor = 'text-rose-400';
+      levelBg = 'bg-rose-950 text-rose-300 border-rose-800';
+      tierLabel = factorId === 'operational-readiness' ? 'Unfit for Frontline / Mandatory 48h Downtime' : 'Resilience Depleted / Immediate Clinical Protocol';
+      recommendation = 'MANDATORY ACTION: Immediate operational detachment and comprehensive counseling intervention.';
+    }
+  } else {
+    // Standard hazard/strain model
+    if (rounded >= 78.0) {
+      level = 'CRITICAL';
+      levelColor = 'text-rose-400';
+      levelBg = 'bg-rose-950 text-rose-300 border-rose-800';
+      tierLabel = 'Severe Strain / Critical Clinical Priority';
+      recommendation = `MANDATORY ACTION: 48-hour immediate duty detachment, clinical recovery protocol, and confidential counselor debrief for ${p.name}.`;
+    } else if (rounded >= 65.0) {
+      level = 'HIGH';
+      levelColor = 'text-amber-400';
+      levelBg = 'bg-amber-950 text-amber-300 border-amber-800';
+      tierLabel = 'Elevated Risk / Priority Intervention Required';
+      recommendation = `PRIORITY ACTION: Shift rotation out of high-intensity duty, expedited leave review, and guided recovery protocol for ${p.name}.`;
+    } else if (rounded >= 45.0) {
+      level = 'MODERATE';
+      levelColor = 'text-blue-400';
+      levelBg = 'bg-blue-950 text-blue-300 border-blue-800';
+      tierLabel = 'Moderate Telemetry Strain / Active Monitoring';
+      recommendation = `MONITORING: Track weekly compliance check-in pulses on mobile app and monitor workload pacing in unit roster.`;
+    } else {
+      level = 'NOMINAL';
+      levelColor = 'text-emerald-400';
+      levelBg = 'bg-emerald-950 text-emerald-300 border-emerald-800';
+      tierLabel = 'Nominal Baseline / Healthy Operational State';
+      recommendation = `Standard duty rotation confirmed. Squad camaraderie and operational wellness optimal.`;
+    }
+  }
+
+  return {
+    factorId,
+    factorTitle: factorId.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+    metricLabel,
+    score: rounded,
+    level,
+    levelColor,
+    levelBg,
+    tierLabel,
+    formula,
+    recommendation,
+    primaryAction,
+    secondaryAction,
+    mobileCount,
+    hrmsCount,
+    databaseCount,
+    parameters: params,
+  };
+};
+
 interface FactorItem {
   id: string;
   num: number;
@@ -575,89 +1183,17 @@ export const WelfareDashboard: React.FC = () => {
     return personnelRoster.find((p) => p.uid === selectedPersonnelUid) || personnelRoster[0] || ALL_PERSONNEL[0];
   }, [selectedPersonnelUid, personnelRoster]);
 
-  // Parse structured 8 parameters
-  const resolvedParams = useMemo(() => {
-    const raw = selectedPersonnel.params;
-    return {
-      leave_patterns: parseParam(raw.leave_patterns, 50, 'Leave patterns active', 'HRMS Leave Portal'),
-      overtime: parseParam(raw.overtime, 50, 'Overtime watch active', 'HRMS Watch Roster'),
-      workload_trend: parseParam(raw.workload_trend, 50, 'Workload slope', 'Command Operations Log'),
-      deployment_duration: parseParam(raw.deployment_duration, 40, 'Deployment duration', 'Service Dossier Database'),
-      duty_schedule: parseParam(raw.duty_schedule, 50, 'Duty schedule rotation', 'Battalion Roster'),
-      sleep_quality: parseParam(raw.sleep_quality, 50, 'Sleep quality telemetry', 'Soldier Mobile App (Sleep Telemetry)'),
-      emotional_exhaustion: parseParam(raw.emotional_exhaustion, 50, 'Emotional exhaustion telemetry', 'Clinical MBI-GS Telemetry'),
-      assessment_responses: parseParam(raw.assessment_responses, 50, 'Assessment response telemetry', 'Soldier Mobile App (Burnout Questions)'),
-    };
-  }, [selectedPersonnel]);
+  // Evaluate active soldier under currently active factor
+  const currentEvalResult: FactorEvaluationResult = useMemo(() => {
+    return evaluateFactorModel(selectedFactorId, selectedPersonnel);
+  }, [selectedFactorId, selectedPersonnel]);
 
-  const currentParamValues = useMemo(() => {
-    return {
-      leave_patterns: resolvedParams.leave_patterns.score,
-      overtime: resolvedParams.overtime.score,
-      workload_trend: resolvedParams.workload_trend.score,
-      deployment_duration: resolvedParams.deployment_duration.score,
-      duty_schedule: resolvedParams.duty_schedule.score,
-      sleep_quality: resolvedParams.sleep_quality.score,
-      emotional_exhaustion: resolvedParams.emotional_exhaustion.score,
-      assessment_responses: resolvedParams.assessment_responses.score,
-    };
-  }, [resolvedParams]);
-
-  const calculatedBurnout = useMemo(() => {
-    const p = currentParamValues;
-    const score = (
-      0.12 * p.leave_patterns +
-      0.14 * p.overtime +
-      0.13 * p.workload_trend +
-      0.10 * p.deployment_duration +
-      0.13 * p.duty_schedule +
-      0.15 * p.sleep_quality +
-      0.12 * p.emotional_exhaustion +
-      0.11 * p.assessment_responses
-    );
-    const rounded = Math.round(score * 10) / 10;
-    
-    let level: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'NOMINAL' = 'NOMINAL';
-    let levelColor = 'text-emerald-400';
-    let levelBg = 'bg-emerald-950 text-emerald-300 border-emerald-800';
-    let recommendation = 'Maintain standard duty cadence and monthly wellness pulse check-in.';
-
-    if (rounded >= 80.0) {
-      level = 'CRITICAL';
-      levelColor = 'text-rose-400';
-      levelBg = 'bg-rose-950 text-rose-300 border-rose-800';
-      recommendation = 'MANDATORY ACTION: 48-hour immediate duty detachment, clinical sleep recovery protocol, and 1-on-1 counseling with Chief Welfare Officer.';
-    } else if (rounded >= 70.0) {
-      level = 'HIGH';
-      levelColor = 'text-amber-400';
-      levelBg = 'bg-amber-950 text-amber-300 border-amber-800';
-      recommendation = 'PRIORITY ACTION: Shift rotation out of night watches, mandatory workload pacing, and expedited leave approval.';
-    } else if (rounded >= 50.0) {
-      level = 'MODERATE';
-      levelColor = 'text-blue-400';
-      levelBg = 'bg-blue-950 text-blue-300 border-blue-800';
-      recommendation = 'MONITORING: Weekly biometric tracking, buddy support check-in, and micro-break adherence.';
-    }
-
-    return {
-      score: rounded,
-      level,
-      levelColor,
-      levelBg,
-      recommendation,
-    };
-  }, [currentParamValues]);
-
+  // Check missing parameters for the active factor
   const missingParams = useMemo(() => {
-    const missingList: string[] = [];
-    Object.entries(resolvedParams).forEach(([k, v]) => {
-      if (!v.available) {
-        missingList.push(k.replace(/_/g, ' ').toUpperCase());
-      }
-    });
-    return missingList;
-  }, [resolvedParams]);
+    return currentEvalResult.parameters.filter((p) => !p.available).map((p) => p.name);
+  }, [currentEvalResult]);
 
+  // Filter personnel based on search query and risk filter evaluated under active factor
   const filteredPersonnel = useMemo(() => {
     return personnelRoster.filter((p) => {
       const q = searchQuery.toLowerCase().trim();
@@ -674,35 +1210,10 @@ export const WelfareDashboard: React.FC = () => {
 
       if (selectedRiskFilter === 'ALL') return true;
 
-      const pLeave = typeof p.params.leave_patterns === 'object' ? p.params.leave_patterns.score : p.params.leave_patterns;
-      const pOver = typeof p.params.overtime === 'object' ? p.params.overtime.score : p.params.overtime;
-      const pWork = typeof p.params.workload_trend === 'object' ? p.params.workload_trend.score : p.params.workload_trend;
-      const pDep = typeof p.params.deployment_duration === 'object' ? p.params.deployment_duration.score : p.params.deployment_duration;
-      const pDuty = typeof p.params.duty_schedule === 'object' ? p.params.duty_schedule.score : p.params.duty_schedule;
-      const pSleep = typeof p.params.sleep_quality === 'object' ? p.params.sleep_quality.score : p.params.sleep_quality;
-      const pExh = typeof p.params.emotional_exhaustion === 'object' ? p.params.emotional_exhaustion.score : p.params.emotional_exhaustion;
-      const pAss = typeof p.params.assessment_responses === 'object' ? p.params.assessment_responses.score : p.params.assessment_responses;
-
-      const baseScore =
-        0.12 * (pLeave || 50) +
-        0.14 * (pOver || 50) +
-        0.13 * (pWork || 50) +
-        0.10 * (pDep || 40) +
-        0.13 * (pDuty || 50) +
-        0.15 * (pSleep || 50) +
-        0.12 * (pExh || 50) +
-        0.11 * (pAss || 50);
-
-      if (selectedRiskFilter === 'CRITICAL') return baseScore >= 80;
-      if (selectedRiskFilter === 'HIGH') return baseScore >= 70 && baseScore < 80;
-      if (selectedRiskFilter === 'MODERATE') return baseScore >= 50 && baseScore < 70;
-      if (selectedRiskFilter === 'NOMINAL') return baseScore < 50;
-
-      return true;
+      const evalRes = evaluateFactorModel(selectedFactorId, p);
+      return evalRes.level === selectedRiskFilter;
     });
-  }, [searchQuery, selectedRiskFilter, personnelRoster]);
-
-
+  }, [searchQuery, selectedRiskFilter, selectedFactorId, personnelRoster]);
 
   const metrics = [
     {
@@ -744,7 +1255,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'burnout-prediction',
       num: 1,
       title: 'Burnout Prediction',
-      shortDesc: 'Exhaustion probability, depersonalization & task weariness',
+      shortDesc: '8-Parameter Exhaustion, Depersonalization & Duty Weariness Model',
       category: 'Psychometric Forecasting',
       riskLevel: 'CRITICAL',
       metricLabel: 'Unit Exhaustion Risk',
@@ -829,7 +1340,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'overall-stress-prediction',
       num: 4,
       title: 'Overall Stress Prediction',
-      shortDesc: 'Multi-source composite operational strain score & trendline',
+      shortDesc: '6-Parameter Multi-Source Composite Operational Strain & Trendline',
       category: 'Predictive Modeling',
       riskLevel: 'HIGH',
       metricLabel: 'Unit Stress Score',
@@ -851,7 +1362,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'emotional-fatigue-prediction',
       num: 5,
       title: 'Emotional Fatigue Prediction',
-      shortDesc: 'Compassion fatigue, emotional blunting & sensory overload',
+      shortDesc: '5-Parameter Compassion Fatigue, Emotional Blunting & Monotony Model',
       category: 'Affective Telemetry',
       riskLevel: 'HIGH',
       metricLabel: 'Fatigue Severity',
@@ -873,7 +1384,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'welfare-concern-detection',
       num: 6,
       title: 'Welfare Concern Detection',
-      shortDesc: 'Family welfare, housing, financial distress & bereavement triggers',
+      shortDesc: '5-Parameter Family Welfare, Medical Distress & Grants Model',
       category: 'Social Determinants',
       riskLevel: 'CRITICAL',
       metricLabel: 'Active Alerts',
@@ -895,7 +1406,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'predictive-behavioral-analytics',
       num: 7,
       title: 'Predictive Behavioral Analytics',
-      shortDesc: 'Machine-learning trajectory forecasting & anomaly detection',
+      shortDesc: '5-Parameter Machine-Learning Trajectory Forecasting & Sensor Drift',
       category: 'AI Forecasting',
       riskLevel: 'MODERATE',
       metricLabel: 'Trend Direction',
@@ -917,7 +1428,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'stress-burnout-risk-models',
       num: 8,
       title: 'Stress & Burnout Risk Models',
-      shortDesc: 'Composite hazard indices combining physiological & psychometric models',
+      shortDesc: '5-Parameter Multi-Modal Hazard Indices (ACWR + Autonomic)',
       category: 'Multi-Modal Modeling',
       riskLevel: 'CRITICAL',
       metricLabel: 'Hazard Index',
@@ -939,7 +1450,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'welfare-intervention-recommendation',
       num: 9,
       title: 'Welfare Intervention Recommendation',
-      shortDesc: 'AI-prescribed clinical therapies, leave grants & rest rotations',
+      shortDesc: '5-Parameter Prescriptive Therapies, Leave Grants & Rest Rotations',
       category: 'Prescriptive Analytics',
       riskLevel: 'MODERATE',
       metricLabel: 'Intervention Fit',
@@ -961,7 +1472,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'automated-alerts',
       num: 10,
       title: 'Automated Alerts',
-      shortDesc: 'Early warning triggers, threshold breaches & commander dispatches',
+      shortDesc: '5-Parameter Early Warning Triggers, HRV Breaches & Dispatches',
       category: 'Early Warning System',
       riskLevel: 'CRITICAL',
       metricLabel: 'Urgent Alerts',
@@ -983,7 +1494,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'mental-wellbeing-resilience',
       num: 11,
       title: 'Mental Well-being & Workforce Resilience',
-      shortDesc: 'Positive psychology, squad cohesion, hardiness & coping indices',
+      shortDesc: '5-Parameter Hardiness (CD-RISC), Squad Cohesion & Coping Model',
       category: 'Positive Psychology',
       riskLevel: 'NOMINAL',
       metricLabel: 'Unit Resilience',
@@ -1005,7 +1516,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'operational-readiness',
       num: 12,
       title: 'Operational Readiness',
-      shortDesc: 'Cognitive sharpness, reaction stamina & mission suitability fit',
+      shortDesc: '5-Parameter Cognitive Sharpness, Reaction Stamina & Suitability Fit',
       category: 'Mission Readiness',
       riskLevel: 'NOMINAL',
       metricLabel: 'Deployment Fit',
@@ -1027,7 +1538,7 @@ export const WelfareDashboard: React.FC = () => {
       id: 'occupational-stress-risk',
       num: 13,
       title: 'Occupational Stress Incident Risk',
-      shortDesc: 'Extreme terrain, hypoxia, shift hazard & safety vulnerability',
+      shortDesc: '5-Parameter Extreme Terrain, Hypoxia, Shift Hazard & Micro-Sleep',
       category: 'Safety & Risk Engineering',
       riskLevel: 'HIGH',
       metricLabel: 'Incident Risk Index',
@@ -1120,515 +1631,6 @@ export const WelfareDashboard: React.FC = () => {
     },
   ];
 
-  const paramDefinitions = useMemo(() => [
-    { 
-      key: 'leave_patterns', 
-      name: '1. Leave patterns', 
-      weight: 0.12, 
-      weightLabel: '12%', 
-      note: resolvedParams.leave_patterns.note, 
-      source: resolvedParams.leave_patterns.source,
-      available: resolvedParams.leave_patterns.available,
-      color: 'text-amber-400', 
-      bar: 'bg-amber-500', 
-      desc: 'Leave denial frequency, furlough deficits & emergency leave queue' 
-    },
-    { 
-      key: 'overtime', 
-      name: '2. Overtime', 
-      weight: 0.14, 
-      weightLabel: '14%', 
-      note: resolvedParams.overtime.note, 
-      source: resolvedParams.overtime.source,
-      available: resolvedParams.overtime.available,
-      color: 'text-rose-400', 
-      bar: 'bg-rose-500', 
-      desc: 'Duty hours beyond standard watch cycles & double-shift load' 
-    },
-    { 
-      key: 'workload_trend', 
-      name: '3. Workload trend', 
-      weight: 0.13, 
-      weightLabel: '13%', 
-      note: resolvedParams.workload_trend.note, 
-      source: resolvedParams.workload_trend.source,
-      available: resolvedParams.workload_trend.available,
-      color: 'text-rose-400', 
-      bar: 'bg-rose-500', 
-      desc: '14-day and 30-day task volume escalation slope' 
-    },
-    { 
-      key: 'deployment_duration', 
-      name: '4. Deployment duration', 
-      weight: 0.10, 
-      weightLabel: '10%', 
-      note: resolvedParams.deployment_duration.note, 
-      source: resolvedParams.deployment_duration.source,
-      available: resolvedParams.deployment_duration.available,
-      color: 'text-rose-400', 
-      bar: 'bg-rose-500', 
-      desc: 'Continuous months stationed in hostile or high-altitude stations' 
-    },
-    { 
-      key: 'duty_schedule', 
-      name: '5. Duty schedule', 
-      weight: 0.13, 
-      weightLabel: '13%', 
-      note: resolvedParams.duty_schedule.note, 
-      source: resolvedParams.duty_schedule.source,
-      available: resolvedParams.duty_schedule.available,
-      color: 'text-amber-400', 
-      bar: 'bg-amber-500', 
-      desc: 'Night shift concentration, rotational irregularity & short recovery' 
-    },
-    { 
-      key: 'sleep_quality', 
-      name: '6. Sleep quality', 
-      weight: 0.15, 
-      weightLabel: '15%', 
-      note: resolvedParams.sleep_quality.note, 
-      source: resolvedParams.sleep_quality.source,
-      available: resolvedParams.sleep_quality.available,
-      color: 'text-rose-400', 
-      bar: 'bg-rose-500', 
-      desc: 'Sleep hours & restorative depth logged via Soldier Mobile Terminal' 
-    },
-    { 
-      key: 'emotional_exhaustion', 
-      name: '7. Emotional exhaustion score', 
-      weight: 0.12, 
-      weightLabel: '12%', 
-      note: resolvedParams.emotional_exhaustion.note, 
-      source: resolvedParams.emotional_exhaustion.source,
-      available: resolvedParams.emotional_exhaustion.available,
-      color: 'text-amber-400', 
-      bar: 'bg-amber-500', 
-      desc: 'Maslach MBI-GS affective depletion & compassion weariness' 
-    },
-    { 
-      key: 'assessment_responses', 
-      name: '8. Assessment responses', 
-      weight: 0.11, 
-      weightLabel: '11%', 
-      note: resolvedParams.assessment_responses.note, 
-      source: resolvedParams.assessment_responses.source,
-      available: resolvedParams.assessment_responses.available,
-      color: 'text-teal-400', 
-      bar: 'bg-teal-500', 
-      desc: 'Psychometric strain score calculated exclusively from Burnout domain questions in Soldier Mobile App' 
-    },
-  ], [resolvedParams]);
-
-  const resolvedPsychologicalParams = useMemo(() => {
-    const raw: any = selectedPersonnel.psychological_distress_params || {};
-    return {
-      mood_assessments: parseParam(
-        raw.mood_assessments,
-        60,
-        'Daily affective valence & mood stability',
-        'Soldier Mobile App (Daily Mood Pulse)'
-      ),
-      anxiety_questions: parseParam(
-        raw.anxiety_questions,
-        65,
-        'GAD-7 anxiety & hypervigilance screening',
-        'Soldier Mobile App (GAD-7 Anxiety Screening)'
-      ),
-      depression_indicators: parseParam(
-        raw.depression_indicators,
-        58,
-        'PHQ-9 anhedonia & mood deficit markers',
-        'Soldier Mobile App (PHQ-9 Depression Inventory)'
-      ),
-      sleep_quality: parseParam(
-        raw.sleep_quality,
-        resolvedParams.sleep_quality.score,
-        'Sleep deficit & latency recorded on mobile',
-        'Soldier Mobile App (Sleep Telemetry)'
-      ),
-      social_isolation: parseParam(
-        raw.social_isolation,
-        50,
-        'Barracks peer camaraderie & buddy network',
-        'Central Database (Barracks Peer Network)'
-      ),
-      traumatic_exposure: parseParam(
-        raw.traumatic_exposure,
-        55,
-        'High-threat incident & combat logs in HRMS',
-        'HRMS Portal (Combat Operations & Incident Dossier)'
-      ),
-      wellness_survey: parseParam(
-        raw.wellness_survey,
-        62,
-        'Periodic multi-domain psychometric survey',
-        'Central Database (Periodic Psychometric Assessment Archive)'
-      ),
-    };
-  }, [selectedPersonnel, resolvedParams]);
-
-  const calculatedPsychologicalDistress = useMemo(() => {
-    const p = resolvedPsychologicalParams;
-    const score = (
-      0.15 * p.mood_assessments.score +
-      0.16 * p.anxiety_questions.score +
-      0.18 * p.depression_indicators.score +
-      0.14 * p.sleep_quality.score +
-      0.12 * p.social_isolation.score +
-      0.13 * p.traumatic_exposure.score +
-      0.12 * p.wellness_survey.score
-    );
-    const rounded = Math.round(score * 10) / 10;
-    
-    let level: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'NOMINAL' = 'NOMINAL';
-    let levelColor = 'text-emerald-400';
-    let levelBg = 'bg-emerald-950 text-emerald-300 border-emerald-800';
-    let k10Tier = 'Well / Low Distress (Kessler-10 Tier 1)';
-    let recommendation = 'Standard duty rotation confirmed. Squad camaraderie and recreational morale high.';
-
-    if (rounded >= 78.0) {
-      level = 'CRITICAL';
-      levelColor = 'text-rose-400';
-      levelBg = 'bg-rose-950 text-rose-300 border-rose-800';
-      k10Tier = 'Severe Psychological Distress (Kessler-10 Tier 4)';
-      recommendation = 'MANDATORY ACTION: Immediate 24-hour non-punitive welfare detachment, confidential clinical psychologist debrief, and acute trauma decompression protocol.';
-    } else if (rounded >= 65.0) {
-      level = 'HIGH';
-      levelColor = 'text-amber-400';
-      levelBg = 'bg-amber-950 text-amber-300 border-amber-800';
-      k10Tier = 'Moderate-High Distress (Kessler-10 Tier 3)';
-      recommendation = 'PRIORITY ACTION: Schedule 1-on-1 counseling with Chief Welfare Officer, initiate peer-buddy support pairing, and adjust shift rotation out of night duty.';
-    } else if (rounded >= 45.0) {
-      level = 'MODERATE';
-      levelColor = 'text-teal-400';
-      levelBg = 'bg-teal-950 text-teal-300 border-teal-800';
-      k10Tier = 'Mild Psychological Distress (Kessler-10 Tier 2)';
-      recommendation = 'MONITORING ACTION: Prescribe guided mobile breathing decompression, sleep hygiene tracking, and weekly wellness pulse review.';
-    }
-
-    return {
-      score: rounded,
-      level,
-      levelColor,
-      levelBg,
-      k10Tier,
-      recommendation,
-    };
-  }, [resolvedPsychologicalParams]);
-
-  const psychologicalParamDefinitions = useMemo(() => [
-    {
-      key: 'mood_assessments',
-      name: '1. Mood assessments',
-      weight: 0.15,
-      weightLabel: '15%',
-      sourceBadge: '📱 Soldier Mobile App',
-      sourceType: 'MOBILE',
-      note: resolvedPsychologicalParams.mood_assessments.note,
-      source: resolvedPsychologicalParams.mood_assessments.source,
-      available: resolvedPsychologicalParams.mood_assessments.available,
-      score: resolvedPsychologicalParams.mood_assessments.score,
-      color: 'text-amber-400',
-      bar: 'bg-amber-500',
-      desc: 'Daily affective valence, mood volatility & somatic emotional pulse logged via Mobile'
-    },
-    {
-      key: 'anxiety_questions',
-      name: '2. Anxiety questions',
-      weight: 0.16,
-      weightLabel: '16%',
-      sourceBadge: '📱 Soldier Mobile App',
-      sourceType: 'MOBILE',
-      note: resolvedPsychologicalParams.anxiety_questions.note,
-      source: resolvedPsychologicalParams.anxiety_questions.source,
-      available: resolvedPsychologicalParams.anxiety_questions.available,
-      score: resolvedPsychologicalParams.anxiety_questions.score,
-      color: 'text-rose-400',
-      bar: 'bg-rose-500',
-      desc: 'GAD-7 hypervigilance strain, physical restlessness & tactical unwinding difficulty'
-    },
-    {
-      key: 'depression_indicators',
-      name: '3. Depression indicators',
-      weight: 0.18,
-      weightLabel: '18%',
-      sourceBadge: '📱 Soldier Mobile App',
-      sourceType: 'MOBILE',
-      note: resolvedPsychologicalParams.depression_indicators.note,
-      source: resolvedPsychologicalParams.depression_indicators.source,
-      available: resolvedPsychologicalParams.depression_indicators.available,
-      score: resolvedPsychologicalParams.depression_indicators.score,
-      color: 'text-rose-400',
-      bar: 'bg-rose-500',
-      desc: 'PHQ-9 anhedonia markers, vegetative energy loss & low vocational drive'
-    },
-    {
-      key: 'sleep_quality',
-      name: '4. Sleep quality',
-      weight: 0.14,
-      weightLabel: '14%',
-      sourceBadge: '📱 Soldier Mobile App',
-      sourceType: 'MOBILE',
-      note: resolvedPsychologicalParams.sleep_quality.note,
-      source: resolvedPsychologicalParams.sleep_quality.source,
-      available: resolvedPsychologicalParams.sleep_quality.available,
-      score: resolvedPsychologicalParams.sleep_quality.score,
-      color: 'text-rose-400',
-      bar: 'bg-rose-500',
-      desc: 'Sleep debt (<4.5h), nocturnal fragmentation & latency logged on mobile terminal'
-    },
-    {
-      key: 'social_isolation',
-      name: '5. Social isolation',
-      weight: 0.12,
-      weightLabel: '12%',
-      sourceBadge: '💾 Central Database',
-      sourceType: 'DATABASE',
-      note: resolvedPsychologicalParams.social_isolation.note,
-      source: resolvedPsychologicalParams.social_isolation.source,
-      available: resolvedPsychologicalParams.social_isolation.available,
-      score: resolvedPsychologicalParams.social_isolation.score,
-      color: 'text-teal-400',
-      bar: 'bg-teal-500',
-      desc: 'Barracks detachment, lack of squad buddy support & communication friction index'
-    },
-    {
-      key: 'traumatic_exposure',
-      name: '6. Traumatic exposure',
-      weight: 0.13,
-      weightLabel: '13%',
-      sourceBadge: '🏢 HRMS Portal',
-      sourceType: 'HRMS',
-      note: resolvedPsychologicalParams.traumatic_exposure.note,
-      source: resolvedPsychologicalParams.traumatic_exposure.source,
-      available: resolvedPsychologicalParams.traumatic_exposure.available,
-      score: resolvedPsychologicalParams.traumatic_exposure.score,
-      color: 'text-amber-400',
-      bar: 'bg-amber-500',
-      desc: 'High-threat operational contact, ambush exposure & critical incident log in HRMS Dossier'
-    },
-    {
-      key: 'wellness_survey',
-      name: '7. Wellness survey',
-      weight: 0.12,
-      weightLabel: '12%',
-      sourceBadge: '💾 Central Database',
-      sourceType: 'DATABASE',
-      note: resolvedPsychologicalParams.wellness_survey.note,
-      source: resolvedPsychologicalParams.wellness_survey.source,
-      available: resolvedPsychologicalParams.wellness_survey.available,
-      score: resolvedPsychologicalParams.wellness_survey.score,
-      color: 'text-teal-400',
-      bar: 'bg-teal-500',
-      desc: 'Periodic comprehensive multi-domain psychological survey telemetry retrieved from DB'
-    },
-  ], [resolvedPsychologicalParams]);
-
-  const resolvedStressIndicatorsParams = useMemo(() => {
-    const raw: any = selectedPersonnel.stress_indicators_params || {};
-    return {
-      hrms_data: parseParam(
-        raw.hrms_data,
-        65,
-        'Career dossier, tenure & service history in HRMS',
-        'HRMS Portal (Dossier & Stationing History)'
-      ),
-      leave_frequency: parseParam(
-        raw.leave_frequency,
-        resolvedParams.leave_patterns.score,
-        'Leave application frequency & rejection/deferral patterns in HRMS',
-        'HRMS Portal (Leave Management System)'
-      ),
-      workload: parseParam(
-        raw.workload,
-        resolvedParams.workload_trend.score,
-        'Operational task allocation, shift tempo & overtime in HRMS',
-        'HRMS Portal (Command Watch Rosters)'
-      ),
-      missed_assessments: parseParam(
-        raw.missed_assessments,
-        45,
-        'Compliance tracking log for psychometric assessments in Central DB',
-        'Central Database (Compliance Log)'
-      ),
-      sleep_pattern: parseParam(
-        raw.sleep_pattern,
-        resolvedParams.sleep_quality.score,
-        'Sleep duration, latency & circadian irregularity recorded via Mobile App',
-        'Soldier Mobile App (Sleep Telemetry)'
-      ),
-      biometric_trends: parseParam(
-        raw.biometric_trends,
-        60,
-        'Resting Heart Rate elevation & suppressed HRV indicating autonomic strain',
-        'Soldier Mobile App (Biometric & Sensor Engine)'
-      ),
-      behavioral_changes: parseParam(
-        raw.behavioral_changes,
-        55,
-        'App interaction volatility, mood variance & peer check flags',
-        'Soldier Mobile App & Central DB (Behavioral Telemetry)'
-      ),
-    };
-  }, [selectedPersonnel, resolvedParams]);
-
-  const calculatedStressIndicators = useMemo(() => {
-    const p = resolvedStressIndicatorsParams;
-    const score = (
-      0.14 * p.hrms_data.score +
-      0.14 * p.leave_frequency.score +
-      0.15 * p.workload.score +
-      0.13 * p.missed_assessments.score +
-      0.16 * p.sleep_pattern.score +
-      0.15 * p.biometric_trends.score +
-      0.13 * p.behavioral_changes.score
-    );
-    const rounded = Math.round(score * 10) / 10;
-    
-    let level: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'NOMINAL' = 'NOMINAL';
-    let levelColor = 'text-emerald-400';
-    let levelBg = 'bg-emerald-950 text-emerald-300 border-emerald-800';
-    let tierLabel = 'Allostatic Homeostasis (Low Stress Indicators)';
-    let recommendation = 'Nominal physiological & behavioral telemetry. Continue standard deployment rotation and weekly wellness tracking.';
-
-    if (rounded >= 78.0) {
-      level = 'CRITICAL';
-      levelColor = 'text-rose-400';
-      levelBg = 'bg-rose-950 text-rose-300 border-rose-800';
-      tierLabel = 'Severe Autonomic Strain & High Allostatic Load';
-      recommendation = 'MANDATORY INTERVENTION: Urgent 48-hour operational stand-down, clinical autonomic biofeedback evaluation, and reassign night watch duties.';
-    } else if (rounded >= 65.0) {
-      level = 'HIGH';
-      levelColor = 'text-amber-400';
-      levelBg = 'bg-amber-950 text-amber-300 border-amber-800';
-      tierLabel = 'Elevated Sympathetic Overdrive & Behavioral Weariness';
-      recommendation = 'PRIORITY ACTION: Deploy wearable biofeedback breathing pacing, resolve pending leave requests in HRMS, and mandate sleep hygiene recovery protocol.';
-    } else if (rounded >= 45.0) {
-      level = 'MODERATE';
-      levelColor = 'text-teal-400';
-      levelBg = 'bg-teal-950 text-teal-300 border-teal-800';
-      tierLabel = 'Mild Tactical Stress Reactivity';
-      recommendation = 'MONITORING ACTION: Track weekly compliance check-in pulses on mobile app and monitor workload pacing in battalion roster.';
-    }
-
-    return {
-      score: rounded,
-      level,
-      levelColor,
-      levelBg,
-      tierLabel,
-      recommendation,
-    };
-  }, [resolvedStressIndicatorsParams]);
-
-  const stressIndicatorsParamDefinitions = useMemo(() => [
-    {
-      key: 'hrms_data',
-      name: '1. HRMS data',
-      weight: 0.14,
-      weightLabel: '14%',
-      sourceBadge: '🏢 HRMS Portal',
-      sourceType: 'HRMS',
-      note: resolvedStressIndicatorsParams.hrms_data.note,
-      source: resolvedStressIndicatorsParams.hrms_data.source,
-      available: resolvedStressIndicatorsParams.hrms_data.available,
-      score: resolvedStressIndicatorsParams.hrms_data.score,
-      color: 'text-amber-400',
-      bar: 'bg-amber-500',
-      desc: 'Career tenure, continuous forward stationing duration & service dossier logs in HRMS'
-    },
-    {
-      key: 'leave_frequency',
-      name: '2. Leave frequency',
-      weight: 0.14,
-      weightLabel: '14%',
-      sourceBadge: '🏢 HRMS Portal',
-      sourceType: 'HRMS',
-      note: resolvedStressIndicatorsParams.leave_frequency.note,
-      source: resolvedStressIndicatorsParams.leave_frequency.source,
-      available: resolvedStressIndicatorsParams.leave_frequency.available,
-      score: resolvedStressIndicatorsParams.leave_frequency.score,
-      color: 'text-amber-400',
-      bar: 'bg-amber-500',
-      desc: 'Leave application frequency, denied/deferred furloughs & time since last leave in HRMS'
-    },
-    {
-      key: 'workload',
-      name: '3. Workload',
-      weight: 0.15,
-      weightLabel: '15%',
-      sourceBadge: '🏢 HRMS Portal',
-      sourceType: 'HRMS',
-      note: resolvedStressIndicatorsParams.workload.note,
-      source: resolvedStressIndicatorsParams.workload.source,
-      available: resolvedStressIndicatorsParams.workload.available,
-      score: resolvedStressIndicatorsParams.workload.score,
-      color: 'text-rose-400',
-      bar: 'bg-rose-500',
-      desc: 'Operational watch hours, overtime duty log & high-intensity task tempo in HRMS Rosters'
-    },
-    {
-      key: 'missed_assessments',
-      name: '4. Missed assessments',
-      weight: 0.13,
-      weightLabel: '13%',
-      sourceBadge: '💾 Central Database',
-      sourceType: 'DATABASE',
-      note: resolvedStressIndicatorsParams.missed_assessments.note,
-      source: resolvedStressIndicatorsParams.missed_assessments.source,
-      available: resolvedStressIndicatorsParams.missed_assessments.available,
-      score: resolvedStressIndicatorsParams.missed_assessments.score,
-      color: 'text-teal-400',
-      bar: 'bg-teal-500',
-      desc: 'Assessment avoidance index, missed scheduled psychometric check-ins in Central DB log'
-    },
-    {
-      key: 'sleep_pattern',
-      name: '5. Sleep pattern',
-      weight: 0.16,
-      weightLabel: '16%',
-      sourceBadge: '📱 Soldier Mobile App',
-      sourceType: 'MOBILE',
-      note: resolvedStressIndicatorsParams.sleep_pattern.note,
-      source: resolvedStressIndicatorsParams.sleep_pattern.source,
-      available: resolvedStressIndicatorsParams.sleep_pattern.available,
-      score: resolvedStressIndicatorsParams.sleep_pattern.score,
-      color: 'text-rose-400',
-      bar: 'bg-rose-500',
-      desc: 'Total sleep duration (<4.5h deficit), sleep onset latency & fragmentation logged via Mobile'
-    },
-    {
-      key: 'biometric_trends',
-      name: '6. Biometric trends',
-      weight: 0.15,
-      weightLabel: '15%',
-      sourceBadge: '📱 Soldier Mobile App',
-      sourceType: 'MOBILE',
-      note: resolvedStressIndicatorsParams.biometric_trends.note,
-      source: resolvedStressIndicatorsParams.biometric_trends.source,
-      available: resolvedStressIndicatorsParams.biometric_trends.available,
-      score: resolvedStressIndicatorsParams.biometric_trends.score,
-      color: 'text-rose-400',
-      bar: 'bg-rose-500',
-      desc: 'Resting Heart Rate elevation (+bpm), HRV root mean square deviation & autonomic strain'
-    },
-    {
-      key: 'behavioral_changes',
-      name: '7. Behavioral changes',
-      weight: 0.13,
-      weightLabel: '13%',
-      sourceBadge: '📱 Mobile App & Central DB',
-      sourceType: 'MOBILE',
-      note: resolvedStressIndicatorsParams.behavioral_changes.note,
-      source: resolvedStressIndicatorsParams.behavioral_changes.source,
-      available: resolvedStressIndicatorsParams.behavioral_changes.available,
-      score: resolvedStressIndicatorsParams.behavioral_changes.score,
-      color: 'text-teal-400',
-      bar: 'bg-teal-500',
-      desc: 'App interaction volatility, mood variance & unit peer withdrawal flags recorded across sources'
-    },
-  ], [resolvedStressIndicatorsParams]);
-
   return (
     <div className="space-y-6">
       {/* Toast Notification for factor actions */}
@@ -1660,7 +1662,7 @@ export const WelfareDashboard: React.FC = () => {
               Welcome, {user?.full_name}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 mt-1.5 max-w-2xl leading-relaxed font-medium">
-              Synchronized HRMS Personnel Welfare Directory. Search personnel, inspect live counts, select soldiers to evaluate 8-parameter multi-variate Burnout Predictions, and trigger direct welfare interventions.
+              Synchronized HRMS Personnel Welfare Directory. Search personnel, inspect live counts, select soldiers to evaluate all 13 multi-source Welfare & Psychometric Factors, and trigger direct clinical interventions.
             </p>
           </div>
 
@@ -1707,7 +1709,7 @@ export const WelfareDashboard: React.FC = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* SECTION: SEARCHABLE PERSONNEL DIRECTORY & BURNOUT PREDICTION COMMAND */}
+      {/* SECTION: SEARCHABLE PERSONNEL DIRECTORY & MULTI-FACTOR LIVE PREDICTOR COMMAND */}
       {/* ========================================================================= */}
       <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft space-y-6 relative overflow-hidden">
         {/* Header & Dynamic Counter */}
@@ -1719,10 +1721,10 @@ export const WelfareDashboard: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
-                  Personnel Roster & Live Burnout Predictor
+                  Personnel Roster &amp; Live Predictor: {currentFactor.title}
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                  Search any user, inspect unit counts, and select personnel to compute 8-parameter multi-variate Burnout Predictions.
+                  Search any user, inspect unit counts, and select personnel to compute live multi-source {currentFactor.title} telemetry & predictions.
                 </p>
               </div>
             </div>
@@ -1732,10 +1734,10 @@ export const WelfareDashboard: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2">
             <span className="px-3.5 py-1.5 rounded-full text-xs font-mono font-black bg-slate-900 text-white shadow-sm flex items-center gap-1.5">
               <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Showing {filteredPersonnel.length} of {ALL_PERSONNEL.length} Personnel</span>
+              <span>Showing {filteredPersonnel.length} of {personnelRoster.length} Personnel</span>
             </span>
             <span className="px-3 py-1.5 rounded-full text-xs font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              Active Selection: <strong className="text-emerald-900">{selectedPersonnel.name}</strong>
+              Active Subject: <strong className="text-emerald-900">{selectedPersonnel.name}</strong> ({currentEvalResult.metricLabel}: {currentEvalResult.score}%)
             </span>
           </div>
         </div>
@@ -1748,7 +1750,7 @@ export const WelfareDashboard: React.FC = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search personnel by name, UID (e.g. UID-EMP-012), regimental number, rank, or unit..."
+              placeholder={`Search personnel for ${currentFactor.title} by name, UID, regimental number, rank, or unit...`}
               className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/90 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all font-medium"
             />
             {searchQuery && (
@@ -1785,28 +1787,17 @@ export const WelfareDashboard: React.FC = () => {
         {/* Personnel Search Results / Selection Carousel Grid */}
         <div className="space-y-3">
           <div className="flex items-center justify-between text-xs text-slate-500 font-semibold px-1">
-            <span>Select Personnel to evaluate Burnout Prediction:</span>
+            <span>Select Personnel to evaluate {currentFactor.title}:</span>
             <span>{filteredPersonnel.length} matches found</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
             {filteredPersonnel.map((p) => {
               const isSelected = selectedPersonnelUid === p.uid;
-              const getVal = (val: any) => (typeof val === 'object' && val !== null ? (typeof val.score === 'number' ? val.score : 50) : (typeof val === 'number' ? val : 50));
-              const baseScore = Math.round(
-                (0.12 * getVal(p.params.leave_patterns) +
-                0.14 * getVal(p.params.overtime) +
-                0.13 * getVal(p.params.workload_trend) +
-                0.10 * getVal(p.params.deployment_duration) +
-                0.13 * getVal(p.params.duty_schedule) +
-                0.15 * getVal(p.params.sleep_quality) +
-                0.12 * getVal(p.params.emotional_exhaustion) +
-                0.11 * getVal(p.params.assessment_responses)) * 10
-              ) / 10;
-
-              const isCrit = baseScore >= 80;
-              const isHigh = baseScore >= 70 && baseScore < 80;
-              const isMod = baseScore >= 50 && baseScore < 70;
+              const evalRes = evaluateFactorModel(selectedFactorId, p);
+              const isCrit = evalRes.level === 'CRITICAL';
+              const isHigh = evalRes.level === 'HIGH';
+              const isMod = evalRes.level === 'MODERATE';
 
               return (
                 <button
@@ -1836,7 +1827,7 @@ export const WelfareDashboard: React.FC = () => {
                           ? isSelected ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-blue-100 text-blue-800'
                           : isSelected ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-emerald-100 text-emerald-800'
                       }`}>
-                        {isCrit ? 'CRITICAL' : isHigh ? 'HIGH' : isMod ? 'MODERATE' : 'NOMINAL'}
+                        {evalRes.level}
                       </span>
                     </div>
 
@@ -1856,11 +1847,9 @@ export const WelfareDashboard: React.FC = () => {
                   <div className={`mt-3 pt-2.5 border-t flex items-center justify-between text-xs font-mono ${
                     isSelected ? 'border-slate-800 text-slate-300' : 'border-slate-200/80 text-slate-600'
                   }`}>
-                    <span className="text-[10px] font-sans font-medium">Burnout Est:</span>
-                    <span className={`font-black text-xs ${
-                      isCrit ? 'text-rose-400' : isHigh ? 'text-amber-400' : isMod ? 'text-blue-400' : 'text-emerald-400'
-                    }`}>
-                      {baseScore}%
+                    <span className="text-[10px] font-sans font-medium">{evalRes.metricLabel}:</span>
+                    <span className={`font-black text-xs ${evalRes.levelColor}`}>
+                      {evalRes.score}%
                     </span>
                   </div>
                 </button>
@@ -1869,7 +1858,7 @@ export const WelfareDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Selected Personnel Burnout Prediction Dossier & Interactive Simulator */}
+        {/* Selected Personnel Multi-Factor Prediction Dossier & Live Parameter Breakdown */}
         <div className="p-6 sm:p-7 rounded-3xl bg-slate-900 text-white border border-slate-800 shadow-2xl space-y-6 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -1907,34 +1896,34 @@ export const WelfareDashboard: React.FC = () => {
                   <span className="text-sm font-medium text-slate-400">({selectedPersonnel.rank})</span>
                 </h3>
                 <p className="text-xs text-slate-300 mt-1 font-medium">
-                  Status: <strong className="text-emerald-400">{selectedPersonnel.status}</strong> &bull; Multi-Variate Defense Burnout Telemetry Dossier.
+                  Status: <strong className="text-emerald-400">{selectedPersonnel.status}</strong> &bull; Evaluating Factor #{currentFactor.num}: <strong className="text-white">{currentFactor.title}</strong>
                 </p>
               </div>
             </div>
 
-            {/* Overall Calculated Burnout Card */}
+            {/* Overall Calculated Factor Card */}
             <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700 flex items-center gap-5 shrink-0 shadow-lg">
               <div className="text-right">
                 <span className="text-[10px] uppercase font-black tracking-wider text-slate-400 block">
-                  Calculated Burnout Risk
+                  Calculated {currentFactor.title}
                 </span>
                 <div className="flex items-baseline justify-end gap-1 mt-0.5">
-                  <span className={`text-3xl font-black font-mono tracking-tight ${calculatedBurnout.levelColor}`}>
-                    {calculatedBurnout.score}%
+                  <span className={`text-3xl font-black font-mono tracking-tight ${currentEvalResult.levelColor}`}>
+                    {currentEvalResult.score}%
                   </span>
                 </div>
-                <span className={`inline-block text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full border mt-1 ${calculatedBurnout.levelBg}`}>
-                  {calculatedBurnout.level} HAZARD
+                <span className={`inline-block text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full border mt-1 ${currentEvalResult.levelBg}`}>
+                  {currentEvalResult.level} HAZARD
                 </span>
               </div>
 
               <div className="flex flex-col gap-1.5">
                 <button
-                  onClick={() => handleTriggerAction('Burnout Dispatch', `Priority intervention for ${selectedPersonnel.name}`)}
+                  onClick={() => handleTriggerAction(currentFactor.title, `${currentEvalResult.primaryAction} for ${selectedPersonnel.name}`)}
                   className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>Dispatch Intervention</span>
+                  <span>{currentEvalResult.primaryAction}</span>
                 </button>
               </div>
             </div>
@@ -1963,19 +1952,26 @@ export const WelfareDashboard: React.FC = () => {
             <div className="flex items-center gap-2">
               <Sparkle className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>
-                <strong className="text-white">Burnout Formula:</strong> 0.12(Leave) + 0.14(Overtime) + 0.13(Workload) + 0.10(Deployment) + 0.13(Schedule) + 0.15(Sleep) + 0.12(Exhaustion) + 0.11(Assessment)
+                <strong className="text-white">{currentFactor.title} Formula:</strong> {currentEvalResult.formula}
               </span>
             </div>
-            <span className="text-[11px] font-mono text-emerald-400 font-bold flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>Retrieved Live Telemetry • Multi-Source Aggregation</span>
-            </span>
+            <div className="flex items-center gap-2 text-[10px] font-bold">
+              <span className="px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">
+                📱 Mobile: {currentEvalResult.mobileCount}
+              </span>
+              <span className="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">
+                🏢 HRMS: {currentEvalResult.hrmsCount}
+              </span>
+              <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
+                💾 DB: {currentEvalResult.databaseCount}
+              </span>
+            </div>
           </div>
 
-          {/* 8 Parameters Detailed Breakdown (Fixed Retrieved Telemetry Metrics) */}
+          {/* Parameters Detailed Breakdown Grid (Fixed Retrieved Telemetry Metrics) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
-            {paramDefinitions.map((param) => {
-              const currentVal = (currentParamValues as any)[param.key];
+            {currentEvalResult.parameters.map((param) => {
+              const currentVal = param.score;
 
               return (
                 <div
@@ -1997,11 +1993,13 @@ export const WelfareDashboard: React.FC = () => {
                   <div className="flex items-center justify-between">
                     {param.available ? (
                       <span className={`text-[9px] font-mono px-2 py-0.5 rounded-md flex items-center gap-1 border ${
-                        param.source?.includes('Mobile')
+                        param.sourceType === 'MOBILE'
                           ? 'text-cyan-300 bg-cyan-950/80 border-cyan-700/80'
+                          : param.sourceType === 'HRMS'
+                          ? 'text-amber-300 bg-amber-950/80 border-amber-700/80'
                           : 'text-emerald-400 bg-emerald-950/70 border-emerald-800/80'
                       }`}>
-                        <span>{param.source?.includes('Mobile') ? '📱' : '✅'}</span>
+                        <span>{param.sourceType === 'MOBILE' ? '📱' : param.sourceType === 'HRMS' ? '🏢' : '💾'}</span>
                         <span className="truncate max-w-[135px] font-semibold">{param.source}</span>
                       </span>
                     ) : (
@@ -2011,33 +2009,23 @@ export const WelfareDashboard: React.FC = () => {
                       </span>
                     )}
 
-                    <span className={`text-sm font-mono font-black ${
-                      currentVal >= 80 ? 'text-rose-400' : currentVal >= 70 ? 'text-amber-400' : currentVal >= 50 ? 'text-blue-400' : 'text-emerald-400'
-                    }`}>
+                    <span className={`text-sm font-mono font-black ${param.color}`}>
                       {currentVal}%
                     </span>
                   </div>
 
-                  {/* Retrieved Telemetry Strain Bar Meter */}
+                  {/* Retrieved Telemetry Strain Bar Meter (Read Only Fixed) */}
                   <div className="space-y-1.5 pt-1">
                     <div className="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-700/60 p-0.5">
                       <div
-                        className={`h-full rounded-full transition-all duration-500 ${
-                          currentVal >= 80
-                            ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]'
-                            : currentVal >= 70
-                            ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'
-                            : currentVal >= 50
-                            ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]'
-                            : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'
-                        }`}
+                        className={`h-full rounded-full transition-all duration-500 ${param.bar}`}
                         style={{ width: `${Math.min(100, Math.max(4, currentVal))}%` }}
                       />
                     </div>
                     <div className="flex justify-between text-[9px] font-mono text-slate-400">
                       <span>0% Nominal</span>
-                      <span className="font-semibold text-slate-300">{currentVal}% Strain</span>
-                      <span>100% Critical</span>
+                      <span className="font-semibold text-slate-300">{currentVal}% Metric</span>
+                      <span>100% High</span>
                     </div>
                   </div>
 
@@ -2055,25 +2043,25 @@ export const WelfareDashboard: React.FC = () => {
             <div className="space-y-1">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>AI Clinical Intervention Guidance for {selectedPersonnel.name}</span>
+                <span>AI Clinical Guidance for {selectedPersonnel.name} ({currentFactor.title})</span>
               </span>
               <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
-                {calculatedBurnout.recommendation}
+                {currentEvalResult.recommendation}
               </p>
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
               <button
-                onClick={() => handleTriggerAction('Welfare Protocol', `Mandatory 48h rest rotation for ${selectedPersonnel.name}`)}
+                onClick={() => handleTriggerAction(currentFactor.title, `${currentEvalResult.primaryAction} for ${selectedPersonnel.name}`)}
                 className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-md cursor-pointer"
               >
-                Schedule Rest Rotation
+                {currentEvalResult.primaryAction}
               </button>
               <button
-                onClick={() => handleTriggerAction('Counseling', `Open 1-on-1 counseling case for ${selectedPersonnel.name}`)}
+                onClick={() => handleTriggerAction(currentFactor.title, `${currentEvalResult.secondaryAction} for ${selectedPersonnel.name}`)}
                 className="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold border border-slate-600 transition-all cursor-pointer"
               >
-                Book Counselor
+                {currentEvalResult.secondaryAction}
               </button>
             </div>
           </div>
@@ -2095,78 +2083,80 @@ export const WelfareDashboard: React.FC = () => {
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium max-w-3xl">
-              13-Factor Psychometric Intelligence Matrix. Click any factor option below to inspect clinical telemetry, root-cause biomarkers, flagged personnel cohorts, and automated welfare protocols.
+              13-Factor Psychometric Intelligence Matrix. Click any factor below to evaluate live multi-source parameters, formulas, and clinical protocols for <strong className="text-slate-900">{selectedPersonnel.name}</strong>.
             </p>
           </div>
-          <div className="flex items-center gap-2 self-start md:self-auto">
-            <span className="text-xs font-mono font-bold text-blue-700 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-200 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-              <span>13 Active Factor Models</span>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
+              Active Factor: <strong className="text-slate-900">#{currentFactor.num} {currentFactor.title}</strong>
             </span>
           </div>
         </div>
 
-        {/* 13 Factor Options Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3">
+        {/* 13-Factor Interactive Card Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {factorOptions.map((factor) => {
             const Icon = factor.icon;
             const isSelected = selectedFactorId === factor.id;
+            const soldierEval = evaluateFactorModel(factor.id, selectedPersonnel);
 
             return (
               <button
+                type="button"
+                id={`factor-card-${factor.id}`}
+                data-testid={`factor-card-${factor.id}`}
                 key={factor.id}
                 onClick={() => setSelectedFactorId(factor.id)}
-                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between space-y-3 relative group ${
+                className={`p-5 rounded-2xl border text-left w-full transition-all cursor-pointer flex flex-col justify-between relative group ${
                   isSelected
-                    ? 'bg-slate-900 border-slate-900 text-white shadow-lg ring-2 ring-blue-500/40 transform -translate-y-0.5'
-                    : 'bg-slate-50/70 hover:bg-white border-slate-200/90 hover:border-slate-300 text-slate-800 shadow-xs'
+                    ? 'bg-slate-900 border-slate-900 text-white shadow-xl ring-2 ring-blue-500/50 transform -translate-y-1'
+                    : 'bg-slate-50/70 hover:bg-white border-slate-200/90 hover:border-slate-300 text-slate-900 shadow-xs'
                 }`}
               >
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className={`text-[10px] font-mono font-black px-2 py-0.5 rounded-md ${
-                      isSelected ? 'bg-slate-800 text-blue-300 border border-slate-700' : 'bg-slate-200/70 text-slate-700'
+                      isSelected ? 'bg-slate-800 text-blue-400 border border-slate-700' : 'bg-slate-200/80 text-slate-700'
                     }`}>
-                      #{String(factor.num).padStart(2, '0')}
+                      Factor #{factor.num}
                     </span>
-                    <span
-                      className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
-                        factor.riskLevel === 'CRITICAL'
-                          ? isSelected ? 'bg-rose-900/80 text-rose-300 border border-rose-700' : 'bg-rose-100 text-rose-800'
-                          : factor.riskLevel === 'HIGH'
-                          ? isSelected ? 'bg-amber-900/80 text-amber-300 border border-amber-700' : 'bg-amber-100 text-amber-800'
-                          : factor.riskLevel === 'MODERATE'
-                          ? isSelected ? 'bg-teal-900/80 text-teal-300 border border-teal-700' : 'bg-teal-100 text-teal-800'
-                          : isSelected ? 'bg-emerald-900/80 text-emerald-300 border border-emerald-700' : 'bg-emerald-100 text-emerald-800'
-                      }`}
-                    >
-                      {factor.riskLevel}
+                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
+                      soldierEval.level === 'CRITICAL'
+                        ? isSelected ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-rose-100 text-rose-800'
+                        : soldierEval.level === 'HIGH'
+                        ? isSelected ? 'bg-amber-950 text-amber-300 border border-amber-800' : 'bg-amber-100 text-amber-800'
+                        : soldierEval.level === 'MODERATE'
+                        ? isSelected ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-blue-100 text-blue-800'
+                        : isSelected ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-emerald-100 text-emerald-800'
+                    }`}>
+                      {soldierEval.level}
                     </span>
                   </div>
 
-                  <div className="flex items-start gap-2.5">
-                    <div className={`p-2 rounded-xl border shrink-0 ${
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2.5 rounded-xl border shrink-0 ${
                       isSelected ? 'bg-slate-800 border-slate-700 text-blue-400' : `${factor.bg} ${factor.border} ${factor.color}`
                     }`}>
-                      <Icon className="w-4 h-4" />
+                      <Icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className={`font-extrabold text-xs leading-snug tracking-tight ${isSelected ? 'text-white' : 'text-slate-900 group-hover:text-blue-600'}`}>
-                        {factor.num}. {factor.title}
-                      </h3>
-                      <p className={`text-[10px] mt-0.5 line-clamp-1 font-medium ${isSelected ? 'text-slate-400' : 'text-slate-500'}`}>
+                      <h4 className={`font-black text-sm leading-tight tracking-tight ${isSelected ? 'text-white' : 'text-slate-900 group-hover:text-blue-700'}`}>
+                        {factor.title}
+                      </h4>
+                      <p className={`text-[11px] mt-1 line-clamp-2 font-medium ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>
                         {factor.shortDesc}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className={`pt-2 border-t flex items-center justify-between text-[11px] font-mono ${
-                  isSelected ? 'border-slate-800 text-slate-300' : 'border-slate-200/60 text-slate-600'
+                <div className={`mt-4 pt-3 border-t flex items-center justify-between text-xs font-mono ${
+                  isSelected ? 'border-slate-800 text-slate-300' : 'border-slate-200/80 text-slate-600'
                 }`}>
-                  <span className="text-[10px] font-sans">{factor.metricLabel}:</span>
-                  <span className={`font-extrabold ${isSelected ? 'text-emerald-400' : 'text-slate-900'}`}>
-                    {factor.metricValue}
+                  <span className="text-[11px] font-sans font-medium text-slate-400">{selectedPersonnel.name.split(' ')[0]}:</span>
+                  <span className={`font-black text-xs ${soldierEval.levelColor}`}>
+                    {soldierEval.score}% ({soldierEval.level})
                   </span>
                 </div>
               </button>
@@ -2175,28 +2165,25 @@ export const WelfareDashboard: React.FC = () => {
         </div>
 
         {/* Selected Factor Deep-Dive Intelligence Panel */}
-        <div className="p-6 sm:p-7 rounded-3xl bg-slate-900 text-white border border-slate-800 shadow-xl space-y-6 relative overflow-hidden">
+        <div className="p-6 sm:p-7 rounded-3xl bg-slate-900 text-white border border-slate-800 shadow-2xl space-y-6 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
 
-          {/* Panel Header */}
+          {/* Factor Panel Header */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-5 relative z-10">
             <div className="flex items-start gap-4">
-              <div className="p-3 rounded-2xl bg-slate-800 border border-slate-700 text-blue-400 shadow-md shrink-0">
+              <div className={`w-14 h-14 rounded-2xl border flex items-center justify-center text-xl font-black shadow-lg shrink-0 ${
+                currentFactor.color === 'text-rose-600'
+                  ? 'bg-rose-950/80 border-rose-800 text-rose-400'
+                  : currentFactor.color === 'text-amber-600'
+                  ? 'bg-amber-950/80 border-amber-800 text-amber-400'
+                  : 'bg-blue-950/80 border-blue-800 text-blue-400'
+              }`}>
                 <CurrentIcon className="w-7 h-7" />
               </div>
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-mono font-bold text-blue-400 bg-blue-950/80 px-2.5 py-0.5 rounded-full border border-blue-800">
+                  <span className="text-xs font-mono font-bold text-blue-400 bg-blue-950 px-2.5 py-0.5 rounded-full border border-blue-800">
                     Factor #{currentFactor.num} &bull; {currentFactor.category}
-                  </span>
-                  <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full ${
-                    currentFactor.riskLevel === 'CRITICAL'
-                      ? 'bg-rose-950 text-rose-300 border border-rose-800'
-                      : currentFactor.riskLevel === 'HIGH'
-                      ? 'bg-amber-950 text-amber-300 border border-amber-800'
-                      : 'bg-emerald-950 text-emerald-300 border border-emerald-800'
-                  }`}>
-                    {currentFactor.riskLevel} PRIORITY
                   </span>
                   <span className="text-xs text-slate-400 font-mono">
                     Model Reliability: <strong className="text-emerald-400">{currentFactor.modelConfidence}</strong>
@@ -2213,11 +2200,11 @@ export const WelfareDashboard: React.FC = () => {
 
             <div className="flex items-center gap-2 shrink-0">
               <button
-                onClick={() => handleTriggerAction(currentFactor.title, 'Welfare Protocol Dispatch')}
+                onClick={() => handleTriggerAction(currentFactor.title, `${currentEvalResult.primaryAction} for ${selectedPersonnel.name}`)}
                 className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-blue-600/30 transition-all cursor-pointer"
               >
                 <Send className="w-3.5 h-3.5" />
-                <span>Initiate Factor Protocol</span>
+                <span>{currentEvalResult.primaryAction}</span>
               </button>
               <button
                 onClick={() => handleTriggerAction(currentFactor.title, 'Telemetry Export')}
@@ -2229,315 +2216,162 @@ export const WelfareDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Panel Body Grid */}
-          {selectedFactorId === 'psychological-distress' ? (
-            <div className="space-y-6 relative z-10">
-              {/* Multi-Source Provenance Header Banner */}
-              <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-mono font-extrabold uppercase px-2.5 py-1 rounded-full bg-blue-950 text-blue-300 border border-blue-800 flex items-center gap-1.5">
-                    <Database className="w-3.5 h-3.5 text-blue-400" />
-                    <span>Multi-Source Unified Telemetry</span>
-                  </span>
-                  <span className="text-xs text-slate-300 font-medium">
-                    Evaluating Active Subject: <strong className="text-white">{selectedPersonnel.name}</strong> ({selectedPersonnel.rank}) &bull; <span className="text-blue-300 font-mono">{selectedPersonnel.uid}</span>
-                  </span>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono font-bold">
-                  <span className="px-2.5 py-1 rounded-lg bg-indigo-950 text-indigo-300 border border-indigo-800 flex items-center gap-1">
-                    📱 Mobile App: 4 Params
-                  </span>
-                  <span className="px-2.5 py-1 rounded-lg bg-amber-950 text-amber-300 border border-amber-800 flex items-center gap-1">
-                    🏢 HRMS Portal: 1 Param
-                  </span>
-                  <span className="px-2.5 py-1 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center gap-1">
-                    💾 Central DB: 2 Params
-                  </span>
-                </div>
+          {/* Factor Panel Body - Universal Multi-Source Telemetry & Parameters */}
+          <div className="space-y-6 relative z-10">
+            {/* Multi-Source Provenance Header Banner */}
+            <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-mono font-extrabold uppercase px-2.5 py-1 rounded-full bg-blue-950 text-blue-300 border border-blue-800 flex items-center gap-1.5">
+                  <Database className="w-3.5 h-3.5 text-blue-400" />
+                  <span>Multi-Source Unified Telemetry & Clinical Model</span>
+                </span>
+                <span className="text-xs text-slate-300 font-medium">
+                  Evaluating Active Subject: <strong className="text-white">{selectedPersonnel.name}</strong> ({selectedPersonnel.rank}) &bull; <span className="text-blue-300 font-mono">{selectedPersonnel.uid}</span>
+                </span>
               </div>
 
-              {/* Psychological Distress Composite Score Banner */}
-              <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-800 via-slate-800/90 to-slate-900 border border-slate-700 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-                <div className="space-y-1.5">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${calculatedPsychologicalDistress.levelBg}`}>
-                      {calculatedPsychologicalDistress.level} DISTRESS RISK
-                    </span>
-                    <span className="text-xs font-mono font-semibold text-slate-300">
-                      &bull; {calculatedPsychologicalDistress.k10Tier}
-                    </span>
-                  </div>
-                  <h4 className="text-base sm:text-lg font-black text-white">
-                    Psychological Distress Prediction Index: <span className="font-mono text-xl sm:text-2xl text-rose-400 font-black">{calculatedPsychologicalDistress.score} / 100</span>
-                  </h4>
-                  <p className="text-xs text-slate-300 font-medium max-w-3xl leading-relaxed">
-                    <strong className="text-slate-100">Formula:</strong> 0.15(Mood) + 0.16(Anxiety) + 0.18(Depression) + 0.14(Sleep) + 0.12(Isolation) + 0.13(Trauma) + 0.12(Wellness)
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    onClick={() => handleTriggerAction('Psychological Distress', `Confidential Debrief for ${selectedPersonnel.name}`)}
-                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-md cursor-pointer flex items-center gap-1.5"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>Dispatch Protocol</span>
-                  </button>
-                  <button
-                    onClick={() => handleTriggerAction('Psychological Distress', `Pair Peer Buddy for ${selectedPersonnel.name}`)}
-                    className="px-3.5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold border border-slate-600 transition-all cursor-pointer"
-                  >
-                    Pair Buddy
-                  </button>
-                </div>
-              </div>
-
-              {/* 7 Parameters Telemetry Grid with Fixed Progress Meters */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
-                {psychologicalParamDefinitions.map((param) => {
-                  const currentVal = param.score;
-                  return (
-                    <div
-                      key={param.key}
-                      className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-3 relative group hover:border-slate-600 transition-all flex flex-col justify-between"
-                    >
-                      <div className="space-y-2">
-                        {/* Header with weight and source tag */}
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-mono font-bold text-blue-300 bg-blue-950 px-2 py-0.5 rounded border border-blue-900">
-                            Weight: {param.weightLabel}
-                          </span>
-                          <span
-                            className={`text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded-full flex items-center gap-1 ${
-                              param.available
-                                ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
-                                : 'bg-rose-950 text-rose-300 border border-rose-800'
-                            }`}
-                          >
-                            <span className={`w-1.5 h-1.5 rounded-full ${param.available ? 'bg-emerald-400' : 'bg-rose-400 animate-ping'}`} />
-                            {param.available ? 'Synchronized' : 'Sync Pending'}
-                          </span>
-                        </div>
-
-                        {/* Title and Origin Source */}
-                        <div>
-                          <h5 className="font-extrabold text-xs text-white leading-snug">
-                            {param.name}
-                          </h5>
-                          <p className="text-[10px] text-slate-400 line-clamp-1 font-medium mt-0.5">
-                            {param.desc}
-                          </p>
-                          <div className="mt-1.5 flex items-center gap-1">
-                            <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-800 font-semibold">
-                              {param.sourceBadge}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Read-only Fixed Telemetry Meter (No editable adjustment bar) */}
-                      <div className="space-y-2 pt-1 border-t border-slate-700/60">
-                        <div className="flex items-center justify-between text-xs font-mono">
-                          <span className="text-[10px] text-slate-400 font-sans">Retrieved Telemetry:</span>
-                          <span className={`font-black text-sm ${param.color}`}>
-                            {currentVal}%
-                          </span>
-                        </div>
-
-                        {/* Fixed Meter Bar */}
-                        <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-700/80 p-0.5">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${param.bar}`}
-                            style={{ width: `${Math.min(100, Math.max(5, currentVal))}%` }}
-                          />
-                        </div>
-
-                        <div className="flex justify-between text-[9px] text-slate-500 font-mono">
-                          <span>0% Nominal</span>
-                          <span className="font-semibold text-slate-300">{currentVal}% Strain</span>
-                          <span>100% Critical</span>
-                        </div>
-
-                        {/* Telemetry Detail Note */}
-                        <p className="text-[10px] text-slate-300 line-clamp-2 leading-relaxed font-medium bg-slate-900/90 p-2 rounded-xl border border-slate-800">
-                          {param.note}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Action Recommendation Card */}
-              <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                    <span>Chief Welfare Officer Clinical Protocol for {selectedPersonnel.name}</span>
-                  </span>
-                  <p className="text-xs text-slate-200 leading-relaxed font-medium">
-                    {calculatedPsychologicalDistress.recommendation}
-                  </p>
-                </div>
+              <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono font-bold">
+                <span className="px-2.5 py-1 rounded-lg bg-indigo-950 text-indigo-300 border border-indigo-800 flex items-center gap-1">
+                  📱 Mobile App: {currentEvalResult.mobileCount} Params
+                </span>
+                <span className="px-2.5 py-1 rounded-lg bg-amber-950 text-amber-300 border border-amber-800 flex items-center gap-1">
+                  🏢 HRMS Portal: {currentEvalResult.hrmsCount} Params
+                </span>
+                <span className="px-2.5 py-1 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center gap-1">
+                  💾 Central DB / Web: {currentEvalResult.databaseCount} Params
+                </span>
               </div>
             </div>
-          ) : selectedFactorId === 'stress-indicators-detection' ? (
-            <div className="space-y-6 relative z-10">
-              {/* Multi-Source Provenance Header Banner */}
-              <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-3">
+
+            {/* Composite Score Banner */}
+            <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-800 via-slate-800/90 to-slate-900 border border-slate-700 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+              <div className="space-y-1.5">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-mono font-extrabold uppercase px-2.5 py-1 rounded-full bg-rose-950 text-rose-300 border border-rose-800 flex items-center gap-1.5">
-                    <Zap className="w-3.5 h-3.5 text-rose-400" />
-                    <span>Multi-Source Unified Telemetry & Predictive Risk Model</span>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${currentEvalResult.levelBg}`}>
+                    {currentEvalResult.level} {currentEvalResult.factorTitle.toUpperCase()}
                   </span>
-                  <span className="text-xs text-slate-300 font-medium">
-                    Evaluating Active Subject: <strong className="text-white">{selectedPersonnel.name}</strong> ({selectedPersonnel.rank}) &bull; <span className="text-blue-300 font-mono">{selectedPersonnel.uid}</span>
-                  </span>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono font-bold">
-                  <span className="px-2.5 py-1 rounded-lg bg-indigo-950 text-indigo-300 border border-indigo-800 flex items-center gap-1">
-                    📱 Mobile App: 3 Params
-                  </span>
-                  <span className="px-2.5 py-1 rounded-lg bg-amber-950 text-amber-300 border border-amber-800 flex items-center gap-1">
-                    🏢 HRMS Portal: 3 Params
-                  </span>
-                  <span className="px-2.5 py-1 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center gap-1">
-                    💾 Central DB / Web: 1 Param
+                  <span className="text-xs font-mono font-semibold text-slate-300">
+                    &bull; {currentEvalResult.tierLabel}
                   </span>
                 </div>
+                <h4 className="text-base sm:text-lg font-black text-white">
+                  {currentFactor.title} Prediction Index: <span className={`font-mono text-xl sm:text-2xl font-black ${currentEvalResult.levelColor}`}>{currentEvalResult.score} / 100</span>
+                </h4>
+                <p className="text-xs text-slate-300 font-medium max-w-3xl leading-relaxed">
+                  <strong className="text-slate-100">Formula:</strong> {currentEvalResult.formula}
+                </p>
               </div>
 
-              {/* Stress Indicators Composite Score Banner */}
-              <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-800 via-slate-800/90 to-slate-900 border border-slate-700 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-                <div className="space-y-1.5">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${calculatedStressIndicators.levelBg}`}>
-                      {calculatedStressIndicators.level} STRESS INDICATORS RISK
-                    </span>
-                    <span className="text-xs font-mono font-semibold text-slate-300">
-                      &bull; {calculatedStressIndicators.tierLabel}
-                    </span>
-                  </div>
-                  <h4 className="text-base sm:text-lg font-black text-white">
-                    Stress Indicators Detection Index: <span className="font-mono text-xl sm:text-2xl text-rose-400 font-black">{calculatedStressIndicators.score} / 100</span>
-                  </h4>
-                  <p className="text-xs text-slate-300 font-medium max-w-3xl leading-relaxed">
-                    <strong className="text-slate-100">Formula:</strong> 0.14(HRMS) + 0.14(Leave) + 0.15(Workload) + 0.13(Missed Assessments) + 0.16(Sleep) + 0.15(Biometrics) + 0.13(Behavioral)
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    onClick={() => handleTriggerAction('Stress Indicators', `Autonomic Biofeedback Protocol for ${selectedPersonnel.name}`)}
-                    className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all shadow-md cursor-pointer flex items-center gap-1.5"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>Initiate Biofeedback</span>
-                  </button>
-                  <button
-                    onClick={() => handleTriggerAction('Stress Indicators', `Expedite HRMS Leave Approval for ${selectedPersonnel.name}`)}
-                    className="px-3.5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold border border-slate-600 transition-all cursor-pointer"
-                  >
-                    Expedite Leave
-                  </button>
-                </div>
-              </div>
-
-              {/* 7 Parameters Telemetry Grid with Fixed Progress Meters */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
-                {stressIndicatorsParamDefinitions.map((param) => {
-                  const currentVal = param.score;
-                  return (
-                    <div
-                      key={param.key}
-                      className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-3 relative group hover:border-slate-600 transition-all flex flex-col justify-between"
-                    >
-                      <div className="space-y-2">
-                        {/* Header with weight and source tag */}
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-mono font-bold text-blue-300 bg-blue-950 px-2 py-0.5 rounded border border-blue-900">
-                            Weight: {param.weightLabel}
-                          </span>
-                          <span
-                            className={`text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded-full flex items-center gap-1 ${
-                              param.available
-                                ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
-                                : 'bg-rose-950 text-rose-300 border border-rose-800'
-                            }`}
-                          >
-                            <span className={`w-1.5 h-1.5 rounded-full ${param.available ? 'bg-emerald-400' : 'bg-rose-400 animate-ping'}`} />
-                            {param.available ? 'Synchronized' : 'Sync Pending'}
-                          </span>
-                        </div>
-
-                        {/* Title and Origin Source */}
-                        <div>
-                          <h5 className="font-extrabold text-xs text-white leading-snug">
-                            {param.name}
-                          </h5>
-                          <p className="text-[10px] text-slate-400 line-clamp-1 font-medium mt-0.5">
-                            {param.desc}
-                          </p>
-                          <div className="mt-1.5 flex items-center gap-1">
-                            <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-800 font-semibold">
-                              {param.sourceBadge}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Read-only Fixed Telemetry Meter (No editable adjustment bar) */}
-                      <div className="space-y-2 pt-1 border-t border-slate-700/60">
-                        <div className="flex items-center justify-between text-xs font-mono">
-                          <span className="text-[10px] text-slate-400 font-sans">Retrieved Telemetry:</span>
-                          <span className={`font-black text-sm ${param.color}`}>
-                            {currentVal}%
-                          </span>
-                        </div>
-
-                        {/* Fixed Meter Bar */}
-                        <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-700/80 p-0.5">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${param.bar}`}
-                            style={{ width: `${Math.min(100, Math.max(5, currentVal))}%` }}
-                          />
-                        </div>
-
-                        <div className="flex justify-between text-[9px] text-slate-500 font-mono">
-                          <span>0% Nominal</span>
-                          <span className="font-semibold text-slate-300">{currentVal}% Strain</span>
-                          <span>100% Critical</span>
-                        </div>
-
-                        {/* Telemetry Detail Note */}
-                        <p className="text-[10px] text-slate-300 line-clamp-2 leading-relaxed font-medium bg-slate-900/90 p-2 rounded-xl border border-slate-800">
-                          {param.note}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Action Recommendation Card */}
-              <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                    <span>Chief Welfare Officer Clinical Protocol for {selectedPersonnel.name}</span>
-                  </span>
-                  <p className="text-xs text-slate-200 leading-relaxed font-medium">
-                    {calculatedStressIndicators.recommendation}
-                  </p>
-                </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => handleTriggerAction(currentFactor.title, `${currentEvalResult.primaryAction} for ${selectedPersonnel.name}`)}
+                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-md cursor-pointer flex items-center gap-1.5"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>{currentEvalResult.primaryAction}</span>
+                </button>
+                <button
+                  onClick={() => handleTriggerAction(currentFactor.title, `${currentEvalResult.secondaryAction} for ${selectedPersonnel.name}`)}
+                  className="px-3.5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold border border-slate-600 transition-all cursor-pointer"
+                >
+                  {currentEvalResult.secondaryAction}
+                </button>
               </div>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
-              {/* Left: Root Cause Biomarkers & Clinical Protocol */}
-              <div className="lg:col-span-6 space-y-5">
+
+            {/* Parameters Telemetry Grid with Fixed Progress Meters */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
+              {currentEvalResult.parameters.map((param) => {
+                const currentVal = param.score;
+                return (
+                  <div
+                    key={param.key}
+                    className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-3 relative group hover:border-slate-600 transition-all flex flex-col justify-between"
+                  >
+                    <div className="space-y-2">
+                      {/* Header with weight and source tag */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono font-bold text-blue-300 bg-blue-950 px-2 py-0.5 rounded border border-blue-900">
+                          Weight: {param.weightLabel}
+                        </span>
+                        <span
+                          className={`text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded-full flex items-center gap-1 ${
+                            param.available
+                              ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                              : 'bg-rose-950 text-rose-300 border border-rose-800'
+                          }`}
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full ${param.available ? 'bg-emerald-400' : 'bg-rose-400 animate-ping'}`} />
+                          {param.available ? 'Synchronized' : 'Sync Pending'}
+                        </span>
+                      </div>
+
+                      {/* Title and Origin Source */}
+                      <div>
+                        <h5 className="font-extrabold text-xs text-white leading-snug">
+                          {param.name}
+                        </h5>
+                        <p className="text-[10px] text-slate-400 line-clamp-1 font-medium mt-0.5">
+                          {param.desc}
+                        </p>
+                        <div className="mt-1.5 flex items-center gap-1">
+                          <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-800 font-semibold">
+                            {param.sourceBadge}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Read-only Fixed Telemetry Meter (No editable adjustment bar) */}
+                    <div className="space-y-2 pt-1 border-t border-slate-700/60">
+                      <div className="flex items-center justify-between text-xs font-mono">
+                        <span className="text-[10px] text-slate-400 font-sans">Retrieved Telemetry:</span>
+                        <span className={`font-black text-sm ${param.color}`}>
+                          {currentVal}%
+                        </span>
+                      </div>
+
+                      {/* Fixed Meter Bar */}
+                      <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-700/80 p-0.5">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${param.bar}`}
+                          style={{ width: `${Math.min(100, Math.max(5, currentVal))}%` }}
+                        />
+                      </div>
+
+                      <div className="flex justify-between text-[9px] text-slate-500 font-mono">
+                        <span>0% Nominal</span>
+                        <span className="font-semibold text-slate-300">{currentVal}% Score</span>
+                        <span>100% High</span>
+                      </div>
+
+                      {/* Telemetry Detail Note */}
+                      <p className="text-[10px] text-slate-300 line-clamp-2 leading-relaxed font-medium bg-slate-900/90 p-2 rounded-xl border border-slate-800">
+                        {param.note}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Action Recommendation Card */}
+            <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  <span>Chief Welfare Officer Clinical Protocol for {selectedPersonnel.name}</span>
+                </span>
+                <p className="text-xs text-slate-200 leading-relaxed font-medium">
+                  {currentEvalResult.recommendation}
+                </p>
+              </div>
+            </div>
+
+            {/* Key Telemetry Signals & Flagged Cohort Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
+              {/* Left: Root Cause Biomarkers */}
+              <div className="lg:col-span-6 space-y-3">
                 <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-3">
                   <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-300 flex items-center gap-2">
                     <Brain className="w-4 h-4 text-blue-400" />
@@ -2609,12 +2443,12 @@ export const WelfareDashboard: React.FC = () => {
                         <button
                           onClick={() => {
                             setSelectedPersonnelUid(p.uid);
-                            handleTriggerAction(currentFactor.title, `Selected ${p.name} for Burnout prediction`);
+                            handleTriggerAction(currentFactor.title, `Selected ${p.name} for ${currentFactor.title} analysis`);
                           }}
                           className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs"
                         >
                           <Flame className="w-3 h-3" />
-                          <span>Analyze Burnout</span>
+                          <span>Analyze {currentFactor.title.split(' ')[0]}</span>
                         </button>
                       </div>
                     </div>
@@ -2622,7 +2456,7 @@ export const WelfareDashboard: React.FC = () => {
                 </div>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
 
@@ -2683,12 +2517,12 @@ export const WelfareDashboard: React.FC = () => {
                   <button
                     onClick={() => {
                       setSelectedPersonnelUid(p.uid);
-                      handleTriggerAction('Flagged Watchlist', `Selected ${p.name} for Burnout evaluation`);
+                      handleTriggerAction('Flagged Watchlist', `Selected ${p.name} for ${currentFactor.title} evaluation`);
                     }}
                     className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
                   >
                     <Flame className="w-3.5 h-3.5" />
-                    <span>Analyze Burnout</span>
+                    <span>Analyze Factor</span>
                   </button>
                 </div>
               </div>
@@ -2732,7 +2566,7 @@ export const WelfareDashboard: React.FC = () => {
           <div className="mt-5 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-start gap-3">
             <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
             <p className="text-[11px] leading-relaxed font-medium">
-              HRMS AI Telemetry: Stress reduction protocol initiated for Major Alex Morgan and Subedar Gurpreet Singh. Next biometrics review scheduled in 48 hours.
+              HRMS AI Telemetry: Multi-factor welfare model synchronizing live data streams across Mobile App, HRMS Portal, and Central Database.
             </p>
           </div>
         </div>
