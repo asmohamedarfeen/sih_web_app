@@ -87,6 +87,15 @@ export interface PersonnelBurnoutProfile {
     biometric_trends: any;
     behavioral_changes: any;
   };
+  readiness_score_params?: {
+    wellness: any;
+    physical_readiness: any;
+    workload: any;
+    mental_readiness: any;
+    behavioral_stability: any;
+    operational_risk: any;
+  };
+  operational_readiness_params?: any;
 }
 
 export interface FactorParamDisplay {
@@ -550,8 +559,11 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
     getRaw((p as any).automated_alerts_params, key, fb, note, src);
   const getResilience = (key: string, fb: number = 50, note: string = 'Resilience hardiness metric', src: string = '💾 Central Database') =>
     getRaw((p as any).mental_resilience_params, key, fb, note, src);
-  const getReadiness = (key: string, fb: number = 50, note: string = 'Readiness suitability metric', src: string = '💾 Central Database') =>
-    getRaw((p as any).operational_readiness_params, key, fb, note, src);
+  const getReadiness = (key: string, fb: number = 50, note: string = 'Readiness suitability metric', src: string = '💾 Central Database') => {
+    const pAny = p as any;
+    const pool = pAny.readiness_score_params || pAny.operational_readiness_params;
+    return getRaw(pool, key, fb, note, src);
+  };
   const getOccupational = (key: string, fb: number = 50, note: string = 'Occupational stress hazard metric', src: string = '💾 Central Database') =>
     getRaw((p as any).occupational_stress_params, key, fb, note, src);
 
@@ -966,48 +978,49 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
       break;
     }
 
+    case 'readiness-score':
     case 'operational-readiness': {
-      metricLabel = 'Combat Readiness';
+      metricLabel = 'Readiness Score';
       const isAmit = p.uid === 'UID-SLD-015';
       const isSarah = p.uid === 'UID-EMP-011';
       const isRamesh = p.uid === 'UID-EMP-012';
       const isGurpreet = p.uid === 'UID-EMP-013';
 
-      const fbWs = isAmit ? 88 : isSarah ? 90 : isRamesh ? 22 : isGurpreet ? 36 : Math.max(15, Math.min(95, 110 - getPsych('wellness_survey', 62).score));
-      const fbFt = isAmit ? 86 : isSarah ? 88 : isRamesh ? 18 : isGurpreet ? 30 : Math.max(15, Math.min(95, 110 - getP('sleep_quality', 50).score));
-      const fbDl = isAmit ? 90 : isSarah ? 92 : isRamesh ? 20 : isGurpreet ? 40 : Math.max(15, Math.min(95, 110 - getP('deployment_duration', 40).score));
-      const fbLv = isAmit ? 85 : isSarah ? 86 : isRamesh ? 25 : isGurpreet ? 42 : Math.max(15, Math.min(95, 110 - getP('leave_patterns', 50).score));
-      const fbAt = isAmit ? 92 : isSarah ? 90 : isRamesh ? 30 : isGurpreet ? 45 : Math.max(15, Math.min(95, 110 - getP('duty_schedule', 50).score));
-      const fbAi = isAmit ? 88 : isSarah ? 86 : isRamesh ? 20 : isGurpreet ? 34 : Math.max(15, Math.min(95, 110 - getP('emotional_exhaustion', 50).score));
+      const fbW = isAmit ? 88 : isSarah ? 90 : isRamesh ? 24 : isGurpreet ? 36 : Math.max(15, Math.min(95, 110 - getPsych('wellness_survey', 62).score));
+      const fbPr = isAmit ? 86 : isSarah ? 88 : isRamesh ? 18 : isGurpreet ? 32 : Math.max(15, Math.min(95, 110 - getP('sleep_quality', 50).score));
+      const fbWl = isAmit ? 84 : isSarah ? 85 : isRamesh ? 20 : isGurpreet ? 35 : Math.max(15, Math.min(95, 110 - getP('workload_trend', 50).score));
+      const fbMr = isAmit ? 90 : isSarah ? 92 : isRamesh ? 26 : isGurpreet ? 40 : Math.max(15, Math.min(95, 110 - getPsych('anxiety_questions', 58).score));
+      const fbBs = isAmit ? 88 : isSarah ? 86 : isRamesh ? 30 : isGurpreet ? 44 : Math.max(15, Math.min(95, 110 - getStress('behavioral_changes', 50).score));
+      const fbOr = isAmit ? 92 : isSarah ? 90 : isRamesh ? 22 : isGurpreet ? 38 : Math.max(15, Math.min(95, 110 - getP('emotional_exhaustion', 50).score));
 
-      const ws = getReadiness('wellness_score', fbWs, 'Composite psychological wellness score in DB', '💾 Central Database (Composite Wellness Index)');
-      const ft = getReadiness('fatigue', fbFt, 'Cognitive & sleep fatigue telemetry logged on mobile', '📱 Soldier Mobile App (Fatigue Telemetry)');
-      const dl = getReadiness('deployment_load', fbDl, 'Operational sector deployment load in HRMS', '🏢 HRMS Portal (Deployment Load Archive)');
-      const lv = getReadiness('leave', fbLv, 'Leave balance & furlough readiness status in HRMS', '🏢 HRMS Portal (Leave Management System)');
-      const at = getReadiness('attendance', fbAt, 'Muster & operational combat attendance in HRMS', '🏢 HRMS Portal (Combat Readiness Attendance)');
-      const ai = getReadiness('ai_risk_predictions', fbAi, 'Multi-modal predictive AI operational risk model in DB', '💾 Central Database (Predictive AI Risk Model)');
+      const w = getReadiness('wellness', fbW, 'Composite psychological wellness index in Central DB', '💾 Central Database (Composite Wellness Index)');
+      const pr = getReadiness('physical_readiness', fbPr, 'Wearable biometric recovery & sleep restoration on mobile', '📱 Soldier Mobile App (Wearables & Sleep Recovery)');
+      const wl = getReadiness('workload', fbWl, 'Command watch rosters, duty pacing & overtime balancing in HRMS', '🏢 HRMS Portal (Command Watch Rosters & Duty Pacing)');
+      const mr = getReadiness('mental_readiness', fbMr, 'Cognitive focus, anxiety regulation & daily mood pulse on mobile', '📱 Soldier Mobile App (Psychometric Mood & Alertness Pulse)');
+      const bs = getReadiness('behavioral_stability', fbBs, 'Behavioral drift telemetry & peer camaraderie review', '📱 Mobile App & 💾 Central DB (Behavioral Telemetry & Peer Rating)');
+      const or = getReadiness('operational_risk', fbOr, 'Sector deployment risk score & predictive AI risk engine', '🏢 HRMS Portal & 💾 Central DB (AI Risk Engine & Deployment Dossier)');
 
       score = (
-        0.20 * ws.score +
-        0.20 * ft.score +
-        0.18 * dl.score +
-        0.15 * lv.score +
-        0.15 * at.score +
-        0.12 * ai.score
+        0.30 * w.score +
+        0.20 * pr.score +
+        0.20 * wl.score +
+        0.15 * mr.score +
+        0.10 * bs.score +
+        0.05 * or.score
       );
 
-      formula = '0.20(Wellness score) + 0.20(Fatigue) + 0.18(Deployment load) + 0.15(Leave) + 0.15(Attendance) + 0.12(AI risk predictions)';
-      mobileCount = 1; hrmsCount = 3; databaseCount = 2;
+      formula = '0.30(Wellness) + 0.20(Physical Readiness) + 0.20(Workload) + 0.15(Mental Readiness) + 0.10(Behavioral Stability) + 0.05(Operational Risk)';
+      mobileCount = 2; hrmsCount = 1; databaseCount = 3;
       primaryAction = 'Certify Combat Clearance';
       secondaryAction = 'Assign Tactical Rest';
 
       params = [
-        { key: 'wellness_score', name: '1. Wellness score', weight: 0.20, weightLabel: '20%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ws.note, source: ws.source, available: ws.available, score: ws.score, ...getColor(ws.score, true), desc: 'Composite wellness index in Central DB' },
-        { key: 'fatigue', name: '2. Fatigue', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: ft.note, source: ft.source, available: ft.available, score: ft.score, ...getColor(ft.score, true), desc: 'Cognitive & sleep fatigue on mobile' },
-        { key: 'deployment_load', name: '3. Deployment load', weight: 0.18, weightLabel: '18%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: dl.note, source: dl.source, available: dl.available, score: dl.score, ...getColor(dl.score, true), desc: 'Operational sector deployment load in HRMS' },
-        { key: 'leave', name: '4. Leave', weight: 0.15, weightLabel: '15%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: lv.note, source: lv.source, available: lv.available, score: lv.score, ...getColor(lv.score), desc: 'Furlough & leave readiness in HRMS' },
-        { key: 'attendance', name: '5. Attendance', weight: 0.15, weightLabel: '15%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: at.note, source: at.source, available: at.available, score: at.score, ...getColor(at.score, true), desc: 'Muster & combat attendance in HRMS' },
-        { key: 'ai_risk_predictions', name: '6. AI risk predictions', weight: 0.12, weightLabel: '12%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: ai.note, source: ai.source, available: ai.available, score: ai.score, ...getColor(ai.score, true), desc: 'Predictive AI risk model in Central DB' },
+        { key: 'wellness', name: '1. Wellness', weight: 0.30, weightLabel: '30%', sourceBadge: '💾 Central DB', sourceType: 'DATABASE', note: w.note, source: w.source, available: w.available, score: w.score, ...getColor(w.score, true), desc: 'Composite wellness index in Central DB' },
+        { key: 'physical_readiness', name: '2. Physical Readiness', weight: 0.20, weightLabel: '20%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: pr.note, source: pr.source, available: pr.available, score: pr.score, ...getColor(pr.score, true), desc: 'Wearable biometric recovery & sleep on mobile' },
+        { key: 'workload', name: '3. Workload', weight: 0.20, weightLabel: '20%', sourceBadge: '🏢 HRMS Portal', sourceType: 'HRMS', note: wl.note, source: wl.source, available: wl.available, score: wl.score, ...getColor(wl.score, true), desc: 'Command watch rosters & duty pacing in HRMS' },
+        { key: 'mental_readiness', name: '4. Mental Readiness', weight: 0.15, weightLabel: '15%', sourceBadge: '📱 Soldier Mobile App', sourceType: 'MOBILE', note: mr.note, source: mr.source, available: mr.available, score: mr.score, ...getColor(mr.score, true), desc: 'Cognitive focus & mood pulse on mobile' },
+        { key: 'behavioral_stability', name: '5. Behavioral Stability', weight: 0.10, weightLabel: '10%', sourceBadge: '📱 Mobile & Central DB', sourceType: 'MOBILE', note: bs.note, source: bs.source, available: bs.available, score: bs.score, ...getColor(bs.score, true), desc: 'Behavioral drift & peer reviews across Mobile & Central DB' },
+        { key: 'operational_risk', name: '6. Operational Risk', weight: 0.05, weightLabel: '5%', sourceBadge: '🏢 HRMS & Central DB', sourceType: 'HRMS', note: or.note, source: or.source, available: or.available, score: or.score, ...getColor(or.score, true), desc: 'Deployment risk score & AI model from HRMS & Central DB' },
       ];
       break;
     }
@@ -1055,31 +1068,32 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
   let levelColor = 'text-emerald-400';
   let levelBg = 'bg-emerald-950 text-emerald-300 border-emerald-800';
 
-  if (factorId === 'mental-wellbeing-resilience' || factorId === 'operational-readiness') {
+  const isReadiness = factorId === 'readiness-score' || factorId === 'operational-readiness';
+  if (factorId === 'mental-wellbeing-resilience' || isReadiness) {
     // Inverted: higher is better
     if (rounded >= 78.0) {
       level = 'NOMINAL';
       levelColor = 'text-emerald-400';
       levelBg = 'bg-emerald-950 text-emerald-300 border-emerald-800';
-      tierLabel = factorId === 'operational-readiness' ? 'Combat Ready / Peak Mission Suitability' : 'High Resilience / Optimal Squad Morale';
+      tierLabel = isReadiness ? 'Combat Ready / Peak Mission Suitability' : 'High Resilience / Optimal Squad Morale';
       recommendation = 'Maintain regular training tempo and proactive leadership brief.';
     } else if (rounded >= 65.0) {
       level = 'MODERATE';
       levelColor = 'text-blue-400';
       levelBg = 'bg-blue-950 text-blue-300 border-blue-800';
-      tierLabel = factorId === 'operational-readiness' ? 'Mission Ready / Minor Fatigue Rest Desirable' : 'Moderate Resilience / Squad Cohesion Active';
+      tierLabel = isReadiness ? 'Mission Ready / Minor Fatigue Rest Desirable' : 'Moderate Resilience / Squad Cohesion Active';
       recommendation = 'Prescribe standard recovery pacing and weekly check-in adherence.';
     } else if (rounded >= 50.0) {
       level = 'HIGH';
       levelColor = 'text-amber-400';
       levelBg = 'bg-amber-950 text-amber-300 border-amber-800';
-      tierLabel = factorId === 'operational-readiness' ? 'Standby Rest Required / Cognitive Fatigue' : 'Low Resilience / Attention Required';
+      tierLabel = isReadiness ? 'Standby Rest Required / Cognitive Fatigue' : 'Low Resilience / Attention Required';
       recommendation = 'PRIORITY ACTION: Schedule light duties, peer buddy pairing, and recovery rest cycle.';
     } else {
       level = 'CRITICAL';
       levelColor = 'text-rose-400';
       levelBg = 'bg-rose-950 text-rose-300 border-rose-800';
-      tierLabel = factorId === 'operational-readiness' ? 'Unfit for Frontline / Mandatory 48h Downtime' : 'Resilience Depleted / Immediate Clinical Protocol';
+      tierLabel = isReadiness ? 'Unfit for Frontline / Mandatory 48h Downtime' : 'Resilience Depleted / Immediate Clinical Protocol';
       recommendation = 'MANDATORY ACTION: Immediate operational detachment and comprehensive counseling intervention.';
     }
   } else {
@@ -1601,33 +1615,33 @@ export const WelfareDashboard: React.FC = () => {
       modelConfidence: '94.0% ROC-AUC'
     },
     {
-      id: 'operational-readiness',
+      id: 'readiness-score',
       num: 12,
-      title: 'Operational Readiness',
-      shortDesc: '6-Parameter Multi-Source Wellness, Fatigue, Deployment, Leave & AI Model',
+      title: 'Readiness Score',
+      shortDesc: '6-Parameter Multi-Source Wellness (30%), Physical (20%), Workload (20%), Mental (15%), Behavioral (10%) & Risk (5%) Model',
       category: 'Mission Readiness',
       riskLevel: 'NOMINAL',
-      metricLabel: 'Deployment Fit',
-      metricValue: '84.2% Combat Ready',
+      metricLabel: 'Readiness Score',
+      metricValue: '86.8% Combat Ready',
       icon: Target,
       color: 'text-blue-600',
       bg: 'bg-blue-50',
       border: 'border-blue-200',
-      clinicalSignificance: 'Multivariate 6-Parameter Predictive Model: 0.20(Wellness score) + 0.20(Fatigue) + 0.18(Deployment load) + 0.15(Leave) + 0.15(Attendance) + 0.12(AI risk predictions). Unified across Central DB, Soldier Mobile App, and HRMS Portal.',
+      clinicalSignificance: 'Multivariate 6-Parameter Model: Readiness Score = 30% × Wellness + 20% × Physical Readiness + 20% × Workload + 15% × Mental Readiness + 10% × Behavioral Stability + 5% × Operational Risk. Unified across Central DB, Soldier Mobile App, and HRMS Portal.',
       biomarkers: [
-        '1. Wellness score (20%) - Central DB Composite Index',
-        '2. Fatigue (20%) - Soldier Mobile App Fatigue Telemetry',
-        '3. Deployment load (18%) - HRMS Deployment Load Archive',
-        '4. Leave (15%) - HRMS Leave Management System',
-        '5. Attendance (15%) - HRMS Combat Readiness Attendance',
-        '6. AI risk predictions (12%) - Central DB Predictive Model'
+        '1. Wellness (30%) - Central DB Composite Wellness Index',
+        '2. Physical Readiness (20%) - Soldier Mobile App Wearables & Sleep Recovery',
+        '3. Workload (20%) - HRMS Portal Command Watch Rosters & Duty Pacing',
+        '4. Mental Readiness (15%) - Soldier Mobile App Psychometric Mood & Alertness Pulse',
+        '5. Behavioral Stability (10%) - Mobile App & Central DB Behavioral Telemetry & Peer Rating',
+        '6. Operational Risk (5%) - Central DB & HRMS AI Risk Engine & Deployment Dossier'
       ],
       flaggedPersonnel: [
-        { name: 'Sepoy Amit Kumar', uid: 'UID-SLD-015', rank: 'Sepoy', unit: '10 Para SF', score: 84.0, risk: 'NOMINAL', trigger: 'Combat Ready: High focus & physical fitness' },
-        { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 46.0, risk: 'CRITICAL', trigger: 'Unfit for frontline duty pending 48h rest' },
+        { name: 'Sepoy Amit Kumar', uid: 'UID-SLD-015', rank: 'Sepoy', unit: '10 Para SF', score: 86.8, risk: 'NOMINAL', trigger: 'Combat Ready: High focus & physical fitness' },
+        { name: 'Havildar Ramesh Chand', uid: 'UID-EMP-012', rank: 'Havildar', unit: 'High Altitude Guard', score: 22.4, risk: 'CRITICAL', trigger: 'Unfit for frontline duty pending 48h rest' },
       ],
       actionProtocol: 'Certify deployment clearance for fit personnel; place fatigued personnel on local guard pacing.',
-      modelConfidence: '96.5% ROC-AUC'
+      modelConfidence: '97.2% ROC-AUC'
     },
     {
       id: 'occupational-stress-risk',
