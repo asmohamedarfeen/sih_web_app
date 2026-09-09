@@ -211,27 +211,25 @@ export const LoginPage: React.FC = () => {
       <div className="absolute -top-40 left-1/4 w-[500px] h-[500px] bg-primary-100/60 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-40 right-1/4 w-[500px] h-[500px] bg-secondary-100/60 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Top Header */}
-      <header className="border-b border-slate-200/80 bg-white/80 backdrop-blur-md px-6 py-4 flex items-center justify-between relative z-10 shadow-sm">
+      {/* Top Executive Header */}
+      <header className="border-b border-secondary-800 bg-secondary px-6 py-4 flex items-center justify-between relative z-10 shadow-md text-white">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-primary via-secondary to-accent p-[1.5px] shadow-md flex items-center justify-center">
-            <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
-              <Shield className="w-5 h-5 text-primary" />
-            </div>
+          <div className="w-10 h-10 rounded-2xl bg-primary border border-accent/40 shadow-md flex items-center justify-center">
+            <Shield className="w-5 h-5 text-accent" />
           </div>
           <div>
-            <h1 className="font-extrabold text-sm tracking-wide text-gray-900 uppercase flex items-center gap-2">
+            <h1 className="font-extrabold text-sm tracking-wide text-white uppercase flex items-center gap-2">
               Defense HRMS & Welfare Portal
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-primary-50 text-primary-700 border border-primary-200">
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-secondary-900 text-accent border border-secondary-700">
                 STRATEGIC COMMAND
               </span>
             </h1>
-            <p className="text-xs text-slate-500 font-medium">Synchronized Strategic Welfare & Stress Intelligence Gateway</p>
+            <p className="text-xs text-slate-300 font-medium">Synchronized Strategic Welfare & Stress Intelligence Gateway</p>
           </div>
         </div>
 
         <div className="hidden sm:flex items-center gap-2.5">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm text-xs font-semibold text-gray-700">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary-900 border border-secondary-700 shadow-sm text-xs font-semibold text-slate-200">
             <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
             <span>HRMS Portal Integration Active</span>
           </div>
@@ -310,7 +308,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full mt-2 bg-gradient-to-r from-primary via-primary-600 to-secondary hover:from-primary-600 hover:to-secondary text-white font-extrabold py-3 px-4 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2 text-sm transition-all duration-200 disabled:opacity-50 cursor-pointer"
+                className="w-full mt-2 bg-primary hover:bg-primary-600 text-white font-extrabold py-3 px-4 rounded-xl shadow-lg shadow-primary/25 flex items-center justify-center gap-2 text-sm transition-all duration-200 disabled:opacity-50 cursor-pointer"
               >
                 {isLoading ? (
                   <>

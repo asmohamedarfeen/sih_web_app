@@ -136,8 +136,8 @@ export const CommanderDashboard: React.FC = () => {
               <RefreshCw className={`w-4 h-4 text-accent-700 ${isRefreshing ? 'animate-spin' : ''}`} />
               <span>{isRefreshing ? 'Syncing...' : 'Sync HRMS'}</span>
             </button>
-            <button className="px-4 py-2.5 rounded-xl bg-accent hover:bg-accent-600 text-gray-900 text-xs font-black shadow-lg shadow-accent/25 flex items-center gap-2 transition-all cursor-pointer">
-              <Zap className="w-4 h-4" />
+            <button className="px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-extrabold shadow-lg shadow-primary/20 flex items-center gap-2 transition-all cursor-pointer">
+              <Zap className="w-4 h-4 text-accent" />
               <span>Broadcast Advisory</span>
             </button>
           </div>

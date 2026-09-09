@@ -123,8 +123,8 @@ export const AdminDashboard: React.FC = () => {
               <RefreshCw className={`w-4 h-4 text-secondary ${isRefreshing ? 'animate-spin' : ''}`} />
               <span>{isRefreshing ? 'Syncing...' : 'Sync HRMS'}</span>
             </button>
-            <button className="px-4 py-2.5 rounded-xl bg-secondary hover:bg-secondary-600 text-white text-xs font-extrabold shadow-lg shadow-secondary/20 flex items-center gap-2 transition-all cursor-pointer">
-              <UserPlus className="w-4 h-4" />
+            <button className="px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-extrabold shadow-lg shadow-primary/20 flex items-center gap-2 transition-all cursor-pointer">
+              <UserPlus className="w-4 h-4 text-accent" />
               <span>Provision Officer</span>
             </button>
           </div>

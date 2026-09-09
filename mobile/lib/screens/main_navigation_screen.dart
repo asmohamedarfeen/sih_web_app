@@ -53,7 +53,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            const Icon(Icons.shield_outlined, color: AppColors.primary, size: 22),
+            const Icon(Icons.shield_outlined, color: AppColors.accent, size: 22),
             const SizedBox(width: 8),
             Text(
               user?.role == 'SOLDIER'
@@ -63,7 +63,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       : user?.role == 'COMMANDER'
                           ? 'COMMAND RADAR'
                           : 'HR FORCE DIRECTORY',
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 0.5, color: Colors.white),
             ),
           ],
         ),

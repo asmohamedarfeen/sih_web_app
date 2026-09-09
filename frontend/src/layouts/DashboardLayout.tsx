@@ -130,13 +130,13 @@ export const DashboardLayout: React.FC = () => {
       {/* Top Ambient Glow */}
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-primary-500/[0.04] blur-[100px] pointer-events-none z-0" />
 
-      {/* Top Header */}
-      <header className="h-16 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl px-4 sm:px-6 flex items-center justify-between sticky top-0 z-40 shadow-sm">
+      {/* Top Header - Executive Navy Blue Command Bar */}
+      <header className="h-16 border-b border-secondary-800 bg-secondary text-white px-4 sm:px-6 flex items-center justify-between sticky top-0 z-40 shadow-md">
         {/* Left Branding */}
         <div className="flex items-center gap-4">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl text-slate-500 hover:text-gray-900 hover:bg-slate-100 transition-colors"
+            className="md:hidden p-2 rounded-xl text-slate-300 hover:text-white hover:bg-secondary-800 transition-colors cursor-pointer"
           >
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -145,35 +145,33 @@ export const DashboardLayout: React.FC = () => {
             className="flex items-center gap-3 cursor-pointer group"
             onClick={() => navigate(getRoleDashboardRoute(user?.role))}
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-primary to-secondary p-[1.5px] shadow-md flex items-center justify-center">
-              <div className="w-full h-full bg-white rounded-[10px] flex items-center justify-center">
-                <Shield className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-              </div>
+            <div className="w-9 h-9 rounded-xl bg-primary border border-accent/40 shadow-md flex items-center justify-center group-hover:scale-105 transition-transform">
+              <Shield className="w-4 h-4 text-accent" />
             </div>
 
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-black text-sm tracking-wider text-gray-900 uppercase flex items-center gap-2">
+                <h1 className="font-black text-sm tracking-wider text-white uppercase flex items-center gap-2">
                   PSWMS
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-100 text-gray-700 border border-slate-200">
-                    DEFENSE PORTAL
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-secondary-900 text-accent border border-secondary-700">
+                    DEFENSE COMMAND
                   </span>
                 </h1>
               </div>
-              <p className="text-[10px] text-slate-500 font-medium tracking-wide">
-                Personnel Stress & Welfare Intelligence Command
+              <p className="text-[10px] text-slate-300 font-medium tracking-wide">
+                Personnel Stress &amp; Welfare Intelligence Command
               </p>
             </div>
           </div>
         </div>
 
         {/* Center Live Status */}
-        <div className="hidden lg:flex items-center gap-3 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs text-slate-600 shadow-sm">
+        <div className="hidden lg:flex items-center gap-3 px-3.5 py-1.5 rounded-full bg-secondary-900 border border-secondary-700 text-xs text-slate-200 shadow-sm">
           <Radio className="w-3.5 h-3.5 text-success animate-pulse" />
-          <span className="text-gray-800 font-semibold">Gateway Active</span>
-          <span className="text-slate-300">&bull;</span>
-          <div className="flex items-center gap-1 font-mono text-[11px] text-slate-600 font-medium">
-            <Clock className="w-3 h-3 text-slate-400" />
+          <span className="text-white font-semibold">Gateway Active</span>
+          <span className="text-secondary-700">&bull;</span>
+          <div className="flex items-center gap-1 font-mono text-[11px] text-slate-300 font-medium">
+            <Clock className="w-3 h-3 text-accent" />
             <span>IST {currentTime || 'LIVE'}</span>
           </div>
         </div>
@@ -181,24 +179,24 @@ export const DashboardLayout: React.FC = () => {
         {/* Right User & Role Info */}
         <div className="flex items-center gap-3">
           {/* Active Role Badge */}
-          <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border ${roleTheme.badgeClass} shadow-sm`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${roleTheme.dotClass} animate-pulse`} />
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border bg-secondary-900 text-accent border-secondary-700 shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
             <span>{roleTheme.label}</span>
           </div>
 
           {/* Notification Button */}
-          <button className="p-2 rounded-xl text-slate-500 hover:text-gray-900 bg-white hover:bg-slate-50 border border-slate-200 shadow-sm transition-all relative cursor-pointer">
+          <button className="p-2 rounded-xl text-slate-300 hover:text-white bg-secondary-900 hover:bg-secondary-800 border border-secondary-700 shadow-sm transition-all relative cursor-pointer">
             <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-accent ring-2 ring-white" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-accent ring-2 ring-secondary" />
           </button>
 
           {/* User Profile Pill */}
           <div className="relative">
             <button
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-              className="flex items-center gap-2.5 p-1.5 pr-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 shadow-sm transition-all text-left cursor-pointer"
+              className="flex items-center gap-2.5 p-1.5 pr-2.5 rounded-xl bg-secondary-900 hover:bg-secondary-800 border border-secondary-700 shadow-sm transition-all text-left cursor-pointer"
             >
-              <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${roleTheme.accentGradient} flex items-center justify-center text-xs font-bold text-white shadow-sm overflow-hidden`}>
+              <div className="w-7 h-7 rounded-lg bg-primary border border-accent/40 flex items-center justify-center text-xs font-bold text-accent shadow-sm overflow-hidden">
                 {user?.avatar_url ? (
                   <img src={user.avatar_url} alt={user.full_name} className="w-full h-full object-cover" />
                 ) : (
@@ -206,19 +204,19 @@ export const DashboardLayout: React.FC = () => {
                 )}
               </div>
               <div className="hidden md:block">
-                <p className="text-xs font-bold text-gray-900 leading-tight">{user?.full_name}</p>
-                <p className="text-[10px] text-slate-500 font-medium">{user?.rank || user?.role}</p>
+                <p className="text-xs font-bold text-white leading-tight">{user?.full_name}</p>
+                <p className="text-[10px] text-slate-300 font-medium">{user?.rank || user?.role}</p>
               </div>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
+              <ChevronDown className="w-3.5 h-3.5 text-accent ml-0.5" />
             </button>
 
             {isUserMenuOpen && (
-              <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white border border-slate-200 shadow-2xl p-2.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white border border-slate-200 shadow-2xl p-2.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150 text-gray-900">
                 <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 mb-2">
                   <p className="font-extrabold text-xs text-gray-900">{user?.full_name}</p>
                   <p className="text-[11px] text-slate-500 font-mono mt-0.5">{user?.email}</p>
                   <div className="mt-2.5 flex items-center justify-between">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${roleTheme.badgeClass}`}>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-secondary-50 text-secondary border-secondary-200">
                       {user?.role}
                     </span>
                     <span className="text-[10px] text-slate-600 font-medium">{user?.unit}</span>
@@ -258,7 +256,7 @@ export const DashboardLayout: React.FC = () => {
         <aside
           className={`${
             isMobileMenuOpen ? 'block fixed inset-0 top-16 z-30 bg-white/95 backdrop-blur-xl' : 'hidden'
-          } md:block w-64 border-r border-slate-200/80 bg-white/70 p-4 space-y-6 shrink-0 z-20 flex flex-col justify-between shadow-sm`}
+          } md:block w-64 border-r border-slate-200/90 bg-white p-4 space-y-6 shrink-0 z-20 flex flex-col justify-between shadow-xs`}
         >
           <div className="space-y-6">
             <div>
@@ -279,11 +277,11 @@ export const DashboardLayout: React.FC = () => {
                       }}
                       className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs transition-all cursor-pointer ${
                         isActive
-                          ? roleTheme.activeNav
+                          ? 'bg-primary text-white shadow-md shadow-primary/20 font-bold'
                           : 'text-slate-600 hover:text-gray-900 hover:bg-slate-100 font-medium'
                       }`}
                     >
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-current' : 'text-slate-400'}`} />
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-accent' : 'text-slate-400'}`} />
                       <span>{item.name}</span>
                     </button>
                   );
