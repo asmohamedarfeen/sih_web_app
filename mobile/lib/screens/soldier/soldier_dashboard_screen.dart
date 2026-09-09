@@ -105,9 +105,9 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                 Container(
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0B132B),
+                    color: const Color(0xFF0F2640),
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: const Color(0xFF1C2541)),
+                    border: Border.all(color: const Color(0xFF234B75)),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.25),
@@ -122,43 +122,51 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           // Soldier Info
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 22,
-                                backgroundColor: const Color(0xFF1C2541),
-                                child: Text(
-                                  (user?.fullName.isNotEmpty == true) ? user!.fullName[0] : 'S',
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w900,
-                                    color: Color(0xFF48CAE4),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 22,
+                                  backgroundColor: AppColors.secondary,
+                                  child: Text(
+                                    (user?.fullName.isNotEmpty == true) ? user!.fullName[0] : 'S',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w900,
+                                      color: AppColors.accent,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    user?.fullName ?? 'Sepoy Amit Kumar',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w900,
-                                    ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        user?.fullName ?? 'Sepoy Amit Kumar',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                      Text(
+                                        '${user?.rank ?? 'Sepoy / Commando'} • ${user?.unit ?? '10 Para SF'}',
+                                        style: const TextStyle(
+                                          color: Color(0xFF8D99AE),
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ],
                                   ),
-                                  Text(
-                                    '${user?.rank ?? 'Sepoy / Commando'} • ${user?.unit ?? '10 Para SF'}',
-                                    style: const TextStyle(
-                                      color: Color(0xFF8D99AE),
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                ),
+                              ],
+                            ),
                           ),
 
                           // View Dossier Button
@@ -168,7 +176,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                                 MaterialPageRoute(builder: (_) => const SoldierDossierScreen()),
                               );
                             },
-                            icon: const Icon(Icons.contact_page_outlined, color: Color(0xFF48CAE4), size: 22),
+                            icon: const Icon(Icons.contact_page_outlined, color: AppColors.accent, size: 22),
                           ),
                         ],
                       ),
@@ -178,29 +186,35 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF141F38),
+                          color: const Color(0xFF0F2640),
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFF243354)),
+                          border: Border.all(color: const Color(0xFF234B75)),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: sync.isOnline ? AppColors.emerald : AppColors.amber,
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: sync.isOnline ? AppColors.emerald : AppColors.amber,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  sync.isOnline ? 'Online (Defense Gateway Connected)' : 'Offline (Local Telemetry Active)',
-                                  style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700),
-                                ),
-                              ],
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      sync.isOnline ? 'Online (Defense Gateway Connected)' : 'Offline (Local Telemetry Active)',
+                                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             if (sync.pendingCount > 0)
                               InkWell(
@@ -368,15 +382,15 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF132A52), Color(0xFF0F172A)],
+                        colors: [AppColors.secondary, Color(0xFF0F2640)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFF2563EB).withValues(alpha: 0.5)),
+                      border: Border.all(color: AppColors.accent.withValues(alpha: 0.5)),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF2563EB).withValues(alpha: 0.15),
+                          color: AppColors.accent.withValues(alpha: 0.15),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         )
@@ -387,10 +401,10 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF2563EB).withValues(alpha: 0.25),
+                            color: AppColors.accent.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(14),
                           ),
-                          child: const Icon(Icons.psychology, color: Color(0xFF60A5FA), size: 26),
+                          child: const Icon(Icons.psychology, color: AppColors.accent, size: 26),
                         ),
                         const SizedBox(width: 14),
                         const Expanded(
@@ -418,13 +432,13 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF2563EB).withValues(alpha: 0.2),
+                            color: AppColors.accent.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: const Color(0xFF60A5FA)),
+                            border: Border.all(color: AppColors.accent),
                           ),
                           child: const Text(
                             'GEMINI',
-                            style: TextStyle(color: Color(0xFF60A5FA), fontSize: 9, fontWeight: FontWeight.w900),
+                            style: TextStyle(color: AppColors.accent, fontSize: 9, fontWeight: FontWeight.w900),
                           ),
                         ),
                       ],
@@ -445,22 +459,22 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+                        colors: [AppColors.primary, Color(0xFF1E3A2F)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFF334155)),
+                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.6)),
                     ),
                     child: Row(
                       children: [
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF0284C7).withValues(alpha: 0.2),
+                            color: Colors.white.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(14),
                           ),
-                          child: const Icon(Icons.phonelink_ring, color: Color(0xFF38BDF8), size: 24),
+                          child: const Icon(Icons.phonelink_ring, color: AppColors.accent, size: 24),
                         ),
                         const SizedBox(width: 14),
                         const Expanded(

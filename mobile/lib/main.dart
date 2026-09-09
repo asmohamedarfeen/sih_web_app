@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'core/constants/api_constants.dart';
 import 'core/services/auth_service.dart';
 import 'core/services/sync_service.dart';
 import 'core/theme/app_theme.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/main_navigation_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await ApiConstants.loadSavedHost();
   runApp(const PswmsMobileApp());
 }
 

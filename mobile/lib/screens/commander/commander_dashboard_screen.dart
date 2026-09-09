@@ -59,7 +59,7 @@ class _CommanderDashboardScreenState extends State<CommanderDashboardScreen> {
                   Container(
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0F172A),
+                      color: AppColors.secondary,
                       borderRadius: BorderRadius.circular(24),
                     ),
                     child: Column(
@@ -67,7 +67,7 @@ class _CommanderDashboardScreenState extends State<CommanderDashboardScreen> {
                       children: [
                         const Row(
                           children: [
-                            Icon(Icons.shield, color: Color(0xFF38BDF8), size: 24),
+                            Icon(Icons.shield, color: AppColors.accent, size: 24),
                             SizedBox(width: 8),
                             Text(
                               'Formation Readiness Index: 88.4%',

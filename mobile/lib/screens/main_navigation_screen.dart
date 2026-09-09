@@ -53,7 +53,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            const Icon(Icons.shield_outlined, color: AppColors.accent, size: 22),
+            const Icon(Icons.shield_outlined, color: AppColors.primary, size: 22),
             const SizedBox(width: 8),
             Text(
               user?.role == 'SOLDIER'
@@ -93,7 +93,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           currentIndex: _currentIndex,
           onTap: (idx) => setState(() => _currentIndex = idx),
           type: BottomNavigationBarType.fixed,
-          selectedItemColor: AppColors.accent,
+          selectedItemColor: AppColors.primary,
           unselectedItemColor: AppColors.textSecondary,
           selectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800),
           unselectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),

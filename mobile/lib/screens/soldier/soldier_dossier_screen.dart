@@ -30,13 +30,13 @@ class SoldierDossierScreen extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 30,
-                      backgroundColor: const Color(0xFF0B132B),
+                      backgroundColor: AppColors.secondary,
                       child: Text(
                         (user?.fullName.isNotEmpty == true) ? user!.fullName[0] : 'S',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xFF48CAE4),
+                          color: AppColors.accent,
                         ),
                       ),
                     ),

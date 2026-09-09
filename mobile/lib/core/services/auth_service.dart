@@ -67,7 +67,7 @@ class AuthService extends ChangeNotifier {
         return false;
       }
     } catch (e) {
-      _errorMessage = 'Network connection failed. Verify host and backend status.';
+      _errorMessage = 'Network connection failed to ${ApiConstants.baseUrl}. Ensure iPhone and Mac are on the same Wi-Fi.';
       _isLoading = false;
       notifyListeners();
       return false;

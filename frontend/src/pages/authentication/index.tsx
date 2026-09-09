@@ -161,68 +161,68 @@ export const LoginPage: React.FC = () => {
       case 'SECURITY_ADMIN':
       case 'ADMIN':
         return {
-          border: 'hover:border-blue-300 border-slate-200/80',
-          badge: 'bg-blue-50 text-blue-700 border-blue-200',
-          iconBg: 'bg-blue-50 text-blue-600 border border-blue-100',
-          glow: 'hover:shadow-glow-blue-soft',
-          accentColor: 'text-blue-600',
+          border: 'hover:border-secondary-300 border-slate-200/80',
+          badge: 'bg-secondary-50 text-secondary-700 border-secondary-200',
+          iconBg: 'bg-secondary-50 text-secondary border border-secondary-100',
+          glow: 'hover:shadow-glow-secondary-soft',
+          accentColor: 'text-secondary',
         };
       case 'WELFARE_OFFICER':
       case 'MEDICAL_OFFICER':
         return {
-          border: 'hover:border-emerald-300 border-slate-200/80',
-          badge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-          iconBg: 'bg-emerald-50 text-emerald-600 border border-emerald-100',
-          glow: 'hover:shadow-glow-emerald-soft',
-          accentColor: 'text-emerald-600',
+          border: 'hover:border-primary-300 border-slate-200/80',
+          badge: 'bg-primary-50 text-primary-700 border-primary-200',
+          iconBg: 'bg-primary-50 text-primary border border-primary-100',
+          glow: 'hover:shadow-glow-primary-soft',
+          accentColor: 'text-primary',
         };
       case 'COMMANDER':
       case 'DEPT_HEAD':
         return {
-          border: 'hover:border-amber-300 border-slate-200/80',
-          badge: 'bg-amber-50 text-amber-700 border-amber-200',
-          iconBg: 'bg-amber-50 text-amber-600 border border-amber-100',
-          glow: 'hover:shadow-glow-amber-soft',
-          accentColor: 'text-amber-600',
+          border: 'hover:border-accent-300 border-slate-200/80',
+          badge: 'bg-accent-50 text-accent-700 border-accent-200',
+          iconBg: 'bg-accent-50 text-accent border border-accent-100',
+          glow: 'hover:shadow-glow-accent-soft',
+          accentColor: 'text-accent-700',
         };
       case 'HR_OFFICER':
       case 'TRAINING_OFFICER':
         return {
-          border: 'hover:border-purple-300 border-slate-200/80',
-          badge: 'bg-purple-50 text-purple-700 border-purple-200',
-          iconBg: 'bg-purple-50 text-purple-600 border border-purple-100',
-          glow: 'hover:shadow-glow-purple-soft',
-          accentColor: 'text-purple-600',
+          border: 'hover:border-secondary-300 border-slate-200/80',
+          badge: 'bg-secondary-50 text-secondary-700 border-secondary-200',
+          iconBg: 'bg-secondary-50 text-secondary border border-secondary-100',
+          glow: 'hover:shadow-glow-secondary-soft',
+          accentColor: 'text-secondary',
         };
       default:
         return {
-          border: 'hover:border-teal-300 border-slate-200/80',
-          badge: 'bg-teal-50 text-teal-700 border-teal-200',
-          iconBg: 'bg-teal-50 text-teal-600 border border-teal-100',
+          border: 'hover:border-primary-300 border-slate-200/80',
+          badge: 'bg-primary-50 text-primary-700 border-primary-200',
+          iconBg: 'bg-primary-50 text-primary border border-primary-100',
           glow: '',
-          accentColor: 'text-teal-600',
+          accentColor: 'text-primary',
         };
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col justify-between font-sans selection:bg-emerald-500/20 selection:text-emerald-900 relative overflow-hidden bg-dot-light">
+    <div className="min-h-screen bg-[#f8fafc] text-gray-900 flex flex-col justify-between font-sans selection:bg-primary-500/20 selection:text-primary-900 relative overflow-hidden bg-dot-light">
       {/* Soft Ambient Light Blobs */}
-      <div className="absolute -top-40 left-1/4 w-[500px] h-[500px] bg-emerald-100/60 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-40 right-1/4 w-[500px] h-[500px] bg-blue-100/60 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-40 left-1/4 w-[500px] h-[500px] bg-primary-100/60 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-40 right-1/4 w-[500px] h-[500px] bg-secondary-100/60 rounded-full blur-3xl pointer-events-none" />
 
       {/* Top Header */}
       <header className="border-b border-slate-200/80 bg-white/80 backdrop-blur-md px-6 py-4 flex items-center justify-between relative z-10 shadow-sm">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-cyan-600 p-[1.5px] shadow-md flex items-center justify-center">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-primary via-secondary to-accent p-[1.5px] shadow-md flex items-center justify-center">
             <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
-              <Shield className="w-5 h-5 text-emerald-600" />
+              <Shield className="w-5 h-5 text-primary" />
             </div>
           </div>
           <div>
-            <h1 className="font-extrabold text-sm tracking-wide text-slate-900 uppercase flex items-center gap-2">
+            <h1 className="font-extrabold text-sm tracking-wide text-gray-900 uppercase flex items-center gap-2">
               Defense HRMS & Welfare Portal
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-primary-50 text-primary-700 border border-primary-200">
                 STRATEGIC COMMAND
               </span>
             </h1>
@@ -231,8 +231,8 @@ export const LoginPage: React.FC = () => {
         </div>
 
         <div className="hidden sm:flex items-center gap-2.5">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm text-xs font-semibold text-slate-700">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm text-xs font-semibold text-gray-700">
+            <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
             <span>HRMS Portal Integration Active</span>
           </div>
         </div>
@@ -245,11 +245,11 @@ export const LoginPage: React.FC = () => {
           {/* Left: Login Form */}
           <div className="lg:col-span-5 flex flex-col justify-center p-8 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft relative overflow-hidden">
             <div className="mb-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-extrabold mb-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 border border-primary-200 text-primary-700 text-xs font-extrabold mb-3">
                 <Lock className="w-3.5 h-3.5" />
                 <span>Zero-Trust RBAC Authentication</span>
               </div>
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+              <h2 className="text-2xl font-black text-gray-900 tracking-tight">
                 Sign In to Command Portal
               </h2>
               <p className="text-xs text-slate-500 mt-1 font-medium">
@@ -258,15 +258,15 @@ export const LoginPage: React.FC = () => {
             </div>
 
             {errorMessage && (
-              <div className="mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5">
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+              <div className="mb-5 p-3.5 rounded-xl bg-danger-50 border border-danger-200 text-danger-700 text-xs flex items-center gap-2.5">
+                <AlertCircle className="w-4 h-4 shrink-0 text-danger" />
                 <span className="font-semibold">{errorMessage}</span>
               </div>
             )}
 
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-[0.1em] mb-1.5">
+                <label className="block text-[11px] font-bold text-gray-700 uppercase tracking-[0.1em] mb-1.5">
                   Official Email ID
                 </label>
                 <div className="relative">
@@ -276,14 +276,14 @@ export const LoginPage: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="e.g. welfare@forces.gov.in"
-                    className="w-full white-input rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all"
+                    className="w-full white-input rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder:text-slate-400 focus:outline-none transition-all"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-[0.1em] mb-1.5">
+                <label className="block text-[11px] font-bold text-gray-700 uppercase tracking-[0.1em] mb-1.5">
                   Access Key / Password
                 </label>
                 <div className="relative">
@@ -293,7 +293,7 @@ export const LoginPage: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full white-input rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all"
+                    className="w-full white-input rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder:text-slate-400 focus:outline-none transition-all"
                     required
                   />
                 </div>
@@ -301,7 +301,7 @@ export const LoginPage: React.FC = () => {
 
               <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
                 <label className="flex items-center gap-2 cursor-pointer select-none">
-                  <input type="checkbox" defaultChecked className="rounded border-slate-300 text-emerald-600 focus:ring-0" />
+                  <input type="checkbox" defaultChecked className="rounded border-slate-300 text-primary focus:ring-0" />
                   <span>Maintain secure session</span>
                 </label>
                 <span className="text-slate-400 font-mono text-[11px]">HMAC-SHA256</span>
@@ -310,7 +310,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full mt-2 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 text-sm transition-all duration-200 disabled:opacity-50 cursor-pointer"
+                className="w-full mt-2 bg-gradient-to-r from-primary via-primary-600 to-secondary hover:from-primary-600 hover:to-secondary text-white font-extrabold py-3 px-4 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2 text-sm transition-all duration-200 disabled:opacity-50 cursor-pointer"
               >
                 {isLoading ? (
                   <>
@@ -331,15 +331,15 @@ export const LoginPage: React.FC = () => {
           <div className="lg:col-span-7 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-extrabold uppercase tracking-[0.12em] text-slate-900 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-emerald-600" />
+                <h3 className="text-sm font-extrabold uppercase tracking-[0.12em] text-gray-900 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary" />
                   <span>HRMS Defense Role Directory</span>
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Click any role below for instant 1-click HRMS authentication and automated dashboard routing.
                 </p>
               </div>
-              <span className="text-[11px] font-mono text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 font-bold">
+              <span className="text-[11px] font-mono text-primary-700 bg-primary-50 px-3 py-1 rounded-full border border-primary-200 font-bold">
                 {demoAccounts.length} Verified Roles
               </span>
             </div>
@@ -356,7 +356,7 @@ export const LoginPage: React.FC = () => {
                     onClick={() => handleSelectDemo(account)}
                     disabled={isLoading}
                     className={`text-left p-5 rounded-2xl bg-white border ${theme.border} ${theme.glow} ${
-                      isSelected ? 'ring-2 ring-emerald-500 shadow-md' : 'shadow-card-soft'
+                      isSelected ? 'ring-2 ring-primary shadow-md' : 'shadow-card-soft'
                     } white-card-hover flex flex-col justify-between relative overflow-hidden group cursor-pointer`}
                   >
                     <div>
@@ -370,7 +370,7 @@ export const LoginPage: React.FC = () => {
                       </div>
 
                       <div className="flex items-baseline gap-2">
-                        <h4 className="font-extrabold text-sm text-slate-900 group-hover:text-emerald-700 transition-colors">
+                        <h4 className="font-extrabold text-sm text-gray-900 group-hover:text-primary transition-colors">
                           {account.full_name}
                         </h4>
                         {account.uid && (
@@ -391,7 +391,7 @@ export const LoginPage: React.FC = () => {
 
                     <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
                       <span className="font-mono text-[11px] text-slate-500">{account.email}</span>
-                      <span className="text-emerald-600 font-bold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                      <span className="text-primary font-bold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
                         Sign In <ArrowRight className="w-3.5 h-3.5" />
                       </span>
                     </div>
@@ -402,14 +402,14 @@ export const LoginPage: React.FC = () => {
 
             {/* Role Hierarchy Card */}
             <div className="p-4 rounded-2xl bg-white border border-slate-200/80 text-xs text-slate-600 flex items-center gap-3 shadow-card-soft">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
               <div className="leading-relaxed">
-                <span className="text-slate-900 font-bold">HRMS Hierarchy Matching: </span>
+                <span className="text-gray-900 font-bold">HRMS Hierarchy Matching: </span>
                 <span className="text-slate-600">
-                  <strong className="text-emerald-700">Welfare Officer</strong> → Matched Cases &bull;{' '}
-                  <strong className="text-amber-700">Commander</strong> → Formation Readiness &bull;{' '}
-                  <strong className="text-purple-700">HR</strong> → Leaves & Workforce &bull;{' '}
-                  <strong className="text-blue-700">Super Admin</strong> → Enterprise Telemetry
+                  <strong className="text-primary-700">Welfare Officer</strong> → Matched Cases &bull;{' '}
+                  <strong className="text-accent-700">Commander</strong> → Formation Readiness &bull;{' '}
+                  <strong className="text-secondary-700">HR</strong> → Leaves & Workforce &bull;{' '}
+                  <strong className="text-secondary-800">Super Admin</strong> → Enterprise Telemetry
                 </span>
               </div>
             </div>

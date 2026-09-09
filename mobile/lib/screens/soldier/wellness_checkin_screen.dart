@@ -168,7 +168,7 @@ class _WellnessCheckinScreenState extends State<WellnessCheckinScreen> {
               ),
               child: const Row(
                 children: [
-                  Icon(Icons.monitor_heart, color: Color(0xFF48CAE4), size: 28),
+                  Icon(Icons.monitor_heart, color: AppColors.accent, size: 28),
                   SizedBox(width: 12),
                   Expanded(
                     child: Column(

@@ -102,11 +102,11 @@ export const WellnessPage: React.FC = () => {
     <div className="space-y-6">
       {/* Banner */}
       <div className="p-7 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-teal-50/70 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-primary-50/70 rounded-full blur-3xl pointer-events-none" />
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-[0.15em] bg-teal-50 text-teal-700 border border-teal-200 shadow-sm">
+              <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-[0.15em] bg-primary-50 text-primary-700 border border-primary-200 shadow-sm">
                 Wellness & Biometric Telemetry
               </span>
               <span className="text-xs text-slate-500 font-mono font-semibold">&bull; Daily Diagnostic Logging</span>
@@ -128,7 +128,7 @@ export const WellnessPage: React.FC = () => {
               }}
               className="px-3.5 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200 flex items-center gap-2 cursor-pointer transition-all shadow-sm"
             >
-              <RefreshCw className="w-4 h-4 text-teal-600" />
+              <RefreshCw className="w-4 h-4 text-primary" />
               <span>Refresh</span>
             </button>
             <button
@@ -136,7 +136,7 @@ export const WellnessPage: React.FC = () => {
                 setSubmitResult(null);
                 setShowModal(true);
               }}
-              className="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs font-extrabold shadow-lg shadow-teal-600/20 flex items-center gap-2 transition-all cursor-pointer self-start sm:self-auto"
+              className="px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-extrabold shadow-lg shadow-primary/20 flex items-center gap-2 transition-all cursor-pointer self-start sm:self-auto"
             >
               <PlusCircle className="w-4 h-4" />
               <span>Log Check-in</span>
@@ -152,7 +152,7 @@ export const WellnessPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-700">
+              <div className="p-1.5 rounded-xl bg-secondary-50 border border-secondary-200 text-secondary-700">
                 <Brain className="w-4 h-4" />
               </div>
               <h2 className="text-lg font-black text-slate-900 tracking-tight">
@@ -163,8 +163,8 @@ export const WellnessPage: React.FC = () => {
               Multi-dimensional psychological evaluations submitted via Soldier Mobile Terminals. Click any soldier to view their categorical test score breakdown.
             </p>
           </div>
-          <span className="text-xs font-mono font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200 self-start sm:self-auto flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+          <span className="text-xs font-mono font-bold text-secondary-700 bg-secondary-50 px-3 py-1 rounded-full border border-secondary-200 self-start sm:self-auto flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-secondary-600" />
             <span>{selfAssessments.length} AI Assessments Indexed</span>
           </span>
         </div>
@@ -184,17 +184,17 @@ export const WellnessPage: React.FC = () => {
                     ? 'border-rose-200/80 hover:border-rose-400'
                     : isModerate
                     ? 'border-amber-200/80 hover:border-amber-400'
-                    : 'border-slate-200/80 hover:border-blue-400/80'
+                    : 'border-slate-200/80 hover:border-secondary-400/80'
                 }`}
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h3 className="font-extrabold text-sm text-slate-900 group-hover:text-blue-600 transition-colors">
+                      <h3 className="font-extrabold text-sm text-slate-900 group-hover:text-secondary-600 transition-colors">
                         {record.personnel_name}
                       </h3>
                       <p className="text-[11px] text-slate-500 font-semibold">{record.rank} &bull; {record.unit}</p>
-                      <span className="text-[10px] font-mono text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 mt-1 inline-block">
+                      <span className="text-[10px] font-mono text-secondary-700 bg-secondary-50 px-1.5 py-0.5 rounded border border-secondary-200 mt-1 inline-block">
                         {record.personnel_uid}
                       </span>
                     </div>
@@ -225,7 +225,7 @@ export const WellnessPage: React.FC = () => {
                             ? 'bg-orange-100 text-orange-800'
                             : record.risk_level === 'MODERATE'
                             ? 'bg-amber-100 text-amber-800'
-                            : 'bg-emerald-100 text-emerald-800'
+                            : 'bg-success-100 text-success-700'
                         }`}
                       >
                         {record.risk_level}
@@ -235,7 +235,7 @@ export const WellnessPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <div className="w-full py-1.5 px-3 rounded-xl bg-white group-hover:bg-blue-600 group-hover:text-white border border-slate-200 group-hover:border-transparent text-slate-700 text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all">
+                  <div className="w-full py-1.5 px-3 rounded-xl bg-white group-hover:bg-secondary group-hover:text-white border border-slate-200 group-hover:border-transparent text-slate-700 text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all">
                     <Eye className="w-3.5 h-3.5" />
                     <span>View Categorical Scores</span>
                   </div>
@@ -264,7 +264,7 @@ export const WellnessPage: React.FC = () => {
 
             {/* Modal Header */}
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 font-black text-lg shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-secondary-50 border border-secondary-200 flex items-center justify-center text-secondary-700 font-black text-lg shrink-0">
                 <Brain className="w-6 h-6" />
               </div>
               <div>
@@ -272,21 +272,21 @@ export const WellnessPage: React.FC = () => {
                   <h2 className="text-xl font-black text-slate-900">
                     {selectedAssessment.personnel_name}
                   </h2>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-blue-50 text-blue-700 border border-blue-200">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-secondary-50 text-secondary-700 border border-secondary-200">
                     Psychological Diagnostic Dossier
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 font-semibold mt-0.5">
                   {selectedAssessment.rank} &bull; {selectedAssessment.unit} &bull; {selectedAssessment.branch} &bull;{' '}
-                  <span className="font-mono text-blue-600">{selectedAssessment.personnel_uid}</span>
+                  <span className="font-mono text-secondary-700">{selectedAssessment.personnel_uid}</span>
                 </p>
               </div>
             </div>
 
             {/* Key Summary Metric Cards */}
             <div className="grid grid-cols-4 gap-3">
-              <div className="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200 text-center">
-                <span className="text-[10px] uppercase font-bold text-blue-600 block">Overall Wellness</span>
+              <div className="p-3.5 rounded-2xl bg-secondary-50/70 border border-secondary-200 text-center">
+                <span className="text-[10px] uppercase font-bold text-secondary-700 block">Overall Wellness</span>
                 <span className="text-xl font-black text-slate-900 font-mono mt-0.5 block">
                   {selectedAssessment.overall_wellness_score}/100
                 </span>
@@ -312,9 +312,9 @@ export const WellnessPage: React.FC = () => {
             </div>
 
             {/* AI Recommendation Quote Box */}
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-50 via-slate-50 to-teal-50 border border-blue-100 text-slate-800 space-y-1">
-              <div className="text-[10px] font-extrabold uppercase tracking-widest text-blue-700 flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-secondary-50 via-slate-50 to-primary-50 border border-secondary-100 text-slate-800 space-y-1">
+              <div className="text-[10px] font-extrabold uppercase tracking-widest text-secondary-700 flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-secondary-600" />
                 <span>AI Clinical Guidance & Officer Recommendation</span>
               </div>
               <p className="text-sm font-semibold leading-relaxed text-slate-800">
@@ -326,7 +326,7 @@ export const WellnessPage: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                  <Sparkles className="w-3.5 h-3.5 text-secondary-600" />
                   <span>Categorical Domain Test Scores (0 - 100 Scale)</span>
                 </h3>
                 <span className="text-[10px] font-mono text-slate-400 font-semibold">
@@ -366,7 +366,7 @@ export const WellnessPage: React.FC = () => {
                                 ? 'bg-orange-100 text-orange-800'
                                 : isCatModerate
                                 ? 'bg-amber-100 text-amber-800'
-                                : 'bg-emerald-100 text-emerald-800'
+                                : 'bg-success-100 text-success-700'
                             }`}
                           >
                             {cat.risk_level}
@@ -384,7 +384,7 @@ export const WellnessPage: React.FC = () => {
                               ? 'bg-orange-500'
                               : isCatModerate
                               ? 'bg-amber-500'
-                              : 'bg-emerald-500'
+                              : 'bg-success'
                           }`}
                           style={{ width: `${Math.min(cat.score, 100)}%` }}
                         />
@@ -436,7 +436,7 @@ export const WellnessPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700">
+              <div className="p-1.5 rounded-xl bg-secondary-50 border border-secondary-200 text-secondary-700">
                 <Smartphone className="w-4 h-4" />
               </div>
               <h2 className="text-lg font-black text-slate-900 tracking-tight">
@@ -447,7 +447,7 @@ export const WellnessPage: React.FC = () => {
               Click on any personnel to view their comprehensive breakdown of applications used, night exposure, and total screen time.
             </p>
           </div>
-          <span className="text-xs font-mono font-bold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200 self-start sm:self-auto">
+          <span className="text-xs font-mono font-bold text-secondary-700 bg-secondary-50 px-3 py-1 rounded-full border border-secondary-200 self-start sm:self-auto">
             {screenTimeList.length} Mobile Terminals Connected
           </span>
         </div>
@@ -458,16 +458,16 @@ export const WellnessPage: React.FC = () => {
             <div
               key={rec.personnel_uid}
               onClick={() => setSelectedUserRecord(rec)}
-              className="p-5 rounded-2xl bg-slate-50/70 hover:bg-white border border-slate-200/80 hover:border-indigo-400/80 shadow-xs hover:shadow-card-soft transition-all cursor-pointer group flex flex-col justify-between space-y-3"
+              className="p-5 rounded-2xl bg-slate-50/70 hover:bg-white border border-slate-200/80 hover:border-secondary-400/80 shadow-xs hover:shadow-card-soft transition-all cursor-pointer group flex flex-col justify-between space-y-3"
             >
               <div>
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h3 className="font-extrabold text-sm text-slate-900 group-hover:text-indigo-600 transition-colors">
+                    <h3 className="font-extrabold text-sm text-slate-900 group-hover:text-secondary-600 transition-colors">
                       {rec.personnel_name}
                     </h3>
                     <p className="text-[11px] text-slate-500 font-semibold">{rec.rank} &bull; {rec.unit}</p>
-                    <span className="text-[10px] font-mono text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100 mt-1 inline-block">
+                    <span className="text-[10px] font-mono text-secondary-700 bg-secondary-50 px-1.5 py-0.5 rounded border border-secondary-200 mt-1 inline-block">
                       {rec.personnel_uid}
                     </span>
                   </div>
@@ -492,7 +492,7 @@ export const WellnessPage: React.FC = () => {
               </div>
 
               <div>
-                <div className="w-full py-1.5 px-3 rounded-xl bg-white group-hover:bg-indigo-600 group-hover:text-white border border-slate-200 group-hover:border-transparent text-slate-700 text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all">
+                <div className="w-full py-1.5 px-3 rounded-xl bg-white group-hover:bg-secondary group-hover:text-white border border-slate-200 group-hover:border-transparent text-slate-700 text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all">
                   <Eye className="w-3.5 h-3.5" />
                   <span>View Breakdown</span>
                 </div>
@@ -520,7 +520,7 @@ export const WellnessPage: React.FC = () => {
 
             {/* Modal Header */}
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 font-black text-lg shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-secondary-50 border border-secondary-200 flex items-center justify-center text-secondary-700 font-black text-lg shrink-0">
                 <Smartphone className="w-6 h-6" />
               </div>
               <div>
@@ -528,20 +528,20 @@ export const WellnessPage: React.FC = () => {
                   <h2 className="text-xl font-black text-slate-900">
                     {selectedUserRecord.personnel_name}
                   </h2>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-secondary-50 text-secondary-700 border border-secondary-200">
                     Screen Time Breakdown
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 font-semibold mt-0.5">
                   {selectedUserRecord.rank} &bull; {selectedUserRecord.unit} &bull;{' '}
-                  <span className="font-mono text-indigo-600">{selectedUserRecord.personnel_uid}</span>
+                  <span className="font-mono text-secondary-700">{selectedUserRecord.personnel_uid}</span>
                 </p>
               </div>
             </div>
 
             {/* Natural Narrative Summary Quote Box */}
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-50 via-slate-50 to-blue-50 border border-indigo-100 text-slate-800">
-              <div className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-700 mb-1 flex items-center gap-1.5">
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-secondary-50 via-slate-50 to-primary-50 border border-secondary-100 text-slate-800">
+              <div className="text-[10px] font-extrabold uppercase tracking-widest text-secondary-700 mb-1 flex items-center gap-1.5">
                 <Zap className="w-3.5 h-3.5" />
                 <span>Executive Telemetry Summary</span>
               </div>
@@ -566,7 +566,7 @@ export const WellnessPage: React.FC = () => {
               </div>
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Device Unlocks</span>
-                <span className="text-xl font-black text-indigo-600 font-mono mt-0.5 block">
+                <span className="text-xl font-black text-secondary-700 font-mono mt-0.5 block">
                   {selectedUserRecord.unlock_count}
                 </span>
               </div>
@@ -591,13 +591,13 @@ export const WellnessPage: React.FC = () => {
                       </div>
                       <div className="text-right">
                         <span className="font-mono font-black text-xs text-slate-800">{app.duration_formatted}</span>
-                        <span className="text-[10px] text-indigo-600 font-bold block">{app.percentage}%</span>
+                        <span className="text-[10px] text-secondary-700 font-bold block">{app.percentage}%</span>
                       </div>
                     </div>
                     {/* Visual Progress Bar */}
                     <div className="w-full bg-slate-200/80 rounded-full h-2 overflow-hidden">
                       <div
-                        className="bg-indigo-600 h-2 rounded-full transition-all duration-500"
+                        className="bg-secondary h-2 rounded-full transition-all duration-500"
                         style={{ width: `${app.percentage}%` }}
                       />
                     </div>
@@ -626,7 +626,7 @@ export const WellnessPage: React.FC = () => {
       <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-            <HeartPulse className="w-4 h-4 text-teal-600" />
+            <HeartPulse className="w-4 h-4 text-primary" />
             <span>Recent Biometric Check-ins</span>
           </h2>
           <span className="text-xs font-mono text-slate-400 font-bold">{assessments.length} Records</span>
@@ -650,11 +650,11 @@ export const WellnessPage: React.FC = () => {
                 <tr key={a.id} className="hover:bg-slate-50/80 transition-colors">
                   <td className="py-3 px-3 font-extrabold text-slate-900">
                     <div>{a.personnel_name}</div>
-                    <span className="text-[10px] font-mono text-teal-700 font-semibold">{a.personnel_uid}</span>
+                    <span className="text-[10px] font-mono text-primary font-semibold">{a.personnel_uid}</span>
                   </td>
                   <td className="py-3 px-3 font-mono font-bold text-slate-800">{a.sleep_hours}h</td>
                   <td className="py-3 px-3 font-mono font-bold text-rose-600">{a.fatigue_level}/10</td>
-                  <td className="py-3 px-3 font-mono font-bold text-emerald-600">{a.mood_score}/10</td>
+                  <td className="py-3 px-3 font-mono font-bold text-success">{a.mood_score}/10</td>
                   <td className="py-3 px-3 font-mono font-bold text-amber-600">{a.workload_pressure}/10</td>
                   <td className="py-3 px-3 font-mono font-bold text-slate-800">{a.consecutive_duty_days} Days</td>
                   <td className="py-3 px-3 text-right text-slate-400 font-mono text-[11px]">
@@ -672,23 +672,23 @@ export const WellnessPage: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-lg w-full p-7 border border-slate-200 shadow-2xl space-y-5">
             <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
-              <HeartPulse className="w-5 h-5 text-teal-600" />
+              <HeartPulse className="w-5 h-5 text-primary" />
               <span>Log Biometric & Psychological Check-in</span>
             </h2>
 
             {submitResult ? (
-              <div className="p-5 rounded-2xl bg-teal-50 border border-teal-200 space-y-3">
-                <div className="flex items-center gap-2 text-teal-800 font-extrabold text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-teal-600" />
+              <div className="p-5 rounded-2xl bg-primary-50 border border-primary-200 space-y-3">
+                <div className="flex items-center gap-2 text-primary-800 font-extrabold text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
                   <span>Assessment Logged & AI Evaluated!</span>
                 </div>
                 <div className="text-xs text-slate-700 space-y-1">
-                  <p>Computed Stress Score: <strong className="text-teal-900 font-mono">{submitResult.evaluation?.stress_score}/100</strong></p>
+                  <p>Computed Stress Score: <strong className="text-primary-900 font-mono">{submitResult.evaluation?.stress_score}/100</strong></p>
                   <p>Risk Classification: <strong className="text-rose-700">{submitResult.evaluation?.risk_level}</strong></p>
                 </div>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="w-full mt-2 py-2 rounded-xl bg-teal-600 text-white font-bold text-xs cursor-pointer"
+                  className="w-full mt-2 py-2 rounded-xl bg-primary hover:bg-primary-600 text-white font-bold text-xs cursor-pointer transition-all shadow-md shadow-primary/20"
                 >
                   Done
                 </button>
@@ -776,7 +776,7 @@ export const WellnessPage: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs font-black cursor-pointer"
+                    className="px-4 py-2 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-black cursor-pointer shadow-md shadow-primary/20 transition-all"
                   >
                     {isSubmitting ? 'Evaluating...' : 'Submit & Evaluate AI'}
                   </button>

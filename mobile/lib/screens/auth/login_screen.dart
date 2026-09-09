@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../core/constants/api_constants.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../main_navigation_screen.dart';
@@ -15,6 +16,118 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController(text: 'soldier@forces.gov.in');
   final _passwordController = TextEditingController(text: 'soldier123');
   bool _obscurePassword = true;
+
+  void _showGatewayConfigDialog() {
+    final controller = TextEditingController(text: ApiConstants.activeHost);
+    String? testResult;
+    bool isTesting = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: AppColors.secondary,
+          title: const Row(
+            children: [
+              Icon(Icons.dns, color: AppColors.accent, size: 20),
+              SizedBox(width: 8),
+              Text(
+                'Backend Gateway Host',
+                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Enter Mac/Server LAN IP and port:',
+                style: TextStyle(color: Color(0xFF8D99AE), fontSize: 12),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: 'e.g. 10.56.52.238:8000',
+                  hintStyle: const TextStyle(color: Color(0xFF475569)),
+                  filled: true,
+                  fillColor: const Color(0xFF0F2640),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.accent,
+                      side: const BorderSide(color: AppColors.accent),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    ),
+                    onPressed: isTesting
+                        ? null
+                        : () async {
+                            setDialogState(() {
+                              isTesting = true;
+                              testResult = null;
+                            });
+                            final ok = await ApiConstants.testConnection(controller.text);
+                            setDialogState(() {
+                              isTesting = false;
+                              testResult = ok
+                                  ? 'Connected successfully! (HTTP 200 OK)'
+                                  : 'Could not reach host. Verify IP & Wi-Fi.';
+                            });
+                          },
+                    icon: isTesting
+                        ? const SizedBox(
+                            width: 12,
+                            height: 12,
+                            child: CircularProgressIndicator(strokeWidth: 1.5, color: AppColors.accent),
+                          )
+                        : const Icon(Icons.wifi_tethering, size: 14),
+                    label: const Text('Test Connection', style: TextStyle(fontSize: 11)),
+                  ),
+                ],
+              ),
+              if (testResult != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  testResult!,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: testResult!.contains('success') ? AppColors.emerald : AppColors.rose,
+                  ),
+                ),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                await ApiConstants.setCustomHost('');
+                setState(() {});
+                if (ctx.mounted) Navigator.of(ctx).pop();
+              },
+              child: const Text('Reset Default', style: TextStyle(color: Color(0xFF8D99AE))),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+              onPressed: () async {
+                await ApiConstants.setCustomHost(controller.text);
+                setState(() {});
+                if (ctx.mounted) Navigator.of(ctx).pop();
+              },
+              child: const Text('Save & Apply', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   final List<Map<String, String>> _quickAccounts = [
     {
@@ -73,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final auth = Provider.of<AuthService>(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0B132B), // Tactical Deep Navy
+      backgroundColor: const Color(0xFF0F2640), // Deep Military Navy
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -86,12 +199,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1C2541),
+                      color: AppColors.secondary,
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: const Color(0xFF3A506B), width: 1.5),
+                      border: Border.all(color: const Color(0xFF234B75), width: 1.5),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.4),
+                          color: Colors.black.withValues(alpha: 0.35),
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         ),
@@ -100,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: const Icon(
                       Icons.shield_outlined,
                       size: 44,
-                      color: Color(0xFF48CAE4), // Tactical Sky Cyan
+                      color: AppColors.accent, // Gold Accent
                     ),
                   ),
                 ),
@@ -128,7 +241,48 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 1.3,
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 14),
+
+                // Gateway Host Indicator & Config Button
+                Center(
+                  child: InkWell(
+                    onTap: _showGatewayConfigDialog,
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0F2640),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: const Color(0xFF234B75)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 7,
+                            height: 7,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.emerald,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Gateway: ${ApiConstants.activeHost}',
+                            style: const TextStyle(
+                              color: AppColors.accent,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          const Icon(Icons.edit_outlined, size: 12, color: Color(0xFF8D99AE)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
 
                 // Error alert if any
                 if (auth.errorMessage != null)
@@ -162,9 +316,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1C2541),
+                    color: AppColors.secondary,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: const Color(0xFF3A506B)),
+                    border: Border.all(color: const Color(0xFF234B75)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,7 +329,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontSize: 10,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.0,
-                          color: Color(0xFF48CAE4),
+                          color: AppColors.accent,
                         ),
                       ),
                       const SizedBox(height: 14),
@@ -187,21 +341,21 @@ class _LoginScreenState extends State<LoginScreen> {
                         decoration: InputDecoration(
                           hintText: 'Official Email (e.g. soldier@forces.gov.in)',
                           hintStyle: const TextStyle(color: Color(0xFF6C757D), fontSize: 12),
-                          prefixIcon: const Icon(Icons.badge_outlined, color: Color(0xFF48CAE4), size: 18),
+                          prefixIcon: const Icon(Icons.badge_outlined, color: AppColors.accent, size: 18),
                           filled: true,
-                          fillColor: const Color(0xFF0B132B),
+                          fillColor: const Color(0xFF0F2640),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
-                            borderSide: const BorderSide(color: Color(0xFF3A506B)),
+                            borderSide: const BorderSide(color: Color(0xFF234B75)),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
-                            borderSide: const BorderSide(color: Color(0xFF3A506B)),
+                            borderSide: const BorderSide(color: Color(0xFF234B75)),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
-                            borderSide: const BorderSide(color: Color(0xFF48CAE4)),
+                            borderSide: const BorderSide(color: AppColors.accent),
                           ),
                         ),
                       ),
@@ -215,7 +369,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         decoration: InputDecoration(
                           hintText: 'Passcode / Security PIN',
                           hintStyle: const TextStyle(color: Color(0xFF6C757D), fontSize: 12),
-                          prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF48CAE4), size: 18),
+                          prefixIcon: const Icon(Icons.lock_outline, color: AppColors.accent, size: 18),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -225,19 +379,19 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                           ),
                           filled: true,
-                          fillColor: const Color(0xFF0B132B),
+                          fillColor: const Color(0xFF0F2640),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
-                            borderSide: const BorderSide(color: Color(0xFF3A506B)),
+                            borderSide: const BorderSide(color: Color(0xFF234B75)),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
-                            borderSide: const BorderSide(color: Color(0xFF3A506B)),
+                            borderSide: const BorderSide(color: Color(0xFF234B75)),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
-                            borderSide: const BorderSide(color: Color(0xFF48CAE4)),
+                            borderSide: const BorderSide(color: AppColors.accent),
                           ),
                         ),
                       ),
@@ -250,7 +404,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: ElevatedButton(
                           onPressed: auth.isLoading ? null : _handleLogin,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF0284C7),
+                            backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
@@ -315,10 +469,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                         decoration: BoxDecoration(
-                          color: isSelected ? const Color(0xFF2A3D66) : const Color(0xFF141F38),
+                          color: isSelected ? const Color(0xFF234B75) : const Color(0xFF0F2640),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: isSelected ? const Color(0xFF48CAE4) : const Color(0xFF243354),
+                            color: isSelected ? AppColors.accent : const Color(0xFF1E3A58),
                             width: isSelected ? 1.5 : 1,
                           ),
                         ),
@@ -326,7 +480,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             CircleAvatar(
                               radius: 14,
-                              backgroundColor: isSelected ? const Color(0xFF48CAE4) : const Color(0xFF1C2541),
+                              backgroundColor: isSelected ? AppColors.accent : AppColors.secondary,
                               child: Icon(
                                 idx == 0
                                     ? Icons.person_outline
@@ -336,7 +490,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             ? Icons.security
                                             : Icons.manage_accounts,
                                 size: 14,
-                                color: isSelected ? const Color(0xFF0B132B) : const Color(0xFF48CAE4),
+                                color: isSelected ? AppColors.secondary : AppColors.accent,
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -347,7 +501,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Text(
                                     acc['role']!,
                                     style: TextStyle(
-                                      color: isSelected ? const Color(0xFF48CAE4) : Colors.white,
+                                      color: isSelected ? AppColors.accent : Colors.white,
                                       fontSize: 11,
                                       fontWeight: FontWeight.w800,
                                     ),
@@ -367,7 +521,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               const Icon(
                                 Icons.check_circle,
                                 size: 16,
-                                color: Color(0xFF48CAE4),
+                                color: AppColors.accent,
                               ),
                           ],
                         ),

@@ -26,35 +26,35 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
       'name': 'Tactical Comms & C3I',
       'category': 'Mission Operations',
       'icon': Icons.radar,
-      'color': const Color(0xFF0284C7),
+      'color': AppColors.secondary,
       'minutes': 130, // 2h 10m
     },
     {
       'name': 'Defense GIS & Topo Maps',
       'category': 'Navigation & Terrain',
       'icon': Icons.map_outlined,
-      'color': const Color(0xFF10B981),
+      'color': AppColors.primary,
       'minutes': 85, // 1h 25m
     },
     {
       'name': 'Forces Secure Messenger',
       'category': 'Secure Communication',
       'icon': Icons.chat_bubble_outline,
-      'color': const Color(0xFF6366F1),
+      'color': AppColors.accent,
       'minutes': 72, // 1h 12m
     },
     {
       'name': 'Defense News & Weather Radar',
       'category': 'Information & Weather',
       'icon': Icons.cloud_outlined,
-      'color': const Color(0xFFF59E0B),
+      'color': AppColors.amber,
       'minutes': 35, // 35m
     },
     {
       'name': 'Terminal System & Utilities',
       'category': 'Device Hardware',
       'icon': Icons.settings_system_daydream,
-      'color': const Color(0xFF64748B),
+      'color': AppColors.textSecondary,
       'minutes': 20, // 20m
     },
   ];
@@ -84,35 +84,35 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
           'name': 'Tactical Comms & C3I',
           'category': 'Mission Operations',
           'icon': Icons.radar,
-          'color': const Color(0xFF0284C7),
+          'color': AppColors.secondary,
           'minutes': 130,
         },
         {
           'name': 'Defense GIS & Topo Maps',
           'category': 'Navigation & Terrain',
           'icon': Icons.map_outlined,
-          'color': const Color(0xFF10B981),
+          'color': AppColors.primary,
           'minutes': 85,
         },
         {
           'name': 'Forces Secure Messenger',
           'category': 'Secure Communication',
           'icon': Icons.chat_bubble_outline,
-          'color': const Color(0xFF6366F1),
+          'color': AppColors.accent,
           'minutes': 72,
         },
         {
           'name': 'Defense News & Weather Radar',
           'category': 'Information & Weather',
           'icon': Icons.cloud_outlined,
-          'color': const Color(0xFFF59E0B),
+          'color': AppColors.amber,
           'minutes': 35,
         },
         {
           'name': 'Terminal System & Utilities',
           'category': 'Device Hardware',
           'icon': Icons.settings_system_daydream,
-          'color': const Color(0xFF64748B),
+          'color': AppColors.textSecondary,
           'minutes': 20,
         },
       ];
@@ -223,7 +223,7 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: const Color(0xFF0B132B),
+                color: const Color(0xFF0F2640),
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
@@ -241,7 +241,7 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
                     children: [
                       const Row(
                         children: [
-                          Icon(Icons.phonelink_ring, color: Color(0xFF48CAE4), size: 24),
+                          Icon(Icons.phonelink_ring, color: AppColors.accent, size: 24),
                           SizedBox(width: 8),
                           Text(
                             'Tactical Device Telemetry',
@@ -252,21 +252,21 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1C2541),
+                          color: AppColors.secondary,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFF3A506B)),
+                          border: Border.all(color: const Color(0xFF234B75)),
                         ),
                         child: Row(
                           children: [
                             Icon(
                               _isEmulatorMode ? Icons.computer : Icons.smartphone,
-                              color: const Color(0xFF48CAE4),
+                              color: AppColors.accent,
                               size: 11,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               _isEmulatorMode ? 'EMULATOR TEMPLATE' : 'REAL DEVICE LIVE',
-                              style: const TextStyle(color: Color(0xFF48CAE4), fontSize: 8, fontWeight: FontWeight.w900),
+                              style: const TextStyle(color: AppColors.accent, fontSize: 8, fontWeight: FontWeight.w900),
                             ),
                           ],
                         ),
@@ -282,7 +282,7 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF141F38),
+                            color: AppColors.secondary,
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Column(
@@ -303,7 +303,7 @@ class _ScreenTimeScreenState extends State<ScreenTimeScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF141F38),
+                            color: AppColors.secondary,
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Column(

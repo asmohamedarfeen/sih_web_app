@@ -57,16 +57,16 @@ export const InterventionsPage: React.FC = () => {
     <div className="space-y-6">
       {/* Top Banner */}
       <div className="p-7 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-50/70 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-primary-50/70 rounded-full blur-3xl pointer-events-none" />
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-[0.15em] bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
+              <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-[0.15em] bg-primary-50 text-primary-700 border border-primary-200 shadow-sm">
                 Clinical Welfare Support
               </span>
               <span className="text-xs text-slate-500 font-mono font-semibold">&bull; Active Interventions & Grants</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
               Intervention Management
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl font-medium">
@@ -76,7 +76,7 @@ export const InterventionsPage: React.FC = () => {
 
           <button
             onClick={() => setShowNewModal(true)}
-            className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shadow-lg shadow-emerald-600/20 flex items-center gap-2 transition-all cursor-pointer self-start sm:self-auto"
+            className="px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-extrabold shadow-lg shadow-primary/20 flex items-center gap-2 transition-all cursor-pointer self-start sm:self-auto"
           >
             <PlusCircle className="w-4 h-4" />
             <span>Initiate Intervention Case</span>
@@ -93,17 +93,17 @@ export const InterventionsPage: React.FC = () => {
           >
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                <span className="text-xs font-mono font-bold text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-full border border-primary-200">
                   {c.case_number}
                 </span>
                 <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-black border uppercase tracking-wider ${
-                  c.status === 'RESOLVED' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-amber-50 text-amber-700 border-amber-200'
+                  c.status === 'RESOLVED' ? 'bg-success-50 text-success-700 border-success-200' : 'bg-warning-50 text-warning-700 border-warning-200'
                 }`}>
                   {c.status}
                 </span>
               </div>
 
-              <h3 className="font-extrabold text-base text-slate-900">{c.title}</h3>
+              <h3 className="font-extrabold text-base text-gray-900">{c.title}</h3>
               <p className="text-xs text-slate-600 font-semibold">{c.personnel_name} ({c.rank}) &bull; <span className="text-slate-400 font-mono">{c.personnel_uid}</span></p>
               <p className="text-xs text-slate-500 line-clamp-2">{c.description}</p>
             </div>
@@ -111,11 +111,11 @@ export const InterventionsPage: React.FC = () => {
             <div className="pt-3 border-t border-slate-100 text-xs text-slate-500 space-y-1 font-medium">
               <div className="flex justify-between">
                 <span>Venue:</span>
-                <span className="font-semibold text-slate-700">{c.venue}</span>
+                <span className="font-semibold text-gray-700">{c.venue}</span>
               </div>
               <div className="flex justify-between">
                 <span>Grant Amount:</span>
-                <span className="font-bold text-emerald-700 font-mono">₹{c.approved_amount.toLocaleString()}</span>
+                <span className="font-bold text-primary-700 font-mono">₹{c.approved_amount.toLocaleString()}</span>
               </div>
             </div>
 
@@ -123,7 +123,7 @@ export const InterventionsPage: React.FC = () => {
               {c.status !== 'RESOLVED' ? (
                 <button
                   onClick={() => handleStatusUpdate(c.id, 'RESOLVED')}
-                  className="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all cursor-pointer"
+                  className="w-full py-2 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-bold transition-all cursor-pointer"
                 >
                   Mark Resolved
                 </button>
@@ -144,8 +144,8 @@ export const InterventionsPage: React.FC = () => {
       {showNewModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-lg w-full p-7 border border-slate-200 shadow-2xl space-y-5">
-            <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
-              <HandHeart className="w-5 h-5 text-emerald-600" />
+            <h2 className="text-lg font-black text-gray-900 flex items-center gap-2">
+              <HandHeart className="w-5 h-5 text-primary" />
               <span>Initiate Welfare Intervention Case</span>
             </h2>
 
@@ -196,7 +196,7 @@ export const InterventionsPage: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-black cursor-pointer"
                 >
                   Open Case
                 </button>

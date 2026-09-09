@@ -45,32 +45,32 @@ export const AdminDashboard: React.FC = () => {
       value: (data?.metrics?.total_personnel_records || 1248).toLocaleString(),
       change: 'Synchronized via HRMS DB',
       icon: Users,
-      color: 'text-blue-600',
-      bg: 'bg-blue-50 border-blue-200'
+      color: 'text-secondary',
+      bg: 'bg-secondary-50 border-secondary-200'
     },
     {
       title: 'Active Monitoring Nodes',
       value: (data?.metrics?.active_monitoring_sessions || 342).toString(),
       change: 'Online Telemetry Stream',
       icon: Key,
-      color: 'text-emerald-600',
-      bg: 'bg-emerald-50 border-emerald-200'
+      color: 'text-primary',
+      bg: 'bg-primary-50 border-primary-200'
     },
     {
       title: 'System Uptime & Latency',
       value: `${data?.metrics?.system_uptime_pct || 99.98}%`,
       change: 'Inference Latency: 18ms',
       icon: Server,
-      color: 'text-teal-600',
-      bg: 'bg-teal-50 border-teal-200'
+      color: 'text-secondary-600',
+      bg: 'bg-secondary-50 border-secondary-200'
     },
     {
       title: 'Security Audit Integrity',
       value: `${data?.metrics?.critical_security_events || 0} Critical`,
       change: data?.metrics?.hrms_sync_status || 'Real-Time Sync',
       icon: ShieldCheck,
-      color: 'text-amber-600',
-      bg: 'bg-amber-50 border-amber-200'
+      color: 'text-accent-700',
+      bg: 'bg-accent-50 border-accent-200'
     },
   ];
 
@@ -92,21 +92,21 @@ export const AdminDashboard: React.FC = () => {
     <div className="space-y-6">
       {/* Top Banner */}
       <div className="p-7 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-blue-50/70 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-secondary-50/70 rounded-full blur-3xl pointer-events-none" />
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-[0.15em] bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
+              <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-[0.15em] bg-secondary-50 text-secondary-700 border border-secondary-200 shadow-sm">
                 Strategic System Command Console
               </span>
               <span className="text-xs text-slate-500 font-mono font-semibold">
-                &bull; HRMS Unique ID: <span className="text-blue-700 font-bold">{user?.uid || 'UID-SUP-001'}</span>
+                &bull; HRMS Unique ID: <span className="text-secondary-700 font-bold">{user?.uid || 'UID-SUP-001'}</span>
               </span>
               <span className="text-xs text-slate-500 font-mono">
-                &bull; Regimental: <span className="text-slate-800 font-bold">{user?.regimental_number || 'ARMY-2005-9001'}</span>
+                &bull; Regimental: <span className="text-gray-900 font-bold">{user?.regimental_number || 'ARMY-2005-9001'}</span>
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
               Welcome, {user?.full_name}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 mt-1.5 max-w-2xl leading-relaxed font-medium">
@@ -120,10 +120,10 @@ export const AdminDashboard: React.FC = () => {
               disabled={isRefreshing}
               className="px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200 flex items-center gap-2 transition-all cursor-pointer shadow-sm"
             >
-              <RefreshCw className={`w-4 h-4 text-blue-600 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 text-secondary ${isRefreshing ? 'animate-spin' : ''}`} />
               <span>{isRefreshing ? 'Syncing...' : 'Sync HRMS'}</span>
             </button>
-            <button className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold shadow-lg shadow-blue-600/20 flex items-center gap-2 transition-all cursor-pointer">
+            <button className="px-4 py-2.5 rounded-xl bg-secondary hover:bg-secondary-600 text-white text-xs font-extrabold shadow-lg shadow-secondary/20 flex items-center gap-2 transition-all cursor-pointer">
               <UserPlus className="w-4 h-4" />
               <span>Provision Officer</span>
             </button>
@@ -143,9 +143,9 @@ export const AdminDashboard: React.FC = () => {
                   <Icon className="w-4 h-4" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-mono">{m.value}</p>
+              <p className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight font-mono">{m.value}</p>
               <p className="text-xs text-slate-600 mt-1.5 flex items-center gap-1.5 font-semibold">
-                <Activity className="w-3.5 h-3.5 text-emerald-600" />
+                <Activity className="w-3.5 h-3.5 text-success" />
                 <span>{m.change}</span>
               </p>
             </div>
@@ -159,13 +159,13 @@ export const AdminDashboard: React.FC = () => {
         <div className="lg:col-span-8 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft relative overflow-hidden">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h2 className="text-sm font-extrabold text-slate-900 uppercase tracking-[0.12em] flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-blue-600" />
+              <h2 className="text-sm font-extrabold text-gray-900 uppercase tracking-[0.12em] flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-secondary" />
                 <span>HRMS Cryptographic Audit Trail</span>
               </h2>
               <p className="text-xs text-slate-500 mt-0.5 font-medium">Real-time audit log of access events and role queries.</p>
             </div>
-            <span className="text-[10px] font-mono text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200 font-bold">
+            <span className="text-[10px] font-mono text-secondary-700 bg-secondary-50 px-2.5 py-1 rounded-full border border-secondary-200 font-bold">
               TAMPER-PROOF LOGS
             </span>
           </div>
@@ -175,17 +175,17 @@ export const AdminDashboard: React.FC = () => {
               <div key={l.id} className="p-4 rounded-2xl bg-slate-50/70 border border-slate-200/80 flex items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-extrabold text-xs text-slate-900">{l.user}</span>
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700">
+                    <span className="font-extrabold text-xs text-gray-900">{l.user}</span>
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-200 text-gray-700">
                       {l.role}
                     </span>
                     <span className="text-[10px] font-mono text-slate-400 font-bold">{l.id}</span>
                   </div>
-                  <p className="text-xs text-slate-700 font-medium">{l.action}</p>
+                  <p className="text-xs text-gray-700 font-medium">{l.action}</p>
                 </div>
                 <div className="text-right shrink-0">
                   <span className="text-[10px] font-mono text-slate-400 font-bold block">{l.time}</span>
-                  <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 mt-1 inline-block">
+                  <span className="text-[10px] font-extrabold text-success bg-success-50 px-2 py-0.5 rounded-full border border-success-200 mt-1 inline-block">
                     {l.status}
                   </span>
                 </div>
@@ -199,22 +199,22 @@ export const AdminDashboard: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-sm font-extrabold text-slate-900 uppercase tracking-[0.12em]">
+                <h2 className="text-sm font-extrabold text-gray-900 uppercase tracking-[0.12em]">
                   Platform Infrastructure
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5 font-medium">Live health status of microservices.</p>
               </div>
-              <Server className="w-4 h-4 text-blue-600" />
+              <Server className="w-4 h-4 text-secondary" />
             </div>
 
             <div className="space-y-3">
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <Server className="w-3.5 h-3.5 text-blue-600" />
+                  <span className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+                    <Server className="w-3.5 h-3.5 text-secondary" />
                     API Gateway
                   </span>
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                  <span className="text-[10px] font-bold text-success bg-success-50 px-2 py-0.5 rounded border border-success-200">
                     Online
                   </span>
                 </div>
@@ -223,11 +223,11 @@ export const AdminDashboard: React.FC = () => {
 
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <Database className="w-3.5 h-3.5 text-indigo-600" />
+                  <span className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+                    <Database className="w-3.5 h-3.5 text-secondary" />
                     HRMS Database
                   </span>
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                  <span className="text-[10px] font-bold text-success bg-success-50 px-2 py-0.5 rounded border border-success-200">
                     Connected
                   </span>
                 </div>
@@ -236,11 +236,11 @@ export const AdminDashboard: React.FC = () => {
 
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <Cpu className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+                    <Cpu className="w-3.5 h-3.5 text-primary" />
                     AI Stress Engine
                   </span>
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                  <span className="text-[10px] font-bold text-success bg-success-50 px-2 py-0.5 rounded border border-success-200">
                     Active
                   </span>
                 </div>
@@ -249,8 +249,8 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-5 p-4 rounded-2xl bg-blue-50 border border-blue-200 text-xs text-blue-900 flex items-start gap-3">
-            <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+          <div className="mt-5 p-4 rounded-2xl bg-secondary-50 border border-secondary-200 text-xs text-secondary-900 flex items-start gap-3">
+            <CheckCircle2 className="w-4 h-4 text-secondary shrink-0 mt-0.5" />
             <p className="text-[11px] leading-relaxed font-medium">
               HRMS sync engine active. Continuous bi-directional telemetry verification enabled.
             </p>

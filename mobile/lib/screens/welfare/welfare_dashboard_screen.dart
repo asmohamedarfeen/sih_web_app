@@ -340,9 +340,9 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF0F172A),
+            color: AppColors.secondary,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFF1E293B)),
+            border: Border.all(color: const Color(0xFF234B75)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -352,7 +352,7 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E293B),
+                      color: const Color(0xFF0F2640),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(Icons.tune, color: AppColors.accent, size: 20),
@@ -409,7 +409,7 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
                   width: 170,
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFF1E293B) : Colors.white,
+                    color: isSelected ? AppColors.secondary : Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isSelected ? AppColors.accent : AppColors.cardBorder,
@@ -423,25 +423,22 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                            decoration: BoxDecoration(
-                              color: isSelected ? Colors.black45 : Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              '#${f['num']}',
-                              style: TextStyle(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w900,
-                                color: isSelected ? Colors.white : Colors.black87,
-                              ),
+                          Text(
+                            '#${f['num']} ${f['category']}',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              color: isSelected ? AppColors.accent : AppColors.textMuted,
                             ),
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                             decoration: BoxDecoration(
-                              color: isCrit ? AppColors.roseLight : (isHigh ? AppColors.amberLight : AppColors.emeraldLight),
+                              color: isCrit
+                                  ? AppColors.roseLight
+                                  : isHigh
+                                      ? AppColors.amberLight
+                                      : AppColors.emeraldLight,
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -449,28 +446,32 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
                               style: TextStyle(
                                 fontSize: 8,
                                 fontWeight: FontWeight.w900,
-                                color: isCrit ? AppColors.rose : (isHigh ? AppColors.amber : AppColors.emerald),
+                                color: isCrit
+                                    ? AppColors.rose
+                                    : isHigh
+                                        ? AppColors.amber
+                                        : AppColors.emerald,
                               ),
                             ),
                           ),
                         ],
                       ),
                       Text(
-                        '${f['num']}. ${f['title']}',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        f['title'],
                         style: TextStyle(
                           fontSize: 11,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w900,
                           color: isSelected ? Colors.white : AppColors.textPrimary,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        f['metric'],
+                        '${f['metricLabel']}: ${f['metric']}',
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w900,
-                          color: isSelected ? const Color(0xFF6EE7B7) : AppColors.textSecondary,
+                          color: isSelected ? AppColors.accent : AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -486,12 +487,12 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: const Color(0xFF0F172A),
+            color: AppColors.secondary,
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: const Color(0xFF334155)),
+            border: Border.all(color: const Color(0xFF234B75)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.15),
+                color: Colors.black.withValues(alpha: 0.15),
                 blurRadius: 15,
                 offset: const Offset(0, 5),
               )
@@ -507,9 +508,9 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E293B),
+                      color: const Color(0xFF0F2640),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFF475569)),
+                      border: Border.all(color: const Color(0xFF234B75)),
                     ),
                     child: Icon(currentFactor['icon'] as IconData, color: AppColors.accent, size: 24),
                   ),
@@ -523,7 +524,7 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF1E293B),
+                                color: const Color(0xFF0F2640),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
@@ -556,9 +557,9 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
+                  color: const Color(0xFF0F2640),
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFF334155)),
+                  border: Border.all(color: const Color(0xFF234B75)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -572,7 +573,7 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
                         ),
                         Text(
                           currentFactor['metric'],
-                          style: const TextStyle(color: Color(0xFF34D399), fontSize: 16, fontWeight: FontWeight.w900, fontFamily: 'monospace'),
+                          style: const TextStyle(color: AppColors.emerald, fontSize: 16, fontWeight: FontWeight.w900, fontFamily: 'monospace'),
                         ),
                       ],
                     ),
@@ -597,9 +598,9 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
+                    color: const Color(0xFF0F2640),
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFF3B82F6).withOpacity(0.5)),
+                    border: Border.all(color: AppColors.accent.withValues(alpha: 0.5)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -663,7 +664,7 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
                             ),
                           ],
                         ),
-                      )).toList(),
+                      )),
                     ],
                   ),
                 ),
@@ -699,20 +700,20 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
               // Action Protocol
               const Text(
                 'WELFARE OFFICER ACTION PROTOCOL',
-                style: TextStyle(color: Color(0xFF6EE7B7), fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                style: TextStyle(color: AppColors.accent, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5),
               ),
               const SizedBox(height: 6),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF064E3B).withOpacity(0.4),
+                  color: AppColors.primary.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFF059669)),
+                  border: Border.all(color: AppColors.primary),
                 ),
                 child: Text(
                   currentFactor['action'],
-                  style: const TextStyle(color: Color(0xFFA7F3D0), fontSize: 11, height: 1.3),
+                  style: const TextStyle(color: Colors.white, fontSize: 11, height: 1.3),
                 ),
               ),
               const SizedBox(height: 16),
@@ -739,9 +740,9 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
                     margin: const EdgeInsets.only(bottom: 8),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E293B),
+                      color: const Color(0xFF0F2640),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFF334155)),
+                      border: Border.all(color: const Color(0xFF234B75)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -779,7 +780,7 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
                         const SizedBox(height: 4),
                         Text(
                           'Trigger: ${p['trigger']}',
-                          style: const TextStyle(color: Color(0xFFFCD34D), fontSize: 10),
+                          style: const TextStyle(color: AppColors.amber, fontSize: 10),
                         ),
                       ],
                     ),
@@ -810,7 +811,7 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
                     icon: const Icon(Icons.description, size: 14, color: Colors.white),
                     label: const Text('Dossier', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800)),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFF475569)),
+                      side: const BorderSide(color: Color(0xFF234B75)),
                       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
@@ -832,7 +833,7 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: const Color(0xFF064E3B), // Deep Emerald
+            color: AppColors.primary, // Military Green
             borderRadius: BorderRadius.circular(24),
           ),
           child: Column(
@@ -840,7 +841,7 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
             children: [
               const Row(
                 children: [
-                  Icon(Icons.volunteer_activism, color: Color(0xFF6EE7B7), size: 24),
+                  Icon(Icons.volunteer_activism, color: AppColors.accent, size: 24),
                   SizedBox(width: 8),
                   Text(
                     'Psychological Welfare Wing',
@@ -851,7 +852,7 @@ class _WelfareDashboardScreenState extends State<WelfareDashboardScreen> with Si
               const SizedBox(height: 8),
               Text(
                 '${_cases.length} active clinical cases and compassionate grant workflows underway.',
-                style: const TextStyle(color: Color(0xFFA7F3D0), fontSize: 11),
+                style: const TextStyle(color: Colors.white70, fontSize: 11),
               ),
             ],
           ),

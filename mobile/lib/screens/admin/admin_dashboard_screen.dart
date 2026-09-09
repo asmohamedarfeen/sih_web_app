@@ -56,7 +56,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   Container(
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E1B4B), // Deep Indigo
+                      color: AppColors.secondary,
                       borderRadius: BorderRadius.circular(24),
                     ),
                     child: Column(
@@ -64,7 +64,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       children: [
                         const Row(
                           children: [
-                            Icon(Icons.badge, color: Color(0xFFA5B4FC), size: 24),
+                            Icon(Icons.badge, color: AppColors.accent, size: 24),
                             SizedBox(width: 8),
                             Text(
                               'Verified Defense Personnel Registry',
@@ -75,7 +75,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         const SizedBox(height: 8),
                         Text(
                           '${_personnel.length} active service records with SHA-256 tamper-proof audit trails.',
-                          style: const TextStyle(color: Color(0xFFC7D2FE), fontSize: 11),
+                          style: const TextStyle(color: Colors.white70, fontSize: 11),
                         ),
                       ],
                     ),

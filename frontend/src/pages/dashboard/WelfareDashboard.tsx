@@ -581,15 +581,15 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
 
   const getColor = (s: number, isInverted: boolean = false) => {
     if (isInverted) {
-      if (s >= 75) return { color: 'text-emerald-400', bar: 'bg-emerald-500' };
-      if (s >= 60) return { color: 'text-blue-400', bar: 'bg-blue-500' };
-      if (s >= 45) return { color: 'text-amber-400', bar: 'bg-amber-500' };
-      return { color: 'text-rose-400', bar: 'bg-rose-500' };
+      if (s >= 75) return { color: 'text-success', bar: 'bg-success' };
+      if (s >= 60) return { color: 'text-secondary-400', bar: 'bg-secondary' };
+      if (s >= 45) return { color: 'text-warning', bar: 'bg-warning' };
+      return { color: 'text-danger', bar: 'bg-danger' };
     }
-    if (s >= 80) return { color: 'text-rose-400', bar: 'bg-rose-500' };
-    if (s >= 70) return { color: 'text-amber-400', bar: 'bg-amber-500' };
-    if (s >= 50) return { color: 'text-blue-400', bar: 'bg-blue-500' };
-    return { color: 'text-emerald-400', bar: 'bg-emerald-500' };
+    if (s >= 80) return { color: 'text-danger', bar: 'bg-danger' };
+    if (s >= 70) return { color: 'text-warning', bar: 'bg-warning' };
+    if (s >= 50) return { color: 'text-secondary-400', bar: 'bg-secondary' };
+    return { color: 'text-success', bar: 'bg-success' };
   };
 
   switch (factorId) {
@@ -1065,34 +1065,34 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
 
   const rounded = Math.round(score * 10) / 10;
   let level: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'NOMINAL' = 'NOMINAL';
-  let levelColor = 'text-emerald-400';
-  let levelBg = 'bg-emerald-950 text-emerald-300 border-emerald-800';
+  let levelColor = 'text-success';
+  let levelBg = 'bg-primary-950 text-success-300 border-primary-800';
 
   const isReadiness = factorId === 'readiness-score' || factorId === 'operational-readiness';
   if (factorId === 'mental-wellbeing-resilience' || isReadiness) {
     // Inverted: higher is better
     if (rounded >= 78.0) {
       level = 'NOMINAL';
-      levelColor = 'text-emerald-400';
-      levelBg = 'bg-emerald-950 text-emerald-300 border-emerald-800';
+      levelColor = 'text-success';
+      levelBg = 'bg-primary-950 text-success-300 border-primary-800';
       tierLabel = isReadiness ? 'Combat Ready / Peak Mission Suitability' : 'High Resilience / Optimal Squad Morale';
       recommendation = 'Maintain regular training tempo and proactive leadership brief.';
     } else if (rounded >= 65.0) {
       level = 'MODERATE';
-      levelColor = 'text-blue-400';
-      levelBg = 'bg-blue-950 text-blue-300 border-blue-800';
+      levelColor = 'text-secondary-300';
+      levelBg = 'bg-secondary-950 text-secondary-200 border-secondary-700';
       tierLabel = isReadiness ? 'Mission Ready / Minor Fatigue Rest Desirable' : 'Moderate Resilience / Squad Cohesion Active';
       recommendation = 'Prescribe standard recovery pacing and weekly check-in adherence.';
     } else if (rounded >= 50.0) {
       level = 'HIGH';
-      levelColor = 'text-amber-400';
-      levelBg = 'bg-amber-950 text-amber-300 border-amber-800';
+      levelColor = 'text-warning';
+      levelBg = 'bg-amber-950 text-warning-300 border-amber-800';
       tierLabel = isReadiness ? 'Standby Rest Required / Cognitive Fatigue' : 'Low Resilience / Attention Required';
       recommendation = 'PRIORITY ACTION: Schedule light duties, peer buddy pairing, and recovery rest cycle.';
     } else {
       level = 'CRITICAL';
-      levelColor = 'text-rose-400';
-      levelBg = 'bg-rose-950 text-rose-300 border-rose-800';
+      levelColor = 'text-danger';
+      levelBg = 'bg-rose-950 text-danger-300 border-rose-800';
       tierLabel = isReadiness ? 'Unfit for Frontline / Mandatory 48h Downtime' : 'Resilience Depleted / Immediate Clinical Protocol';
       recommendation = 'MANDATORY ACTION: Immediate operational detachment and comprehensive counseling intervention.';
     }
@@ -1100,26 +1100,26 @@ export const evaluateFactorModel = (factorId: string, p: PersonnelBurnoutProfile
     // Standard hazard/strain model
     if (rounded >= 78.0) {
       level = 'CRITICAL';
-      levelColor = 'text-rose-400';
-      levelBg = 'bg-rose-950 text-rose-300 border-rose-800';
+      levelColor = 'text-danger';
+      levelBg = 'bg-rose-950 text-danger-300 border-rose-800';
       tierLabel = 'Severe Strain / Critical Clinical Priority';
       recommendation = `MANDATORY ACTION: 48-hour immediate duty detachment, clinical recovery protocol, and confidential counselor debrief for ${p.name}.`;
     } else if (rounded >= 65.0) {
       level = 'HIGH';
-      levelColor = 'text-amber-400';
-      levelBg = 'bg-amber-950 text-amber-300 border-amber-800';
+      levelColor = 'text-warning';
+      levelBg = 'bg-amber-950 text-warning-300 border-amber-800';
       tierLabel = 'Elevated Risk / Priority Intervention Required';
       recommendation = `PRIORITY ACTION: Shift rotation out of high-intensity duty, expedited leave review, and guided recovery protocol for ${p.name}.`;
     } else if (rounded >= 45.0) {
       level = 'MODERATE';
-      levelColor = 'text-blue-400';
-      levelBg = 'bg-blue-950 text-blue-300 border-blue-800';
+      levelColor = 'text-secondary-300';
+      levelBg = 'bg-secondary-950 text-secondary-200 border-secondary-700';
       tierLabel = 'Moderate Telemetry Strain / Active Monitoring';
       recommendation = `MONITORING: Track weekly compliance check-in pulses on mobile app and monitor workload pacing in unit roster.`;
     } else {
       level = 'NOMINAL';
-      levelColor = 'text-emerald-400';
-      levelBg = 'bg-emerald-950 text-emerald-300 border-emerald-800';
+      levelColor = 'text-success';
+      levelBg = 'bg-primary-950 text-success-300 border-primary-800';
       tierLabel = 'Nominal Baseline / Healthy Operational State';
       recommendation = `Standard duty rotation confirmed. Squad camaraderie and operational wellness optimal.`;
     }
@@ -1271,32 +1271,32 @@ export const WelfareDashboard: React.FC = () => {
       value: data?.metrics?.active_welfare_cases?.toString() || '18',
       sub: `${data?.metrics?.critical_cases || 4} Critical Priority`,
       icon: HandHeart,
-      color: 'text-emerald-600',
-      bg: 'bg-emerald-50 border-emerald-200'
+      color: 'text-primary',
+      bg: 'bg-primary-50 border-primary-200'
     },
     {
       title: 'High-Risk Watchlist',
       value: `${data?.metrics?.high_risk_personnel_count || 4} Personnel`,
       sub: 'Stress Score > 70/100',
       icon: AlertTriangle,
-      color: 'text-rose-600',
-      bg: 'bg-rose-50 border-rose-200'
+      color: 'text-danger',
+      bg: 'bg-danger-50 border-danger-200'
     },
     {
       title: "Today's Counseling Sessions",
       value: `${data?.metrics?.today_counseling_sessions || 4} Scheduled`,
       sub: '2 Completed Today',
       icon: Calendar,
-      color: 'text-teal-600',
-      bg: 'bg-teal-50 border-teal-200'
+      color: 'text-accent-600',
+      bg: 'bg-accent-50 border-accent-200'
     },
     {
       title: 'Intervention Recovery Metric',
       value: `${data?.metrics?.recovery_rate_pct || 92.5}%`,
       sub: `${data?.metrics?.monthly_resolved_interventions || 34} Cases Resolved`,
       icon: CheckCircle,
-      color: 'text-blue-600',
-      bg: 'bg-blue-50 border-blue-200'
+      color: 'text-secondary',
+      bg: 'bg-secondary-50 border-secondary-200'
     },
   ];
 
@@ -1484,9 +1484,9 @@ export const WelfareDashboard: React.FC = () => {
       metricLabel: 'Trend Direction',
       metricValue: '+14% Risk Trend',
       icon: LineChart,
-      color: 'text-blue-600',
-      bg: 'bg-blue-50',
-      border: 'border-blue-200',
+      color: 'text-secondary',
+      bg: 'bg-secondary-50',
+      border: 'border-secondary-200',
       clinicalSignificance: 'Multivariate 7-Parameter Predictive Model: 0.15(Historical HRMS records) + 0.14(Attendance) + 0.15(Leave) + 0.14(Deployment) + 0.15(Assessments) + 0.14(Biometric trends) + 0.13(Behavioral history). Unified across HRMS Portal, Soldier Mobile App, and Central Database.',
       biomarkers: [
         '1. Historical HRMS records (15%) - HRMS Service Dossier',
@@ -1541,9 +1541,9 @@ export const WelfareDashboard: React.FC = () => {
       metricLabel: 'Intervention Fit',
       metricValue: '91% Accuracy',
       icon: HeartHandshake,
-      color: 'text-teal-600',
-      bg: 'bg-teal-50',
-      border: 'border-teal-200',
+      color: 'text-accent-600',
+      bg: 'bg-accent-50',
+      border: 'border-accent-200',
       clinicalSignificance: 'Multivariate 5-Parameter Predictive Model: 0.25(AI risk score) + 0.20(Assessment history) + 0.20(Workload) + 0.20(Deployment) + 0.15(Previous interventions). Unified across Central Database and HRMS Portal.',
       biomarkers: [
         '1. AI risk score (25%) - Central DB Composite AI Engine',
@@ -1596,9 +1596,9 @@ export const WelfareDashboard: React.FC = () => {
       metricLabel: 'Unit Resilience',
       metricValue: '82% Resilient',
       icon: Smile,
-      color: 'text-emerald-600',
-      bg: 'bg-emerald-50',
-      border: 'border-emerald-200',
+      color: 'text-success',
+      bg: 'bg-success-50',
+      border: 'border-success-200',
       clinicalSignificance: 'Multivariate 5-Parameter Predictive Model: 0.24(Wellness score history) + 0.20(Intervention outcomes) + 0.22(Assessments) + 0.18(Attendance) + 0.16(Productivity trends). Unified across Central DB, Soldier Mobile App, and HRMS Portal.',
       biomarkers: [
         '1. Wellness score history (24%) - Central DB Wellness Archive',
@@ -1624,9 +1624,9 @@ export const WelfareDashboard: React.FC = () => {
       metricLabel: 'Readiness Score',
       metricValue: '86.8% Combat Ready',
       icon: Target,
-      color: 'text-blue-600',
-      bg: 'bg-blue-50',
-      border: 'border-blue-200',
+      color: 'text-secondary',
+      bg: 'bg-secondary-50',
+      border: 'border-secondary-200',
       clinicalSignificance: 'Multivariate 6-Parameter Model: Readiness Score = 30% × Wellness + 20% × Physical Readiness + 20% × Workload + 15% × Mental Readiness + 10% × Behavioral Stability + 5% × Operational Risk. Unified across Central DB, Soldier Mobile App, and HRMS Portal.',
       biomarkers: [
         '1. Wellness (30%) - Central DB Composite Wellness Index',
@@ -1751,30 +1751,30 @@ export const WelfareDashboard: React.FC = () => {
     <div className="space-y-6">
       {/* Toast Notification for factor actions */}
       {actionAlert && (
-        <div className="fixed top-5 right-5 z-50 p-4 rounded-2xl bg-slate-900 text-white border border-emerald-500 shadow-2xl flex items-center gap-3 animate-fade-in text-xs font-semibold">
-          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+        <div className="fixed top-5 right-5 z-50 p-4 rounded-2xl bg-gray-900 text-white border border-primary shadow-2xl flex items-center gap-3 animate-fade-in text-xs font-semibold">
+          <CheckCircle2 className="w-5 h-5 text-primary-300 shrink-0" />
           <span>{actionAlert}</span>
         </div>
       )}
 
       {/* Welcome Banner */}
       <div className="p-7 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-50/70 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-primary-50/70 rounded-full blur-3xl pointer-events-none" />
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-[0.15em] bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-[0.15em] bg-primary-50 text-primary-700 border border-primary-200 shadow-sm flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-primary" />
                 <span>Chief Welfare Officer Command Center</span>
               </span>
               <span className="text-xs text-slate-500 font-mono font-semibold">
-                &bull; HRMS Unique ID: <span className="text-emerald-700 font-bold">{user?.uid || 'UID-WEL-007'}</span>
+                &bull; HRMS Unique ID: <span className="text-primary-700 font-bold">{user?.uid || 'UID-WEL-007'}</span>
               </span>
               <span className="text-xs text-slate-500 font-mono">
-                &bull; Regimental: <span className="text-slate-800 font-bold">{user?.regimental_number || 'CRPF-2014-8007'}</span>
+                &bull; Regimental: <span className="text-gray-900 font-bold">{user?.regimental_number || 'CRPF-2014-8007'}</span>
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
               Welcome, {user?.full_name}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 mt-1.5 max-w-2xl leading-relaxed font-medium">
@@ -1788,12 +1788,12 @@ export const WelfareDashboard: React.FC = () => {
               disabled={isRefreshing}
               className="px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200 flex items-center gap-2 transition-all cursor-pointer shadow-sm"
             >
-              <RefreshCw className={`w-4 h-4 text-emerald-600 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 text-primary ${isRefreshing ? 'animate-spin' : ''}`} />
               <span>{isRefreshing ? 'Syncing...' : 'Sync HRMS'}</span>
             </button>
             <button
               onClick={() => handleTriggerAction('Welfare Command', 'New Case Initiation')}
-              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shadow-lg shadow-emerald-600/20 flex items-center gap-2 transition-all cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-extrabold shadow-lg shadow-primary/20 flex items-center gap-2 transition-all cursor-pointer"
             >
               <PlusCircle className="w-4 h-4" />
               <span>Initiate Case</span>
@@ -1814,9 +1814,9 @@ export const WelfareDashboard: React.FC = () => {
                   <Icon className="w-4 h-4" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-mono">{m.value}</p>
+              <p className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight font-mono">{m.value}</p>
               <p className="text-xs text-slate-600 mt-1.5 flex items-center gap-1.5 font-semibold">
-                <HeartPulse className="w-3.5 h-3.5 text-emerald-600" />
+                <HeartPulse className="w-3.5 h-3.5 text-primary" />
                 <span>{m.sub}</span>
               </p>
             </div>
@@ -1832,11 +1832,11 @@ export const WelfareDashboard: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
           <div>
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 shadow-xs">
+              <div className="p-2 rounded-xl bg-primary-50 border border-primary-200 text-primary-700 shadow-xs">
                 <Users className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+                <h2 className="text-lg sm:text-xl font-black text-gray-900 tracking-tight">
                   Personnel Roster &amp; Live Predictor: {currentFactor.title}
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-500 font-medium">
@@ -1848,12 +1848,12 @@ export const WelfareDashboard: React.FC = () => {
 
           {/* Dynamic Counter Badges */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="px-3.5 py-1.5 rounded-full text-xs font-mono font-black bg-slate-900 text-white shadow-sm flex items-center gap-1.5">
-              <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="px-3.5 py-1.5 rounded-full text-xs font-mono font-black bg-secondary text-white shadow-sm flex items-center gap-1.5">
+              <UserCheck className="w-3.5 h-3.5 text-accent" />
               <span>Showing {filteredPersonnel.length} of {personnelRoster.length} Personnel</span>
             </span>
-            <span className="px-3 py-1.5 rounded-full text-xs font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              Active Subject: <strong className="text-emerald-900">{selectedPersonnel.name}</strong> ({currentEvalResult.metricLabel}: {currentEvalResult.score}%)
+            <span className="px-3 py-1.5 rounded-full text-xs font-mono font-bold bg-primary-50 text-primary-700 border border-primary-200">
+              Active Subject: <strong className="text-primary-900">{selectedPersonnel.name}</strong> ({currentEvalResult.metricLabel}: {currentEvalResult.score}%)
             </span>
           </div>
         </div>
@@ -1867,7 +1867,7 @@ export const WelfareDashboard: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={`Search personnel for ${currentFactor.title} by name, UID, regimental number, rank, or unit...`}
-              className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/90 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all font-medium"
+              className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/90 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all font-medium"
             />
             {searchQuery && (
               <button
@@ -1890,7 +1890,7 @@ export const WelfareDashboard: React.FC = () => {
                 onClick={() => setSelectedRiskFilter(lvl)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   selectedRiskFilter === lvl
-                    ? 'bg-emerald-600 text-white shadow-sm'
+                    ? 'bg-primary text-white shadow-sm'
                     : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
                 }`}
               >
@@ -1923,14 +1923,14 @@ export const WelfareDashboard: React.FC = () => {
                   }}
                   className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between relative group ${
                     isSelected
-                      ? 'bg-slate-900 border-slate-900 text-white shadow-xl ring-2 ring-emerald-500/50 transform -translate-y-1'
+                      ? 'bg-secondary border-secondary text-white shadow-xl ring-2 ring-primary/50 transform -translate-y-1'
                       : 'bg-slate-50/80 hover:bg-white border-slate-200/90 hover:border-slate-300 text-slate-900 shadow-xs'
                   }`}
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className={`text-[10px] font-mono font-black px-2 py-0.5 rounded-md ${
-                        isSelected ? 'bg-slate-800 text-emerald-400 border border-slate-700' : 'bg-slate-200/80 text-slate-700'
+                        isSelected ? 'bg-secondary-800 text-accent border border-secondary-700' : 'bg-slate-200/80 text-slate-700'
                       }`}>
                         {p.uid}
                       </span>
@@ -1940,18 +1940,18 @@ export const WelfareDashboard: React.FC = () => {
                           : isHigh
                           ? isSelected ? 'bg-amber-950 text-amber-300 border border-amber-800' : 'bg-amber-100 text-amber-800'
                           : isMod
-                          ? isSelected ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-blue-100 text-blue-800'
-                          : isSelected ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-emerald-100 text-emerald-800'
+                          ? isSelected ? 'bg-secondary-950 text-secondary-300 border border-secondary-800' : 'bg-secondary-100 text-secondary-800'
+                          : isSelected ? 'bg-primary-950 text-primary-300 border border-primary-800' : 'bg-primary-100 text-primary-800'
                       }`}>
                         {evalRes.level}
                       </span>
                     </div>
 
                     <div>
-                      <h4 className={`font-black text-xs leading-snug tracking-tight ${isSelected ? 'text-white' : 'text-slate-900 group-hover:text-emerald-700'}`}>
+                      <h4 className={`font-black text-xs leading-snug tracking-tight ${isSelected ? 'text-white' : 'text-slate-900 group-hover:text-primary'}`}>
                         {p.name}
                       </h4>
-                      <p className={`text-[11px] font-medium ${isSelected ? 'text-slate-400' : 'text-slate-500'}`}>
+                      <p className={`text-[11px] font-medium ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>
                         {p.rank} &bull; {p.unit}
                       </p>
                       <p className={`text-[10px] font-mono ${isSelected ? 'text-slate-400' : 'text-slate-400'}`}>
@@ -1961,7 +1961,7 @@ export const WelfareDashboard: React.FC = () => {
                   </div>
 
                   <div className={`mt-3 pt-2.5 border-t flex items-center justify-between text-xs font-mono ${
-                    isSelected ? 'border-slate-800 text-slate-300' : 'border-slate-200/80 text-slate-600'
+                    isSelected ? 'border-secondary-800 text-slate-300' : 'border-slate-200/80 text-slate-600'
                   }`}>
                     <span className="text-[10px] font-sans font-medium">{evalRes.metricLabel}:</span>
                     <span className={`font-black text-xs ${evalRes.levelColor}`}>
@@ -1975,24 +1975,24 @@ export const WelfareDashboard: React.FC = () => {
         </div>
 
         {/* Selected Personnel Multi-Factor Prediction Dossier & Live Parameter Breakdown */}
-        <div className="p-6 sm:p-7 rounded-3xl bg-slate-900 text-white border border-slate-800 shadow-2xl space-y-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="p-6 sm:p-7 rounded-3xl bg-secondary text-white border border-secondary-800 shadow-2xl space-y-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-accent/15 rounded-full blur-3xl pointer-events-none" />
 
           {/* Dossier Header */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-5 relative z-10">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-secondary-800 pb-5 relative z-10">
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-800 flex items-center justify-center text-white text-xl font-black shadow-lg shrink-0 border border-emerald-400/40">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl font-black shadow-lg shrink-0 border border-accent/40">
                 {selectedPersonnel.name.charAt(0)}
               </div>
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-800">
+                  <span className="text-xs font-mono font-bold text-accent bg-secondary-900/90 px-2.5 py-0.5 rounded-full border border-secondary-700">
                     {selectedPersonnel.uid} &bull; {selectedPersonnel.regimental_number}
                   </span>
-                  <span className="text-xs font-mono text-slate-300 bg-slate-800 px-2.5 py-0.5 rounded-full border border-slate-700">
+                  <span className="text-xs font-mono text-slate-300 bg-secondary-800 px-2.5 py-0.5 rounded-full border border-secondary-700">
                     {selectedPersonnel.branch} &bull; {selectedPersonnel.unit}
                   </span>
-                  <span className="text-xs font-mono text-slate-400">
+                  <span className="text-xs font-mono text-slate-300">
                     Category: <strong className="text-white">{selectedPersonnel.medical_category}</strong>
                   </span>
                   {selectedPersonnel.hrms_sync_status === 'PARTIAL_SYNC' ? (
@@ -2001,26 +2001,26 @@ export const WelfareDashboard: React.FC = () => {
                       <span>HRMS Sync: PARTIAL SYNC ({selectedPersonnel.data_completeness_pct || 75}%)</span>
                     </span>
                   ) : (
-                    <span className="text-[10px] font-mono font-black text-emerald-300 bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-700 flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span className="text-[10px] font-mono font-black text-success-300 bg-primary-950/80 px-2.5 py-0.5 rounded-full border border-primary-700 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-success"></span>
                       <span>HRMS Sync: SYNCHRONIZED (100%)</span>
                     </span>
                   )}
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white mt-1 flex items-center gap-2">
                   <span>{selectedPersonnel.name}</span>
-                  <span className="text-sm font-medium text-slate-400">({selectedPersonnel.rank})</span>
+                  <span className="text-sm font-medium text-slate-300">({selectedPersonnel.rank})</span>
                 </h3>
                 <p className="text-xs text-slate-300 mt-1 font-medium">
-                  Status: <strong className="text-emerald-400">{selectedPersonnel.status}</strong> &bull; Evaluating Factor #{currentFactor.num}: <strong className="text-white">{currentFactor.title}</strong>
+                  Status: <strong className="text-accent">{selectedPersonnel.status}</strong> &bull; Evaluating Factor #{currentFactor.num}: <strong className="text-white">{currentFactor.title}</strong>
                 </p>
               </div>
             </div>
 
             {/* Overall Calculated Factor Card */}
-            <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700 flex items-center gap-5 shrink-0 shadow-lg">
+            <div className="p-4 rounded-2xl bg-secondary-900/90 border border-secondary-700 flex items-center gap-5 shrink-0 shadow-lg">
               <div className="text-right">
-                <span className="text-[10px] uppercase font-black tracking-wider text-slate-400 block">
+                <span className="text-[10px] uppercase font-black tracking-wider text-slate-300 block">
                   Calculated {currentFactor.title}
                 </span>
                 <div className="flex items-baseline justify-end gap-1 mt-0.5">
@@ -2036,7 +2036,7 @@ export const WelfareDashboard: React.FC = () => {
               <div className="flex flex-col gap-1.5">
                 <button
                   onClick={() => handleTriggerAction(currentFactor.title, `${currentEvalResult.primaryAction} for ${selectedPersonnel.name}`)}
-                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>{currentEvalResult.primaryAction}</span>
@@ -2064,21 +2064,21 @@ export const WelfareDashboard: React.FC = () => {
           )}
 
           {/* Mathematical Weight Breakdown Formula Bar */}
-          <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 flex flex-col md:flex-row md:items-center justify-between gap-2 font-mono">
+          <div className="p-3.5 rounded-2xl bg-secondary-950/90 border border-secondary-800 text-xs text-slate-300 flex flex-col md:flex-row md:items-center justify-between gap-2 font-mono">
             <div className="flex items-center gap-2">
-              <Sparkle className="w-4 h-4 text-emerald-400 shrink-0" />
+              <Sparkle className="w-4 h-4 text-accent shrink-0" />
               <span>
                 <strong className="text-white">{currentFactor.title} Formula:</strong> {currentEvalResult.formula}
               </span>
             </div>
             <div className="flex items-center gap-2 text-[10px] font-bold">
-              <span className="px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">
+              <span className="px-2 py-0.5 rounded bg-secondary-900 text-secondary-200 border border-secondary-700">
                 📱 Mobile: {currentEvalResult.mobileCount}
               </span>
-              <span className="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">
+              <span className="px-2 py-0.5 rounded bg-amber-950 text-warning-300 border border-amber-800">
                 🏢 HRMS: {currentEvalResult.hrmsCount}
               </span>
-              <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
+              <span className="px-2 py-0.5 rounded bg-primary-950 text-primary-300 border border-primary-800">
                 💾 DB: {currentEvalResult.databaseCount}
               </span>
             </div>
@@ -2094,13 +2094,13 @@ export const WelfareDashboard: React.FC = () => {
                   key={param.key}
                   className={`p-4 rounded-2xl border transition-all space-y-2.5 ${
                     !param.available
-                      ? 'bg-slate-800/70 border-amber-500/50 ring-1 ring-amber-500/20'
-                      : 'bg-slate-800/60 border-slate-700/80'
+                      ? 'bg-secondary-900/70 border-amber-500/50 ring-1 ring-amber-500/20'
+                      : 'bg-secondary-900/60 border-secondary-800'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-black text-white">{param.name}</span>
-                    <span className="text-[10px] font-mono font-bold text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">
+                    <span className="text-[10px] font-mono font-bold text-slate-300 bg-secondary-950 px-1.5 py-0.5 rounded border border-secondary-800">
                       {param.weightLabel}
                     </span>
                   </div>
@@ -2110,10 +2110,10 @@ export const WelfareDashboard: React.FC = () => {
                     {param.available ? (
                       <span className={`text-[9px] font-mono px-2 py-0.5 rounded-md flex items-center gap-1 border ${
                         param.sourceType === 'MOBILE'
-                          ? 'text-cyan-300 bg-cyan-950/80 border-cyan-700/80'
+                          ? 'text-secondary-200 bg-secondary-950/80 border-secondary-700/80'
                           : param.sourceType === 'HRMS'
                           ? 'text-amber-300 bg-amber-950/80 border-amber-700/80'
-                          : 'text-emerald-400 bg-emerald-950/70 border-emerald-800/80'
+                          : 'text-primary-300 bg-primary-950/70 border-primary-800/80'
                       }`}>
                         <span>{param.sourceType === 'MOBILE' ? '📱' : param.sourceType === 'HRMS' ? '🏢' : '💾'}</span>
                         <span className="truncate max-w-[135px] font-semibold">{param.source}</span>
@@ -2132,7 +2132,7 @@ export const WelfareDashboard: React.FC = () => {
 
                   {/* Retrieved Telemetry Strain Bar Meter (Read Only Fixed) */}
                   <div className="space-y-1.5 pt-1">
-                    <div className="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-700/60 p-0.5">
+                    <div className="w-full h-2 bg-secondary-950 rounded-full overflow-hidden border border-secondary-800 p-0.5">
                       <div
                         className={`h-full rounded-full transition-all duration-500 ${param.bar}`}
                         style={{ width: `${Math.min(100, Math.max(4, currentVal))}%` }}
@@ -2146,7 +2146,7 @@ export const WelfareDashboard: React.FC = () => {
                   </div>
 
                   {/* Context Note */}
-                  <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed font-medium bg-slate-900/80 p-2 rounded-xl border border-slate-800/80">
+                  <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed font-medium bg-secondary-950/80 p-2 rounded-xl border border-secondary-800/80">
                     {param.note}
                   </p>
                 </div>
@@ -2155,10 +2155,10 @@ export const WelfareDashboard: React.FC = () => {
           </div>
 
           {/* Clinical Recommendation & Protocol Dispatch Card */}
-          <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="p-5 rounded-2xl bg-secondary-900/80 border border-secondary-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-accent flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-accent" />
                 <span>AI Clinical Guidance for {selectedPersonnel.name} ({currentFactor.title})</span>
               </span>
               <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
@@ -2169,13 +2169,13 @@ export const WelfareDashboard: React.FC = () => {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => handleTriggerAction(currentFactor.title, `${currentEvalResult.primaryAction} for ${selectedPersonnel.name}`)}
-                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-bold transition-all shadow-md cursor-pointer"
               >
                 {currentEvalResult.primaryAction}
               </button>
               <button
                 onClick={() => handleTriggerAction(currentFactor.title, `${currentEvalResult.secondaryAction} for ${selectedPersonnel.name}`)}
-                className="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold border border-slate-600 transition-all cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-secondary-800 hover:bg-secondary-700 text-slate-200 text-xs font-bold border border-secondary-700 transition-all cursor-pointer"
               >
                 {currentEvalResult.secondaryAction}
               </button>
@@ -2191,7 +2191,7 @@ export const WelfareDashboard: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-5">
           <div>
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 shadow-xs">
+              <div className="p-2 rounded-xl bg-secondary-50 border border-secondary-200 text-secondary shadow-xs">
                 <Sliders className="w-5 h-5" />
               </div>
               <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
@@ -2226,14 +2226,14 @@ export const WelfareDashboard: React.FC = () => {
                 onClick={() => setSelectedFactorId(factor.id)}
                 className={`p-5 rounded-2xl border text-left w-full transition-all cursor-pointer flex flex-col justify-between relative group ${
                   isSelected
-                    ? 'bg-slate-900 border-slate-900 text-white shadow-xl ring-2 ring-blue-500/50 transform -translate-y-1'
+                    ? 'bg-secondary border-secondary text-white shadow-xl ring-2 ring-primary/50 transform -translate-y-1'
                     : 'bg-slate-50/70 hover:bg-white border-slate-200/90 hover:border-slate-300 text-slate-900 shadow-xs'
                 }`}
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className={`text-[10px] font-mono font-black px-2 py-0.5 rounded-md ${
-                      isSelected ? 'bg-slate-800 text-blue-400 border border-slate-700' : 'bg-slate-200/80 text-slate-700'
+                      isSelected ? 'bg-secondary-800 text-accent border border-secondary-700' : 'bg-slate-200/80 text-slate-700'
                     }`}>
                       Factor #{factor.num}
                     </span>
@@ -2243,8 +2243,8 @@ export const WelfareDashboard: React.FC = () => {
                         : soldierEval.level === 'HIGH'
                         ? isSelected ? 'bg-amber-950 text-amber-300 border border-amber-800' : 'bg-amber-100 text-amber-800'
                         : soldierEval.level === 'MODERATE'
-                        ? isSelected ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-blue-100 text-blue-800'
-                        : isSelected ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-emerald-100 text-emerald-800'
+                        ? isSelected ? 'bg-secondary-950 text-secondary-300 border border-secondary-800' : 'bg-secondary-100 text-secondary-800'
+                        : isSelected ? 'bg-primary-950 text-primary-300 border border-primary-800' : 'bg-primary-100 text-primary-800'
                     }`}>
                       {soldierEval.level}
                     </span>
@@ -2252,12 +2252,12 @@ export const WelfareDashboard: React.FC = () => {
 
                   <div className="flex items-start gap-3">
                     <div className={`p-2.5 rounded-xl border shrink-0 ${
-                      isSelected ? 'bg-slate-800 border-slate-700 text-blue-400' : `${factor.bg} ${factor.border} ${factor.color}`
+                      isSelected ? 'bg-secondary-800 border-secondary-700 text-accent' : `${factor.bg} ${factor.border} ${factor.color}`
                     }`}>
                       <Icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className={`font-black text-sm leading-tight tracking-tight ${isSelected ? 'text-white' : 'text-slate-900 group-hover:text-blue-700'}`}>
+                      <h4 className={`font-black text-sm leading-tight tracking-tight ${isSelected ? 'text-white' : 'text-slate-900 group-hover:text-primary'}`}>
                         {factor.title}
                       </h4>
                       <p className={`text-[11px] mt-1 line-clamp-2 font-medium ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>
@@ -2268,7 +2268,7 @@ export const WelfareDashboard: React.FC = () => {
                 </div>
 
                 <div className={`mt-4 pt-3 border-t flex items-center justify-between text-xs font-mono ${
-                  isSelected ? 'border-slate-800 text-slate-300' : 'border-slate-200/80 text-slate-600'
+                  isSelected ? 'border-secondary-800 text-slate-300' : 'border-slate-200/80 text-slate-600'
                 }`}>
                   <span className="text-[11px] font-sans font-medium text-slate-400">{selectedPersonnel.name.split(' ')[0]}:</span>
                   <span className={`font-black text-xs ${soldierEval.levelColor}`}>
@@ -2281,28 +2281,28 @@ export const WelfareDashboard: React.FC = () => {
         </div>
 
         {/* Selected Factor Deep-Dive Intelligence Panel */}
-        <div className="p-6 sm:p-7 rounded-3xl bg-slate-900 text-white border border-slate-800 shadow-2xl space-y-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="p-6 sm:p-7 rounded-3xl bg-secondary text-white border border-secondary-800 shadow-2xl space-y-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-accent/15 rounded-full blur-3xl pointer-events-none" />
 
           {/* Factor Panel Header */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-5 relative z-10">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-secondary-800 pb-5 relative z-10">
             <div className="flex items-start gap-4">
               <div className={`w-14 h-14 rounded-2xl border flex items-center justify-center text-xl font-black shadow-lg shrink-0 ${
                 currentFactor.color === 'text-rose-600'
                   ? 'bg-rose-950/80 border-rose-800 text-rose-400'
                   : currentFactor.color === 'text-amber-600'
                   ? 'bg-amber-950/80 border-amber-800 text-amber-400'
-                  : 'bg-blue-950/80 border-blue-800 text-blue-400'
+                  : 'bg-secondary-900/80 border-secondary-700 text-accent'
               }`}>
                 <CurrentIcon className="w-7 h-7" />
               </div>
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-mono font-bold text-blue-400 bg-blue-950 px-2.5 py-0.5 rounded-full border border-blue-800">
+                  <span className="text-xs font-mono font-bold text-accent bg-secondary-900 px-2.5 py-0.5 rounded-full border border-secondary-700">
                     Factor #{currentFactor.num} &bull; {currentFactor.category}
                   </span>
-                  <span className="text-xs text-slate-400 font-mono">
-                    Model Reliability: <strong className="text-emerald-400">{currentFactor.modelConfidence}</strong>
+                  <span className="text-xs text-slate-300 font-mono">
+                    Model Reliability: <strong className="text-accent">{currentFactor.modelConfidence}</strong>
                   </span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white mt-1">
@@ -2317,14 +2317,14 @@ export const WelfareDashboard: React.FC = () => {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => handleTriggerAction(currentFactor.title, `${currentEvalResult.primaryAction} for ${selectedPersonnel.name}`)}
-                className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-blue-600/30 transition-all cursor-pointer"
+                className="px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-primary/30 transition-all cursor-pointer"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>{currentEvalResult.primaryAction}</span>
               </button>
               <button
                 onClick={() => handleTriggerAction(currentFactor.title, 'Telemetry Export')}
-                className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer"
+                className="px-3.5 py-2.5 rounded-xl bg-secondary-800 hover:bg-secondary-700 text-slate-200 text-xs font-bold border border-secondary-700 flex items-center gap-1.5 transition-all cursor-pointer"
               >
                 <FileText className="w-3.5 h-3.5 text-slate-400" />
                 <span>Export Dossier</span>
@@ -2335,32 +2335,32 @@ export const WelfareDashboard: React.FC = () => {
           {/* Factor Panel Body - Universal Multi-Source Telemetry & Parameters */}
           <div className="space-y-6 relative z-10">
             {/* Multi-Source Provenance Header Banner */}
-            <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="p-4 rounded-2xl bg-secondary-900/90 border border-secondary-700 flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[10px] font-mono font-extrabold uppercase px-2.5 py-1 rounded-full bg-blue-950 text-blue-300 border border-blue-800 flex items-center gap-1.5">
-                  <Database className="w-3.5 h-3.5 text-blue-400" />
+                <span className="text-[10px] font-mono font-extrabold uppercase px-2.5 py-1 rounded-full bg-secondary-950 text-secondary-200 border border-secondary-700 flex items-center gap-1.5">
+                  <Database className="w-3.5 h-3.5 text-accent" />
                   <span>Multi-Source Unified Telemetry & Clinical Model</span>
                 </span>
                 <span className="text-xs text-slate-300 font-medium">
-                  Evaluating Active Subject: <strong className="text-white">{selectedPersonnel.name}</strong> ({selectedPersonnel.rank}) &bull; <span className="text-blue-300 font-mono">{selectedPersonnel.uid}</span>
+                  Evaluating Active Subject: <strong className="text-white">{selectedPersonnel.name}</strong> ({selectedPersonnel.rank}) &bull; <span className="text-accent font-mono">{selectedPersonnel.uid}</span>
                 </span>
               </div>
 
               <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono font-bold">
-                <span className="px-2.5 py-1 rounded-lg bg-indigo-950 text-indigo-300 border border-indigo-800 flex items-center gap-1">
+                <span className="px-2.5 py-1 rounded-lg bg-secondary-950 text-secondary-200 border border-secondary-700 flex items-center gap-1">
                   📱 Mobile App: {currentEvalResult.mobileCount} Params
                 </span>
-                <span className="px-2.5 py-1 rounded-lg bg-amber-950 text-amber-300 border border-amber-800 flex items-center gap-1">
+                <span className="px-2.5 py-1 rounded-lg bg-amber-950 text-warning-300 border border-amber-800 flex items-center gap-1">
                   🏢 HRMS Portal: {currentEvalResult.hrmsCount} Params
                 </span>
-                <span className="px-2.5 py-1 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center gap-1">
+                <span className="px-2.5 py-1 rounded-lg bg-primary-950 text-primary-300 border border-primary-800 flex items-center gap-1">
                   💾 Central DB / Web: {currentEvalResult.databaseCount} Params
                 </span>
               </div>
             </div>
 
             {/* Composite Score Banner */}
-            <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-800 via-slate-800/90 to-slate-900 border border-slate-700 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+            <div className="p-5 rounded-2xl bg-gradient-to-r from-secondary-800 via-secondary-800/90 to-secondary-900 border border-secondary-700 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
               <div className="space-y-1.5">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${currentEvalResult.levelBg}`}>
@@ -2381,14 +2381,14 @@ export const WelfareDashboard: React.FC = () => {
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => handleTriggerAction(currentFactor.title, `${currentEvalResult.primaryAction} for ${selectedPersonnel.name}`)}
-                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-md cursor-pointer flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-bold transition-all shadow-md cursor-pointer flex items-center gap-1.5"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>{currentEvalResult.primaryAction}</span>
                 </button>
                 <button
                   onClick={() => handleTriggerAction(currentFactor.title, `${currentEvalResult.secondaryAction} for ${selectedPersonnel.name}`)}
-                  className="px-3.5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold border border-slate-600 transition-all cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-secondary-800 hover:bg-secondary-700 text-slate-200 text-xs font-bold border border-secondary-700 transition-all cursor-pointer"
                 >
                   {currentEvalResult.secondaryAction}
                 </button>
@@ -2402,22 +2402,22 @@ export const WelfareDashboard: React.FC = () => {
                 return (
                   <div
                     key={param.key}
-                    className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-3 relative group hover:border-slate-600 transition-all flex flex-col justify-between"
+                    className="p-4 rounded-2xl bg-secondary-900/80 border border-secondary-800/80 space-y-3 relative group hover:border-secondary-700 transition-all flex flex-col justify-between"
                   >
                     <div className="space-y-2">
                       {/* Header with weight and source tag */}
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono font-bold text-blue-300 bg-blue-950 px-2 py-0.5 rounded border border-blue-900">
+                        <span className="text-[10px] font-mono font-bold text-accent bg-secondary-950 px-2 py-0.5 rounded border border-secondary-800">
                           Weight: {param.weightLabel}
                         </span>
                         <span
                           className={`text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded-full flex items-center gap-1 ${
                             param.available
-                              ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                              ? 'bg-primary-950 text-primary-300 border border-primary-800'
                               : 'bg-rose-950 text-rose-300 border border-rose-800'
                           }`}
                         >
-                          <span className={`w-1.5 h-1.5 rounded-full ${param.available ? 'bg-emerald-400' : 'bg-rose-400 animate-ping'}`} />
+                          <span className={`w-1.5 h-1.5 rounded-full ${param.available ? 'bg-success' : 'bg-rose-400 animate-ping'}`} />
                           {param.available ? 'Synchronized' : 'Sync Pending'}
                         </span>
                       </div>
@@ -2427,11 +2427,11 @@ export const WelfareDashboard: React.FC = () => {
                         <h5 className="font-extrabold text-xs text-white leading-snug">
                           {param.name}
                         </h5>
-                        <p className="text-[10px] text-slate-400 line-clamp-1 font-medium mt-0.5">
+                        <p className="text-[10px] text-slate-300 line-clamp-1 font-medium mt-0.5">
                           {param.desc}
                         </p>
                         <div className="mt-1.5 flex items-center gap-1">
-                          <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-800 font-semibold">
+                          <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-secondary-950 text-slate-300 border border-secondary-800 font-semibold">
                             {param.sourceBadge}
                           </span>
                         </div>
@@ -2439,7 +2439,7 @@ export const WelfareDashboard: React.FC = () => {
                     </div>
 
                     {/* Read-only Fixed Telemetry Meter (No editable adjustment bar) */}
-                    <div className="space-y-2 pt-1 border-t border-slate-700/60">
+                    <div className="space-y-2 pt-1 border-t border-secondary-800/60">
                       <div className="flex items-center justify-between text-xs font-mono">
                         <span className="text-[10px] text-slate-400 font-sans">Retrieved Telemetry:</span>
                         <span className={`font-black text-sm ${param.color}`}>
@@ -2448,21 +2448,21 @@ export const WelfareDashboard: React.FC = () => {
                       </div>
 
                       {/* Fixed Meter Bar */}
-                      <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-700/80 p-0.5">
+                      <div className="w-full bg-secondary-950 rounded-full h-2 overflow-hidden border border-secondary-800/80 p-0.5">
                         <div
                           className={`h-full rounded-full transition-all duration-500 ${param.bar}`}
                           style={{ width: `${Math.min(100, Math.max(5, currentVal))}%` }}
                         />
                       </div>
 
-                      <div className="flex justify-between text-[9px] text-slate-500 font-mono">
+                      <div className="flex justify-between text-[9px] text-slate-400 font-mono">
                         <span>0% Nominal</span>
                         <span className="font-semibold text-slate-300">{currentVal}% Score</span>
                         <span>100% High</span>
                       </div>
 
                       {/* Telemetry Detail Note */}
-                      <p className="text-[10px] text-slate-300 line-clamp-2 leading-relaxed font-medium bg-slate-900/90 p-2 rounded-xl border border-slate-800">
+                      <p className="text-[10px] text-slate-300 line-clamp-2 leading-relaxed font-medium bg-secondary-950/90 p-2 rounded-xl border border-secondary-800">
                         {param.note}
                       </p>
                     </div>
@@ -2472,10 +2472,10 @@ export const WelfareDashboard: React.FC = () => {
             </div>
 
             {/* Action Recommendation Card */}
-            <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="p-4 rounded-2xl bg-secondary-900/80 border border-secondary-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="space-y-1">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-accent flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-accent" />
                   <span>Chief Welfare Officer Clinical Protocol for {selectedPersonnel.name}</span>
                 </span>
                 <p className="text-xs text-slate-200 leading-relaxed font-medium">
@@ -2488,34 +2488,34 @@ export const WelfareDashboard: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
               {/* Left: Root Cause Biomarkers */}
               <div className="lg:col-span-6 space-y-3">
-                <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-3">
+                <div className="p-5 rounded-2xl bg-secondary-900/80 border border-secondary-800/80 space-y-3">
                   <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                    <Brain className="w-4 h-4 text-blue-400" />
+                    <Brain className="w-4 h-4 text-accent" />
                     <span>Key Telemetry Signals & Root-Cause Biomarkers</span>
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {currentFactor.biomarkers.map((bio, idx) => (
-                      <div key={idx} className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-start gap-2 text-xs text-slate-200">
-                        <ChevronRight className="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
+                      <div key={idx} className="p-2.5 rounded-xl bg-secondary-950/90 border border-secondary-800 flex items-start gap-2 text-xs text-slate-200">
+                        <ChevronRight className="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" />
                         <span>{bio}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-2.5">
-                  <h4 className="text-xs font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <div className="p-5 rounded-2xl bg-secondary-900/80 border border-secondary-800/80 space-y-2.5">
+                  <h4 className="text-xs font-extrabold uppercase tracking-wider text-accent flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-accent" />
                     <span>Welfare Officer Action Protocol</span>
                   </h4>
-                  <p className="text-xs text-slate-200 leading-relaxed font-medium bg-slate-900/90 p-3.5 rounded-xl border border-slate-800">
+                  <p className="text-xs text-slate-200 leading-relaxed font-medium bg-secondary-950/90 p-3.5 rounded-xl border border-secondary-800">
                     {currentFactor.actionProtocol}
                   </p>
                 </div>
               </div>
 
               {/* Right: Flagged Personnel Cohort under this factor */}
-              <div className="lg:col-span-6 p-5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-3">
+              <div className="lg:col-span-6 p-5 rounded-2xl bg-secondary-900/80 border border-secondary-800/80 space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-300 flex items-center gap-2">
                     <Users className="w-4 h-4 text-amber-400" />
@@ -2528,12 +2528,12 @@ export const WelfareDashboard: React.FC = () => {
                   {currentFactor.flaggedPersonnel.map((p, idx) => (
                     <div
                       key={idx}
-                      className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                      className="p-3.5 rounded-xl bg-secondary-950/90 border border-secondary-800 hover:border-secondary-700 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                     >
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <span className="font-extrabold text-xs text-white">{p.name}</span>
-                          <span className="text-[10px] font-mono text-blue-300 bg-blue-950 px-1.5 py-0.5 rounded border border-blue-900">
+                          <span className="text-[10px] font-mono text-accent bg-secondary-900 px-1.5 py-0.5 rounded border border-secondary-700">
                             {p.uid}
                           </span>
                           <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
@@ -2561,7 +2561,7 @@ export const WelfareDashboard: React.FC = () => {
                             setSelectedPersonnelUid(p.uid);
                             handleTriggerAction(currentFactor.title, `Selected ${p.name} for ${currentFactor.title} analysis`);
                           }}
-                          className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs"
+                          className="px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-600 text-white text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs"
                         >
                           <Flame className="w-3 h-3" />
                           <span>Analyze {currentFactor.title.split(' ')[0]}</span>
@@ -2604,7 +2604,7 @@ export const WelfareDashboard: React.FC = () => {
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-extrabold text-sm text-slate-900">{p.name}</span>
-                    <span className="text-xs font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-bold">
+                    <span className="text-xs font-mono text-primary-700 bg-primary-50 px-2 py-0.5 rounded border border-primary-200 font-bold">
                       {p.uid}
                     </span>
                     <span className="text-xs font-mono text-slate-500 font-semibold">
@@ -2635,7 +2635,7 @@ export const WelfareDashboard: React.FC = () => {
                       setSelectedPersonnelUid(p.uid);
                       handleTriggerAction('Flagged Watchlist', `Selected ${p.name} for ${currentFactor.title} evaluation`);
                     }}
-                    className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
                   >
                     <Flame className="w-3.5 h-3.5" />
                     <span>Analyze Factor</span>
@@ -2656,15 +2656,15 @@ export const WelfareDashboard: React.FC = () => {
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5 font-medium">Scheduled debriefings & wellness follow-ups.</p>
               </div>
-              <Calendar className="w-4 h-4 text-emerald-600" />
+              <Calendar className="w-4 h-4 text-primary" />
             </div>
 
             <div className="space-y-3">
               {upcomingSessions.map((s, idx) => (
                 <div key={idx} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold text-emerald-700 flex items-center gap-1.5">
-                      <Clock className="w-3 h-3 text-emerald-600" />
+                    <span className="text-xs font-mono font-bold text-primary-700 flex items-center gap-1.5">
+                      <Clock className="w-3 h-3 text-primary" />
                       {s.scheduled_time}
                     </span>
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-white text-slate-700 font-bold border border-slate-200 shadow-xs">
@@ -2679,8 +2679,8 @@ export const WelfareDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-5 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-start gap-3">
-            <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+          <div className="mt-5 p-4 rounded-2xl bg-primary-50 border border-primary-200 text-xs text-primary-900 flex items-start gap-3">
+            <Sparkles className="w-4 h-4 text-primary shrink-0 mt-0.5" />
             <p className="text-[11px] leading-relaxed font-medium">
               HRMS AI Telemetry: Multi-factor welfare model synchronizing live data streams across Mobile App, HRMS Portal, and Central Database.
             </p>

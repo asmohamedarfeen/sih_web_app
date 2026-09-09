@@ -3,26 +3,28 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   // Strategic Defense Color Palette
-  static const Color primary = Color(0xFF0F172A); // Slate 900
-  static const Color secondary = Color(0xFF1E293B); // Slate 800
-  static const Color accent = Color(0xFF0284C7); // Tactical Sky Blue
-  static const Color accentLight = Color(0xFFE0F2FE); // Light Sky
+  static const Color primary = Color(0xFF2F4F3E); // Military Green
+  static const Color primaryLight = Color(0xFFEAF0EC);
+  static const Color secondary = Color(0xFF163A5F); // Navy Blue
+  static const Color secondaryLight = Color(0xFFE8EEF5);
+  static const Color accent = Color(0xFFD4A017); // Gold
+  static const Color accentLight = Color(0xFFFAF5E7);
   
   // Tactical Status Accents
-  static const Color emerald = Color(0xFF10B981); // Nominal / Synced
-  static const Color emeraldLight = Color(0xFFD1FAE5);
-  static const Color amber = Color(0xFFF59E0B); // Moderate / Warning
+  static const Color emerald = Color(0xFF16A34A); // Success Green
+  static const Color emeraldLight = Color(0xFFDCFCE7);
+  static const Color amber = Color(0xFFF59E0B); // Warning Amber
   static const Color amberLight = Color(0xFFFEF3C7);
-  static const Color rose = Color(0xFFEF4444); // High Risk / Alert
+  static const Color rose = Color(0xFFDC2626); // Danger Red
   static const Color roseLight = Color(0xFFFEE2E2);
   
   // Neutral Surfaces
-  static const Color background = Color(0xFFF8FAFC); // Slate 50
-  static const Color surface = Colors.white;
-  static const Color cardBorder = Color(0xFFE2E8F0); // Slate 200
-  static const Color textPrimary = Color(0xFF0F172A); // Slate 900
-  static const Color textSecondary = Color(0xFF64748B); // Slate 500
-  static const Color textMuted = Color(0xFF94A3B8); // Slate 400
+  static const Color background = Color(0xFFF8FAFC); // Off White
+  static const Color surface = Colors.white; // White Cards
+  static const Color cardBorder = Color(0xFFE2E8F0); // Subtle Border
+  static const Color textPrimary = Color(0xFF1F2937); // Dark Gray
+  static const Color textSecondary = Color(0xFF4B5563); // Gray 600
+  static const Color textMuted = Color(0xFF9CA3AF); // Gray 400
 }
 
 class AppTheme {
@@ -31,7 +33,7 @@ class AppTheme {
       useMaterial3: true,
       scaffoldBackgroundColor: AppColors.background,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.accent,
+        seedColor: AppColors.primary,
         primary: AppColors.primary,
         secondary: AppColors.secondary,
         surface: AppColors.surface,

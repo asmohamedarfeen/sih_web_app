@@ -42,13 +42,13 @@ export const PersonnelPage: React.FC = () => {
   const getRiskBadge = (risk: string) => {
     switch (risk) {
       case 'CRITICAL':
-        return 'bg-rose-50 text-rose-700 border-rose-200';
+        return 'bg-danger-50 text-danger-700 border-danger-200';
       case 'HIGH':
-        return 'bg-amber-50 text-amber-700 border-amber-200';
+        return 'bg-warning-50 text-warning-700 border-warning-200';
       case 'MODERATE':
-        return 'bg-blue-50 text-blue-700 border-blue-200';
+        return 'bg-accent-50 text-accent-700 border-accent-200';
       default:
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        return 'bg-success-50 text-success-700 border-success-200';
     }
   };
 
@@ -56,16 +56,16 @@ export const PersonnelPage: React.FC = () => {
     <div className="space-y-6">
       {/* Header Banner */}
       <div className="p-7 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-blue-50/60 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-secondary-50/60 rounded-full blur-3xl pointer-events-none" />
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-[0.15em] bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
+              <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-[0.15em] bg-secondary-50 text-secondary-700 border border-secondary-200 shadow-sm">
                 HRMS Force Directory
               </span>
               <span className="text-xs text-slate-500 font-mono font-semibold">&bull; Verified Service Personnel</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
               Personnel Management
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl font-medium">
@@ -77,7 +77,7 @@ export const PersonnelPage: React.FC = () => {
             onClick={fetchPersonnel}
             className="px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200 flex items-center gap-2 transition-all cursor-pointer shadow-sm self-start sm:self-auto"
           >
-            <RefreshCw className={`w-4 h-4 text-blue-600 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 text-secondary ${isLoading ? 'animate-spin' : ''}`} />
             <span>Refresh Roster</span>
           </button>
         </div>
@@ -92,7 +92,7 @@ export const PersonnelPage: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, UID, or regimental number..."
-            className="w-full white-input rounded-xl pl-10 pr-4 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
+            className="w-full white-input rounded-xl pl-10 pr-4 py-2 text-sm text-gray-900 placeholder:text-slate-400 focus:outline-none"
           />
         </form>
 
@@ -130,28 +130,28 @@ export const PersonnelPage: React.FC = () => {
             {personnel.map((p) => (
               <tr key={p.uid} className="hover:bg-slate-50/80 transition-colors">
                 <td className="py-3.5 px-3">
-                  <div className="font-extrabold text-sm text-slate-900">{p.name}</div>
+                  <div className="font-extrabold text-sm text-gray-900">{p.name}</div>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-[10px] font-mono font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+                    <span className="text-[10px] font-mono font-bold text-secondary-700 bg-secondary-50 px-1.5 py-0.5 rounded border border-secondary-200">
                       {p.uid}
                     </span>
                     <span className="text-[10px] font-mono text-slate-400">{p.regimental_number}</span>
                   </div>
                 </td>
                 <td className="py-3.5 px-3">
-                  <div className="font-bold text-slate-800">{p.rank}</div>
+                  <div className="font-bold text-gray-800">{p.rank}</div>
                   <div className="text-[11px] text-slate-500">{p.branch}</div>
                 </td>
                 <td className="py-3.5 px-3">
-                  <div className="font-semibold text-slate-800">{p.unit}</div>
+                  <div className="font-semibold text-gray-800">{p.unit}</div>
                   <div className="text-[10px] text-slate-400">Counselor: {p.counselor_assigned}</div>
                 </td>
                 <td className="py-3.5 px-3">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-700 border border-slate-200">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-100 text-gray-700 border border-slate-200">
                     {p.medical_category}
                   </span>
                 </td>
-                <td className="py-3.5 px-3 font-mono font-black text-sm text-slate-900">
+                <td className="py-3.5 px-3 font-mono font-black text-sm text-gray-900">
                   {p.stress_score}<span className="text-[10px] text-slate-400 font-normal">/100</span>
                 </td>
                 <td className="py-3.5 px-3">
@@ -162,7 +162,7 @@ export const PersonnelPage: React.FC = () => {
                 <td className="py-3.5 px-3 text-right">
                   <button
                     onClick={() => setSelectedPersonnel(p)}
-                    className="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold border border-blue-200 flex items-center gap-1.5 transition-all inline-flex cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-primary-50 hover:bg-primary-100 text-primary-700 text-xs font-bold border border-primary-200 flex items-center gap-1.5 transition-all inline-flex cursor-pointer"
                   >
                     <Eye className="w-3.5 h-3.5" />
                     <span>Dossier</span>
@@ -186,18 +186,18 @@ export const PersonnelPage: React.FC = () => {
             </button>
 
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 font-black text-lg shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-primary-50 border border-primary-200 flex items-center justify-center text-primary font-black text-lg shrink-0">
                 {selectedPersonnel.name.charAt(0)}
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-black text-slate-900">{selectedPersonnel.name}</h2>
+                  <h2 className="text-xl font-black text-gray-900">{selectedPersonnel.name}</h2>
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${getRiskBadge(selectedPersonnel.risk_level)}`}>
                     {selectedPersonnel.risk_level}
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 font-semibold mt-0.5">
-                  {selectedPersonnel.rank} &bull; {selectedPersonnel.branch} &bull; <span className="font-mono text-blue-700">{selectedPersonnel.uid}</span> ({selectedPersonnel.regimental_number})
+                  {selectedPersonnel.rank} &bull; {selectedPersonnel.branch} &bull; <span className="font-mono text-primary-700">{selectedPersonnel.uid}</span> ({selectedPersonnel.regimental_number})
                 </p>
               </div>
             </div>
@@ -205,24 +205,24 @@ export const PersonnelPage: React.FC = () => {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
                 <span className="text-[10px] font-bold text-slate-400 uppercase">Medical SHAPE</span>
-                <p className="text-sm font-black text-slate-900 font-mono mt-0.5">{selectedPersonnel.medical_category}</p>
+                <p className="text-sm font-black text-gray-900 font-mono mt-0.5">{selectedPersonnel.medical_category}</p>
               </div>
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
                 <span className="text-[10px] font-bold text-slate-400 uppercase">Sleep Avg</span>
-                <p className="text-sm font-black text-slate-900 font-mono mt-0.5">{selectedPersonnel.sleep_hours}h / night</p>
+                <p className="text-sm font-black text-gray-900 font-mono mt-0.5">{selectedPersonnel.sleep_hours}h / night</p>
               </div>
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
                 <span className="text-[10px] font-bold text-slate-400 uppercase">Shift Days</span>
-                <p className="text-sm font-black text-slate-900 font-mono mt-0.5">{selectedPersonnel.consecutive_duty_days} Days</p>
+                <p className="text-sm font-black text-gray-900 font-mono mt-0.5">{selectedPersonnel.consecutive_duty_days} Days</p>
               </div>
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
                 <span className="text-[10px] font-bold text-slate-400 uppercase">Fatigue Level</span>
-                <p className="text-sm font-black text-rose-600 font-mono mt-0.5">{selectedPersonnel.fatigue_level}/10</p>
+                <p className="text-sm font-black text-danger font-mono mt-0.5">{selectedPersonnel.fatigue_level}/10</p>
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900">
-              <span className="font-extrabold uppercase tracking-wide text-[10px] text-amber-800 block mb-1">
+            <div className="p-4 rounded-2xl bg-accent-50 border border-accent-200 text-xs text-accent-900">
+              <span className="font-extrabold uppercase tracking-wide text-[10px] text-accent-800 block mb-1">
                 AI Diagnostic Telemetry Flag
               </span>
               <p className="font-medium">{selectedPersonnel.trigger_factor}</p>

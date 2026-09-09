@@ -764,12 +764,12 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+                colors: [AppColors.secondary, Color(0xFF0F2640)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFF334155)),
+              border: Border.all(color: const Color(0xFF234B75)),
             ),
             child: Column(
               children: [
@@ -788,7 +788,7 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildMetricPill('Wellness', '$overall/100', const Color(0xFF38BDF8)),
+                    _buildMetricPill('Wellness', '$overall/100', AppColors.accent),
                     _buildMetricPill('Stress', '$stress/100', AppColors.amber),
                     _buildMetricPill('Burnout', '$burnout/100', AppColors.rose),
                     _buildMetricPill('Readiness', '$readiness/100', AppColors.emerald),
