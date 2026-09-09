@@ -1183,6 +1183,7 @@ export const WelfareDashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedRiskFilter, setSelectedRiskFilter] = useState<string>('ALL');
   const [selectedPersonnelUid, setSelectedPersonnelUid] = useState<string>('UID-EMP-012');
+  const [welfareActiveSection, setWelfareActiveSection] = useState<'all' | 'overview' | 'highrisk' | 'individual-ai' | 'interventions' | 'cases' | 'alerts' | 'analytics'>('all');
 
   const loadWelfareData = async () => {
     try {
@@ -1800,10 +1801,42 @@ export const WelfareDashboard: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {/* 7 Section Quick Navigation Pills */}
+        <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs">
+          {[
+            { id: 'all', label: 'All 7 Sections' },
+            { id: 'overview', label: '1. Overview', targetId: 'welfare-overview' },
+            { id: 'highrisk', label: '2. High-Risk Personnel', targetId: 'welfare-highrisk' },
+            { id: 'individual-ai', label: '3. Individual AI Analysis', targetId: 'welfare-individual-ai' },
+            { id: 'interventions', label: '4. Recommendations', targetId: 'welfare-interventions' },
+            { id: 'cases', label: '5. Case Management', targetId: 'welfare-cases' },
+            { id: 'alerts', label: '6. Alerts', targetId: 'welfare-alerts' },
+            { id: 'analytics', label: '7. Analytics', targetId: 'welfare-analytics' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setWelfareActiveSection(tab.id as any);
+                if (tab.targetId) {
+                  const el = document.getElementById(tab.targetId);
+                  el?.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                welfareActiveSection === tab.id
+                  ? 'bg-secondary text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-600 hover:text-gray-900 hover:bg-slate-200'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* SECTION 1: Metrics Row (Overview) */}
+      <div id="welfare-overview" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {metrics.map((m) => {
           const Icon = m.icon;
           return (
@@ -1824,10 +1857,8 @@ export const WelfareDashboard: React.FC = () => {
         })}
       </div>
 
-      {/* ========================================================================= */}
-      {/* SECTION: SEARCHABLE PERSONNEL DIRECTORY & MULTI-FACTOR LIVE PREDICTOR COMMAND */}
-      {/* ========================================================================= */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft space-y-6 relative overflow-hidden">
+      {/* SECTION 3: SEARCHABLE PERSONNEL DIRECTORY & MULTI-FACTOR LIVE PREDICTOR COMMAND */}
+      <div id="welfare-individual-ai" className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft space-y-6 relative overflow-hidden">
         {/* Header & Dynamic Counter */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
           <div>
@@ -2154,8 +2185,8 @@ export const WelfareDashboard: React.FC = () => {
             })}
           </div>
 
-          {/* Clinical Recommendation & Protocol Dispatch Card */}
-          <div className="p-5 rounded-2xl bg-secondary-900/80 border border-secondary-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          {/* SECTION 4: Clinical Recommendation & Protocol Dispatch Card */}
+          <div id="welfare-interventions" className="p-5 rounded-2xl bg-secondary-900/80 border border-secondary-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-accent flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-accent" />
@@ -2578,8 +2609,8 @@ export const WelfareDashboard: React.FC = () => {
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* High Risk Watchlist */}
-        <div className="lg:col-span-7 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft relative overflow-hidden">
+        {/* SECTION 2: High Risk Watchlist */}
+        <div id="welfare-highrisk" className="lg:col-span-7 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft relative overflow-hidden">
           <div className="flex items-center justify-between mb-5">
             <div>
               <h2 className="text-sm font-extrabold text-slate-900 uppercase tracking-[0.12em] flex items-center gap-2">
@@ -2646,8 +2677,8 @@ export const WelfareDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Counseling Schedule */}
-        <div className="lg:col-span-5 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft flex flex-col justify-between">
+        {/* SECTION 5: Counseling Schedule & Case Management */}
+        <div id="welfare-cases" className="lg:col-span-5 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>

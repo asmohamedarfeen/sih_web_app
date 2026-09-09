@@ -27,7 +27,7 @@ export const getRoleDashboardRoute = (role?: UserRole | null): string => {
     case 'TRAINING_OFFICER':
       return '/dashboard/hr';
     case 'PERSONNEL':
-      return '/dashboard/welfare';
+      return '/dashboard/personnel';
     default:
       return '/login';
   }

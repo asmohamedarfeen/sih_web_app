@@ -113,7 +113,7 @@ export const LoginPage: React.FC = () => {
             unit: 'Rapid Action Battalion 1',
             branch: 'CRPF',
             description: 'Self-service medical file, payslips, weapon custody, leave applications, and burnout survey.',
-            dashboard_route: '/dashboard/welfare',
+            dashboard_route: '/dashboard/personnel',
           },
         ]);
       }

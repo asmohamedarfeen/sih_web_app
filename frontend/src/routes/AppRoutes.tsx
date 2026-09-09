@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage } from '../pages/authentication';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { RoleProtectedRoute } from './RoleProtectedRoute';
-import { DashboardDispatcher, AdminDashboard, WelfareDashboard, CommanderDashboard, HRDashboard } from '../pages/dashboard';
+import { DashboardDispatcher, AdminDashboard, WelfareDashboard, CommanderDashboard, HRDashboard, PersonnelDashboard } from '../pages/dashboard';
 import { PersonnelPage } from '../pages/personnel';
 import { WellnessPage } from '../pages/wellness';
 import { AIRiskPage } from '../pages/ai-risk';
@@ -51,10 +51,22 @@ export const AppRoutes: React.FC = () => {
             <Route path="/admin/*" element={<AdminDashboard />} />
           </Route>
 
+          {/* Personnel / Soldier Dashboard */}
           <Route
             element={
               <RoleProtectedRoute
-                allowedRoles={['WELFARE_OFFICER', 'MEDICAL_OFFICER', 'SUPER_ADMIN', 'ADMIN', 'PERSONNEL']}
+                allowedRoles={['PERSONNEL', 'SUPER_ADMIN', 'ADMIN']}
+              />
+            }
+          >
+            <Route path="/dashboard/personnel" element={<PersonnelDashboard />} />
+            <Route path="/personnel-dashboard/*" element={<PersonnelDashboard />} />
+          </Route>
+
+          <Route
+            element={
+              <RoleProtectedRoute
+                allowedRoles={['WELFARE_OFFICER', 'MEDICAL_OFFICER', 'SUPER_ADMIN', 'ADMIN']}
               />
             }
           >

@@ -98,6 +98,15 @@ export const DashboardLayout: React.FC = () => {
           accentGradient: 'from-secondary-600 to-primary-600',
           activeNav: 'bg-secondary-50/90 text-secondary-700 border border-secondary-200/80 shadow-sm font-bold',
         };
+      case 'PERSONNEL':
+        return {
+          label: 'Frontline Personnel',
+          shortLabel: 'SOLDIER',
+          badgeClass: 'bg-primary-50 text-primary-700 border-primary-200',
+          dotClass: 'bg-primary',
+          accentGradient: 'from-primary to-primary-700',
+          activeNav: 'bg-primary text-white shadow-md shadow-primary/20 font-bold',
+        };
       default:
         return {
           label: 'Authorized Personnel',
@@ -112,16 +121,52 @@ export const DashboardLayout: React.FC = () => {
 
   const roleTheme = getRoleTheme(user?.role);
 
-  const getNavItems = () => [
-    { name: 'Command Overview', path: getRoleDashboardRoute(user?.role), icon: LayoutDashboard },
-    { name: 'Personnel Directory', path: '/personnel', icon: Users },
-    { name: 'Wellness Check-ins', path: '/wellness', icon: HeartPulse },
-    { name: 'AI Risk Diagnostics', path: '/ai-risk', icon: Brain },
-    { name: 'Welfare Interventions', path: '/interventions', icon: HandHeart },
-    { name: 'Tactical Alerts', path: '/alerts', icon: AlertTriangle },
-    { name: 'Analytics Center', path: '/analytics', icon: BarChart3 },
-    { name: 'Dossier Reports', path: '/reports', icon: FileText },
-  ];
+  const getNavItems = () => {
+    if (user?.role === 'PERSONNEL') {
+      return [
+        { name: 'Personal Dashboard', path: '/dashboard/personnel', icon: LayoutDashboard },
+        { name: 'Daily Check-ins', path: '/wellness', icon: HeartPulse },
+        { name: 'AI Health Insights', path: '/ai-risk', icon: Brain },
+        { name: 'Recovery Activities', path: '/interventions', icon: HandHeart },
+        { name: 'My Alerts & SOS', path: '/alerts', icon: AlertTriangle },
+        { name: 'My Service Record', path: '/reports', icon: FileText },
+      ];
+    }
+
+    if (user?.role === 'COMMANDER' || user?.role === 'DEPT_HEAD') {
+      return [
+        { name: 'Commander Dashboard', path: '/dashboard/commander', icon: LayoutDashboard },
+        { name: 'Formation Personnel', path: '/personnel', icon: Users },
+        { name: 'Readiness & Analytics', path: '/analytics', icon: BarChart3 },
+        { name: 'Tactical Alerts', path: '/alerts', icon: AlertTriangle },
+        { name: 'Operational Reports', path: '/reports', icon: FileText },
+      ];
+    }
+
+    if (user?.role === 'WELFARE_OFFICER' || user?.role === 'MEDICAL_OFFICER') {
+      return [
+        { name: 'Welfare Dashboard', path: '/dashboard/welfare', icon: LayoutDashboard },
+        { name: 'Monitored Personnel', path: '/personnel', icon: Users },
+        { name: 'Wellness Check-ins', path: '/wellness', icon: HeartPulse },
+        { name: 'AI Risk Diagnostics', path: '/ai-risk', icon: Brain },
+        { name: 'Welfare Interventions', path: '/interventions', icon: HandHeart },
+        { name: 'Tactical Alerts', path: '/alerts', icon: AlertTriangle },
+        { name: 'Analytics Center', path: '/analytics', icon: BarChart3 },
+        { name: 'Case Reports', path: '/reports', icon: FileText },
+      ];
+    }
+
+    return [
+      { name: 'System Command', path: getRoleDashboardRoute(user?.role), icon: LayoutDashboard },
+      { name: 'Personnel Directory', path: '/personnel', icon: Users },
+      { name: 'Wellness Check-ins', path: '/wellness', icon: HeartPulse },
+      { name: 'AI Risk Diagnostics', path: '/ai-risk', icon: Brain },
+      { name: 'Welfare Interventions', path: '/interventions', icon: HandHeart },
+      { name: 'Tactical Alerts', path: '/alerts', icon: AlertTriangle },
+      { name: 'Analytics Center', path: '/analytics', icon: BarChart3 },
+      { name: 'Dossier Reports', path: '/reports', icon: FileText },
+    ];
+  };
 
   const navItems = getNavItems();
 
