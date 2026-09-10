@@ -26,6 +26,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import FeatureDetailModal from '../../components/FeatureDetailModal';
+import { getWelfareFeatureDetail, WelfareFeatureDetail } from '../../utils/welfareMetricsData';
 
 export interface PriorityPersonnel {
   id: string;
@@ -360,6 +362,14 @@ export const WelfareDashboard: React.FC = () => {
   const [isWhyFlaggedOpen, setIsWhyFlaggedOpen] = useState(false);
   const [actionAlert, setActionAlert] = useState<string | null>(null);
   const [showFullMatrix, setShowFullMatrix] = useState(false);
+  const [selectedFeatureDetail, setSelectedFeatureDetail] = useState<WelfareFeatureDetail | null>(null);
+  const [isFeatureModalOpen, setIsFeatureModalOpen] = useState(false);
+
+  const handleOpenFeatureDetail = (featureNameOrId: string) => {
+    const detail = getWelfareFeatureDetail(featureNameOrId);
+    setSelectedFeatureDetail(detail);
+    setIsFeatureModalOpen(true);
+  };
 
   // Filtered personnel based on search query and risk tier
   const filteredPersonnel = useMemo(() => {
@@ -721,17 +731,23 @@ export const WelfareDashboard: React.FC = () => {
                 <h3 className="text-base font-black text-gray-900">AI Health Modules</h3>
               </div>
               <button
-                onClick={() => setShowFullMatrix(!showFullMatrix)}
-                className="text-xs font-bold text-primary hover:text-primary-700 flex items-center gap-1 cursor-pointer"
+                onClick={() => handleOpenFeatureDetail('Burnout Risk')}
+                className="text-xs font-bold text-primary hover:text-primary-700 flex items-center gap-1 cursor-pointer bg-primary-50/60 hover:bg-primary-100/60 px-2.5 py-1 rounded-xl transition-colors"
+                title="Inspect in-depth diagnostic breakdown"
               >
-                <span>View Details &rarr;</span>
+                <span>Inspect All &rarr;</span>
               </button>
             </div>
-            <p className="text-xs text-slate-500 font-medium mb-5">
-              Risk Distribution Across Key Factors (Total 520 Personnel)
-            </p>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-xs text-slate-500 font-medium">
+                Risk Distribution Across Key Factors (Total 520 Personnel)
+              </p>
+              <span className="text-[10px] text-primary font-bold bg-primary-50 px-2 py-0.5 rounded-md hidden sm:inline-block">
+                ⚡ Click any module for details
+              </span>
+            </div>
 
-            <div className="space-y-4">
+            <div className="space-y-2">
               {[
                 { name: 'Burnout Risk', pct: 24, count: 126, icon: Flame, color: 'bg-rose-600' },
                 { name: 'Psychological Distress', pct: 18, count: 94, icon: Brain, color: 'bg-orange-500' },
@@ -743,16 +759,26 @@ export const WelfareDashboard: React.FC = () => {
               ].map((mod) => {
                 const ModIcon = mod.icon;
                 return (
-                  <div key={mod.name} className="flex items-center gap-3 text-xs">
-                    <div className="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 shrink-0">
+                  <div
+                    key={mod.name}
+                    onClick={() => handleOpenFeatureDetail(mod.name)}
+                    className="flex items-center gap-3 text-xs p-2 -mx-2 rounded-xl hover:bg-slate-100/90 cursor-pointer transition-all group border border-transparent hover:border-slate-200"
+                    title={`Click to view deep-dive clinical formula, cohort, and SOP for ${mod.name}`}
+                  >
+                    <div className="w-6 h-6 rounded-lg bg-slate-100 group-hover:bg-[#163A5F] group-hover:text-white flex items-center justify-center text-slate-600 shrink-0 transition-colors">
                       <ModIcon className="w-3.5 h-3.5" />
                     </div>
-                    <div className="w-36 font-semibold text-slate-800 truncate">{mod.name}</div>
+                    <div className="w-36 font-semibold text-slate-800 group-hover:text-primary group-hover:font-black truncate transition-colors flex items-center gap-1">
+                      <span>{mod.name}</span>
+                    </div>
                     <div className="flex-1 bg-slate-100 rounded-full h-3 overflow-hidden">
                       <div className={`h-full ${mod.color} rounded-full transition-all duration-700`} style={{ width: `${mod.pct * 3.2}%` }} />
                     </div>
                     <div className="w-10 text-right font-black text-slate-900">{mod.pct}%</div>
                     <div className="w-10 text-right text-[11px] text-slate-400 font-medium">({mod.count})</div>
+                    <div className="text-[10px] text-primary font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pl-1">
+                      View &rarr;
+                    </div>
                   </div>
                 );
               })}
@@ -988,14 +1014,24 @@ export const WelfareDashboard: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-slate-500 font-medium mb-4">
-              Relative impact breakdown for {selectedPersonnel.name} ({selectedPersonnel.jcNumber})
+              Relative impact breakdown for {selectedPersonnel.name} ({selectedPersonnel.jcNumber}) &bull; Click any factor for analysis
             </p>
 
-            <div className="space-y-3.5">
+            <div className="space-y-3">
               {selectedPersonnel.topFactors.map((factor) => (
-                <div key={factor.name} className="text-xs">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-semibold text-slate-800">{factor.name}</span>
+                <div
+                  key={factor.name}
+                  onClick={() => handleOpenFeatureDetail(factor.name)}
+                  className="text-xs p-2 -mx-2 rounded-xl hover:bg-slate-50 cursor-pointer transition-all border border-transparent hover:border-slate-200 group"
+                  title={`Click to view deep-dive analysis on ${factor.name}`}
+                >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="font-semibold text-slate-800 group-hover:text-primary group-hover:font-black transition-colors flex items-center gap-1.5">
+                      <span>{factor.name}</span>
+                      <span className="text-[10px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                        &rarr;
+                      </span>
+                    </span>
                     <div className="flex items-center gap-2">
                       <span className="font-black text-slate-900">{factor.pct}%</span>
                       <span
@@ -1489,18 +1525,48 @@ export const WelfareDashboard: React.FC = () => {
                 { name: '12. Readiness Score', weight: '5%', formula: 'Physical + Mental Combat Index' },
                 { name: '13. Occupational Incident Risk', weight: '5%', formula: 'Fatigue Spike Correlation' },
               ].map((f) => (
-                <div key={f.name} className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
-                  <div className="font-bold text-gray-900 flex items-center justify-between">
-                    <span>{f.name}</span>
-                    <span className="text-primary font-mono">{f.weight}</span>
+                <div
+                  key={f.name}
+                  onClick={() => handleOpenFeatureDetail(f.name)}
+                  className="p-3.5 rounded-2xl bg-slate-50 hover:bg-white border border-slate-200/80 hover:border-[#D4A017] hover:shadow-lg cursor-pointer transition-all group relative flex flex-col justify-between"
+                  title={`Click to view entire mathematical formula, clinical evidence, cohort list, and SOP for ${f.name}`}
+                >
+                  <div>
+                    <div className="font-bold text-gray-900 group-hover:text-primary flex items-center justify-between transition-colors">
+                      <span className="truncate pr-2">{f.name}</span>
+                      <span className="text-primary font-mono text-[11px] bg-primary-50 px-2 py-0.5 rounded-md font-black shrink-0">
+                        {f.weight}
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-slate-500 font-mono mt-1.5 line-clamp-1">{f.formula}</div>
                   </div>
-                  <div className="text-[10px] text-slate-500 font-mono mt-1">{f.formula}</div>
+
+                  <div className="mt-3 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[10px] text-primary font-bold">
+                    <span className="group-hover:underline">Inspect Details &rarr;</span>
+                    <span className="text-[9px] text-slate-400 font-medium">SOP &bull; Telemetry</span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
       </div>
+
+      {/* ========================================================================= */}
+      {/* 8. FEATURE DEEP-DIVE & CLINICAL-MATHEMATICAL INTELLIGENCE MODAL           */}
+      {/* ========================================================================= */}
+      <FeatureDetailModal
+        isOpen={isFeatureModalOpen}
+        onClose={() => setIsFeatureModalOpen(false)}
+        feature={selectedFeatureDetail}
+        allPersonnel={ALL_PERSONNEL_DATABASE}
+        onSelectPersonnel={(p) => {
+          handleSelectPersonnel(p as any);
+        }}
+        onInitiateProtocol={(feat) => {
+          handleInitiateAction(`Standardized Triage Protocol for ${feat}`);
+        }}
+      />
     </div>
   );
 };
