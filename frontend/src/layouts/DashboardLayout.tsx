@@ -123,6 +123,8 @@ export const DashboardLayout: React.FC = () => {
 
   const roleTheme = getRoleTheme(user?.role);
 
+  const isCommander = user?.role === 'COMMANDER' || user?.role === 'DEPT_HEAD';
+
   const getNavItems = () => {
     if (user?.role === 'PERSONNEL') {
       return [
@@ -135,13 +137,17 @@ export const DashboardLayout: React.FC = () => {
       ];
     }
 
-    if (user?.role === 'COMMANDER' || user?.role === 'DEPT_HEAD') {
+    if (isCommander) {
       return [
-        { name: 'Commander Dashboard', path: '/dashboard/commander', icon: LayoutDashboard },
-        { name: 'Formation Personnel', path: '/personnel', icon: Users },
-        { name: 'Readiness & Analytics', path: '/analytics', icon: BarChart3 },
-        { name: 'Tactical Alerts', path: '/alerts', icon: AlertTriangle },
-        { name: 'Operational Reports', path: '/reports', icon: FileText },
+        { name: 'Dashboard', path: '/dashboard/commander', icon: LayoutDashboard },
+        { name: 'Force Overview', path: '/personnel', icon: Users },
+        { name: 'Unit Analysis', path: '/analytics', icon: BarChart3 },
+        { name: 'Risk & Alerts', path: '/alerts', icon: AlertTriangle, badge: '4' },
+        { name: 'AI Insights', path: '/ai-risk', icon: Brain },
+        { name: 'Welfare Actions', path: '/interventions', icon: HandHeart },
+        { name: 'Reports', path: '/reports', icon: FileText },
+        { name: 'Resources', path: '/wellness', icon: HeartPulse },
+        { name: 'Settings', path: '/alerts', icon: Sliders },
       ];
     }
 
@@ -173,17 +179,17 @@ export const DashboardLayout: React.FC = () => {
   const navItems = getNavItems();
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-gray-800 flex flex-col font-sans selection:bg-primary-500/20 selection:text-primary-900">
+    <div className={`min-h-screen ${isCommander ? 'bg-[#F4F6F9]' : 'bg-[#f8fafc]'} text-gray-800 flex flex-col font-sans selection:bg-primary-500/20 selection:text-primary-900`}>
       {/* Top Ambient Glow */}
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-primary-500/[0.04] blur-[100px] pointer-events-none z-0" />
 
-      {/* Top Header - Executive Navy Blue Command Bar */}
-      <header className="h-16 border-b border-secondary-800 bg-secondary text-white px-4 sm:px-6 flex items-center justify-between sticky top-0 z-40 shadow-md">
+      {/* Top Header - Executive Command Bar */}
+      <header className={`h-16 ${isCommander ? 'bg-[#0E231B] border-[#183B2E]' : 'bg-secondary border-secondary-800'} border-b text-white px-4 sm:px-6 flex items-center justify-between sticky top-0 z-40 shadow-md`}>
         {/* Left Branding */}
         <div className="flex items-center gap-4">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl text-slate-300 hover:text-white hover:bg-secondary-800 transition-colors cursor-pointer"
+            className="md:hidden p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
           >
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -192,69 +198,116 @@ export const DashboardLayout: React.FC = () => {
             className="flex items-center gap-3 cursor-pointer group"
             onClick={() => navigate(getRoleDashboardRoute(user?.role))}
           >
-            <div className="w-9 h-9 rounded-xl bg-primary border border-accent/40 shadow-md flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Shield className="w-4 h-4 text-accent" />
-            </div>
-
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="font-black text-sm tracking-wider text-white uppercase flex items-center gap-2">
-                  PSWMS
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-secondary-900 text-accent border border-secondary-700">
-                    DEFENSE COMMAND
-                  </span>
-                </h1>
+            {isCommander ? (
+              <div className="flex items-center gap-3">
+                {/* Indian Army Gold Crest / Emblem */}
+                <div className="w-10 h-10 rounded-xl bg-white/10 border border-[#D4A017]/40 shadow-md flex items-center justify-center p-1 shrink-0">
+                  <Shield className="w-5 h-5 text-[#D4A017]" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-black tracking-widest text-[#D4A017] uppercase">
+                      भारतीय सेना
+                    </span>
+                    <span className="text-[9px] font-bold text-slate-300 tracking-wider">
+                      INDIAN ARMY
+                    </span>
+                    <span className="hidden xl:inline-block text-[8px] text-[#D4A017]/80 font-semibold border-l border-white/20 pl-2">
+                      SERVICE &bull; SECURITY &bull; SELFLESSNESS
+                    </span>
+                  </div>
+                  <h1 className="font-black text-sm tracking-tight text-white flex items-center gap-2">
+                    AI Command Readiness Center
+                    <span className="hidden sm:inline-block text-[10px] font-semibold text-slate-300 font-normal">
+                      &bull; People Ready | Units Strong | Nation Secure
+                    </span>
+                  </h1>
+                </div>
               </div>
-              <p className="text-[10px] text-slate-300 font-medium tracking-wide">
-                Personnel Stress &amp; Welfare Intelligence Command
-              </p>
-            </div>
+            ) : (
+              <>
+                <div className="w-9 h-9 rounded-xl bg-primary border border-accent/40 shadow-md flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <Shield className="w-4 h-4 text-accent" />
+                </div>
+
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h1 className="font-black text-sm tracking-wider text-white uppercase flex items-center gap-2">
+                      PSWMS
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-secondary-900 text-accent border border-secondary-700">
+                        DEFENSE COMMAND
+                      </span>
+                    </h1>
+                  </div>
+                  <p className="text-[10px] text-slate-300 font-medium tracking-wide">
+                    Personnel Stress &amp; Welfare Intelligence Command
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
-        {/* Center Live Status */}
-        <div className="hidden lg:flex items-center gap-3 px-3.5 py-1.5 rounded-full bg-secondary-900 border border-secondary-700 text-xs text-slate-200 shadow-sm">
-          <Radio className="w-3.5 h-3.5 text-success animate-pulse" />
-          <span className="text-white font-semibold">Gateway Active</span>
-          <span className="text-secondary-700">&bull;</span>
-          <div className="flex items-center gap-1 font-mono text-[11px] text-slate-300 font-medium">
-            <Clock className="w-3 h-3 text-accent" />
-            <span>IST {currentTime || 'LIVE'}</span>
+        {/* Center / Motto */}
+        {isCommander ? (
+          <div className="hidden lg:flex items-center gap-2 text-xs text-slate-300 italic tracking-wide">
+            <span>Stronger Soldiers</span>
+            <span className="text-slate-500">&bull;</span>
+            <span>Stronger Missions</span>
+            <span className="text-slate-500">&bull;</span>
+            <span className="text-white font-medium">A Safer India</span>
           </div>
-        </div>
+        ) : (
+          <div className="hidden lg:flex items-center gap-3 px-3.5 py-1.5 rounded-full bg-secondary-900 border border-secondary-700 text-xs text-slate-200 shadow-sm">
+            <Radio className="w-3.5 h-3.5 text-success animate-pulse" />
+            <span className="text-white font-semibold">Gateway Active</span>
+            <span className="text-secondary-700">&bull;</span>
+            <div className="flex items-center gap-1 font-mono text-[11px] text-slate-300 font-medium">
+              <Clock className="w-3 h-3 text-accent" />
+              <span>IST {currentTime || 'LIVE'}</span>
+            </div>
+          </div>
+        )}
 
         {/* Right User & Role Info */}
         <div className="flex items-center gap-3">
-          {/* Active Role Badge */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border bg-secondary-900 text-accent border-secondary-700 shadow-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-            <span>{roleTheme.label}</span>
-          </div>
+          {!isCommander && (
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border bg-secondary-900 text-accent border-secondary-700 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+              <span>{roleTheme.label}</span>
+            </div>
+          )}
 
           {/* Notification Button */}
-          <button className="p-2 rounded-xl text-slate-300 hover:text-white bg-secondary-900 hover:bg-secondary-800 border border-secondary-700 shadow-sm transition-all relative cursor-pointer">
+          <button className={`p-2 rounded-xl text-slate-300 hover:text-white ${isCommander ? 'bg-black/30 hover:bg-black/40 border-[#1B382D]' : 'bg-secondary-900 hover:bg-secondary-800 border-secondary-700'} border shadow-sm transition-all relative cursor-pointer`}>
             <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-accent ring-2 ring-secondary" />
+            <span className="absolute top-1 right-1 px-1 min-w-[14px] h-[14px] rounded-full bg-rose-500 text-[9px] font-bold text-white flex items-center justify-center">
+              4
+            </span>
           </button>
 
           {/* User Profile Pill */}
           <div className="relative">
             <button
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-              className="flex items-center gap-2.5 p-1.5 pr-2.5 rounded-xl bg-secondary-900 hover:bg-secondary-800 border border-secondary-700 shadow-sm transition-all text-left cursor-pointer"
+              className={`flex items-center gap-2.5 p-1.5 pr-2.5 rounded-xl ${isCommander ? 'bg-black/30 hover:bg-black/40 border-[#1B382D]' : 'bg-secondary-900 hover:bg-secondary-800 border-secondary-700'} border shadow-sm transition-all text-left cursor-pointer`}
             >
-              <div className="w-7 h-7 rounded-lg bg-primary border border-accent/40 flex items-center justify-center text-xs font-bold text-accent shadow-sm overflow-hidden">
+              <div className="w-7 h-7 rounded-lg bg-[#D4A017]/20 border border-[#D4A017]/50 flex items-center justify-center text-xs font-bold text-[#D4A017] shadow-sm overflow-hidden">
                 {user?.avatar_url ? (
                   <img src={user.avatar_url} alt={user.full_name} className="w-full h-full object-cover" />
                 ) : (
-                  user?.full_name?.charAt(0) || 'U'
+                  user?.full_name?.charAt(0) || 'C'
                 )}
               </div>
               <div className="hidden md:block">
-                <p className="text-xs font-bold text-white leading-tight">{user?.full_name}</p>
-                <p className="text-[10px] text-slate-300 font-medium">{user?.rank || user?.role}</p>
+                <p className="text-xs font-bold text-white leading-tight">
+                  {isCommander ? 'Commander' : user?.full_name}
+                </p>
+                <p className="text-[10px] text-slate-300 font-medium">
+                  {isCommander ? 'Northern Command' : (user?.rank || user?.role)}
+                </p>
               </div>
-              <ChevronDown className="w-3.5 h-3.5 text-accent ml-0.5" />
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
             </button>
 
             {isUserMenuOpen && (
@@ -294,6 +347,12 @@ export const DashboardLayout: React.FC = () => {
               </div>
             )}
           </div>
+
+          {/* Date & Time display */}
+          <div className="hidden xl:flex items-center gap-1.5 text-xs text-slate-300 font-mono border-l border-white/10 pl-3">
+            <Clock className="w-3.5 h-3.5 text-[#D4A017]" />
+            <span>Mon, 8 Sep 2025 | 10:24 AM</span>
+          </div>
         </div>
       </header>
 
@@ -302,16 +361,20 @@ export const DashboardLayout: React.FC = () => {
         {/* Sidebar */}
         <aside
           className={`${
-            isMobileMenuOpen ? 'block fixed inset-0 top-16 z-30 bg-white/95 backdrop-blur-xl' : 'hidden'
-          } md:block w-64 border-r border-slate-200/90 bg-white p-4 space-y-6 shrink-0 z-20 flex flex-col justify-between shadow-xs`}
+            isMobileMenuOpen ? 'block fixed inset-0 top-16 z-30' : 'hidden'
+          } md:block w-64 ${
+            isCommander
+              ? 'bg-[#0E231B] border-r border-[#193A2D] text-slate-200'
+              : 'bg-white border-r border-slate-200/90 text-gray-800'
+          } p-3.5 space-y-4 shrink-0 z-20 flex flex-col justify-between shadow-xs overflow-y-auto`}
         >
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 px-3 mb-2.5">
-                Primary Modules
+              <p className={`text-[10px] font-black uppercase tracking-[0.15em] ${isCommander ? 'text-emerald-500/80' : 'text-slate-400'} px-3 mb-2`}>
+                {isCommander ? 'Command Modules' : 'Primary Modules'}
               </p>
               <nav className="space-y-1">
-                {navItems.map((item) => {
+                {navItems.map((item: any) => {
                   const Icon = item.icon;
                   const isActive = location.pathname === item.path;
 
@@ -322,14 +385,25 @@ export const DashboardLayout: React.FC = () => {
                         navigate(item.path);
                         setIsMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs transition-all cursor-pointer ${
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all cursor-pointer ${
                         isActive
-                          ? 'bg-primary text-white shadow-md shadow-primary/20 font-bold'
+                          ? isCommander
+                            ? 'bg-[#1F4A38] text-white shadow-md font-bold border border-emerald-500/40'
+                            : 'bg-primary text-white shadow-md shadow-primary/20 font-bold'
+                          : isCommander
+                          ? 'text-slate-300 hover:text-white hover:bg-white/5 font-medium'
                           : 'text-slate-600 hover:text-gray-900 hover:bg-slate-100 font-medium'
                       }`}
                     >
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-accent' : 'text-slate-400'}`} />
-                      <span>{item.name}</span>
+                      <div className="flex items-center gap-3">
+                        <Icon className={`w-4 h-4 ${isActive ? (isCommander ? 'text-emerald-400' : 'text-accent') : (isCommander ? 'text-slate-400' : 'text-slate-400')}`} />
+                        <span>{item.name}</span>
+                      </div>
+                      {item.badge && (
+                        <span className="w-5 h-5 rounded-full bg-rose-600 text-white text-[10px] font-black flex items-center justify-center shadow-xs">
+                          {item.badge}
+                        </span>
+                      )}
                     </button>
                   );
                 })}
@@ -337,19 +411,23 @@ export const DashboardLayout: React.FC = () => {
             </div>
 
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 px-3 mb-2.5">
+              <p className={`text-[10px] font-black uppercase tracking-[0.15em] ${isCommander ? 'text-emerald-500/80' : 'text-slate-400'} px-3 mb-2`}>
                 Role Dispatch
               </p>
               <div className="space-y-1 px-1">
                 <button
                   onClick={() => navigate('/login')}
-                  className="w-full text-left p-2.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-slate-300 text-xs text-slate-700 hover:text-gray-900 transition-all flex items-center justify-between group cursor-pointer shadow-sm"
+                  className={`w-full text-left p-2.5 rounded-xl ${
+                    isCommander
+                      ? 'bg-black/30 border-[#1B382D] hover:bg-black/40 text-slate-300'
+                      : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-700 hover:text-gray-900'
+                  } border text-xs transition-all flex items-center justify-between group cursor-pointer shadow-sm`}
                 >
                   <div className="flex items-center gap-2 font-medium">
                     <Compass className="w-3.5 h-3.5 text-slate-400 group-hover:text-primary transition-colors" />
                     <span>Change Profile</span>
                   </div>
-                  <span className="text-[10px] font-mono text-primary bg-primary-50 px-1.5 py-0.5 rounded font-bold border border-primary-200">
+                  <span className={`text-[10px] font-mono ${isCommander ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 'bg-primary-50 text-primary border-primary-200'} px-1.5 py-0.5 rounded font-bold border`}>
                     Switch
                   </span>
                 </button>
@@ -357,20 +435,51 @@ export const DashboardLayout: React.FC = () => {
             </div>
           </div>
 
-          {/* Bottom Security Card */}
-          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 space-y-2 shadow-sm">
-            <div className="flex items-center gap-2 text-gray-900 font-bold">
-              <ShieldCheck className="w-4 h-4 text-primary" />
-              <span>Defense Grade RBAC</span>
+          {/* Bottom Card / Soldier Silhouette for Commander */}
+          {isCommander ? (
+            <div className="relative rounded-2xl overflow-hidden bg-gradient-to-t from-[#091510] via-[#0e221b] to-transparent p-3 pt-6 text-center border border-[#1b3d30]/60 mt-auto">
+              <svg viewBox="0 0 200 80" className="w-full h-16 text-[#091510] -mb-1 opacity-95" preserveAspectRatio="none">
+                <path d="M0,80 L0,45 L35,22 L70,38 L110,12 L145,35 L180,18 L200,30 L200,80 Z" fill="#0A1C15" />
+                <path d="M0,80 L0,55 L30,38 L70,50 L120,32 L160,48 L200,36 L200,80 Z" fill="#07140F" />
+                <g transform="translate(32, 12) scale(0.65)" fill="#040B08">
+                  <ellipse cx="25" cy="12" rx="6" ry="6.5" />
+                  <path d="M18,18 C18,18 20,35 21,48 L29,48 C30,35 32,18 32,18 Z" />
+                  <path d="M14,22 C14,22 17,20 18,26 L18,36 C16,36 14,32 14,22 Z" />
+                  <path d="M21,48 L19,75 L22,76 L25,52 L28,75 L31,75 L29,48 Z" />
+                  <line x1="8" y1="28" x2="38" y2="40" stroke="#040B08" strokeWidth="2.5" strokeLinecap="round" />
+                  <line x1="6" y1="26" x2="12" y2="30" stroke="#040B08" strokeWidth="3" />
+                </g>
+              </svg>
+              <div className="relative z-10 -mt-1">
+                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-200">
+                  NATION FIRST
+                </div>
+                <div className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
+                  ALWAYS
+                </div>
+                {/* Indian Tricolor Bar */}
+                <div className="flex h-1 w-14 mx-auto mt-1 rounded-full overflow-hidden shadow-xs">
+                  <div className="w-1/3 bg-[#FF9933]" />
+                  <div className="w-1/3 bg-[#FFFFFF]" />
+                  <div className="w-1/3 bg-[#138808]" />
+                </div>
+              </div>
             </div>
-            <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
-              Active session verified with 256-bit cryptographic tokens.
-            </p>
-          </div>
+          ) : (
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 space-y-2 shadow-sm">
+              <div className="flex items-center gap-2 text-gray-900 font-bold">
+                <ShieldCheck className="w-4 h-4 text-primary" />
+                <span>Defense Grade RBAC</span>
+              </div>
+              <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+                Active session verified with 256-bit cryptographic tokens.
+              </p>
+            </div>
+          )}
         </aside>
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#f8fafc] relative">
+        <main className={`flex-1 overflow-y-auto ${isCommander ? 'p-3 sm:p-5 lg:p-6 bg-[#F4F6F9]' : 'p-4 sm:p-6 lg:p-8 bg-[#f8fafc]'} relative`}>
           <Outlet />
         </main>
       </div>
