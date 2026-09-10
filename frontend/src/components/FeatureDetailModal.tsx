@@ -12,7 +12,6 @@ import {
   ExternalLink,
   ChevronRight,
   TrendingUp,
-  Cpu,
   Clock,
   Printer,
 } from 'lucide-react';
@@ -48,7 +47,6 @@ export const FeatureDetailModal: React.FC<FeatureDetailModalProps> = ({
   onInitiateProtocol,
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'formula' | 'cohort' | 'sop'>('overview');
-  const [copiedFormula, setCopiedFormula] = useState(false);
 
   // Close on Escape key
   useEffect(() => {
@@ -71,12 +69,6 @@ export const FeatureDetailModal: React.FC<FeatureDetailModalProps> = ({
   const cohortPersonnel = allPersonnel.filter((p) =>
     feature.flaggedPersonnelIds.includes(p.jcNumber) || p.riskScore >= 75
   ).slice(0, 5);
-
-  const handleCopyFormula = () => {
-    navigator.clipboard.writeText(feature.mathematicalFormula);
-    setCopiedFormula(true);
-    setTimeout(() => setCopiedFormula(false), 2000);
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-black/60 backdrop-blur-sm animate-fade-in">
@@ -264,29 +256,6 @@ export const FeatureDetailModal: React.FC<FeatureDetailModalProps> = ({
           {/* TAB 2: MATHEMATICAL FORMULA & AI ARCHITECTURE */}
           {activeTab === 'formula' && (
             <div className="space-y-6">
-              {/* Formula Banner */}
-              <div className="p-5 rounded-2xl bg-slate-900 text-slate-100 space-y-3 shadow-inner">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-mono font-bold text-emerald-400">
-                    <Cpu className="w-4 h-4" />
-                    <span>PRODUCTION ALGORITHMIC FORMULATION (v2.4)</span>
-                  </div>
-                  <button
-                    onClick={handleCopyFormula}
-                    className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-semibold text-slate-200 transition-colors cursor-pointer"
-                  >
-                    {copiedFormula ? '✓ Formula Copied' : 'Copy Formula'}
-                  </button>
-                </div>
-                <div className="p-3 bg-black/40 rounded-xl font-mono text-xs sm:text-sm text-[#D4A017] overflow-x-auto whitespace-nowrap">
-                  {feature.mathematicalFormula}
-                </div>
-                <div className="flex items-center justify-between text-[11px] text-slate-400">
-                  <span>Objective: Minimize False Negatives in Combat Stress Flagging</span>
-                  <span className="text-emerald-400 font-semibold">AUC-ROC: 0.964</span>
-                </div>
-              </div>
-
               {/* Variables Breakdown Table */}
               <div className="space-y-3">
                 <h4 className="font-black text-slate-900 text-xs uppercase tracking-wider flex items-center gap-2">
