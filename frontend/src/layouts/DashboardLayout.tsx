@@ -19,6 +19,8 @@ import {
   Compass,
   Radio,
   Clock,
+  Activity,
+  Sliders,
 } from 'lucide-react';
 import { useAuthStore, getRoleDashboardRoute } from '../store/authStore';
 import { authService } from '../services/authService';
@@ -145,14 +147,14 @@ export const DashboardLayout: React.FC = () => {
 
     if (user?.role === 'WELFARE_OFFICER' || user?.role === 'MEDICAL_OFFICER') {
       return [
-        { name: 'Welfare Dashboard', path: '/dashboard/welfare', icon: LayoutDashboard },
-        { name: 'Monitored Personnel', path: '/personnel', icon: Users },
-        { name: 'Wellness Check-ins', path: '/wellness', icon: HeartPulse },
-        { name: 'AI Risk Diagnostics', path: '/ai-risk', icon: Brain },
-        { name: 'Welfare Interventions', path: '/interventions', icon: HandHeart },
-        { name: 'Tactical Alerts', path: '/alerts', icon: AlertTriangle },
-        { name: 'Analytics Center', path: '/analytics', icon: BarChart3 },
-        { name: 'Case Reports', path: '/reports', icon: FileText },
+        { name: 'Dashboard', path: '/dashboard/welfare', icon: LayoutDashboard },
+        { name: 'Personnel Overview', path: '/personnel', icon: Users },
+        { name: 'Risk Analysis', path: '/analytics', icon: Activity },
+        { name: 'AI Predictions', path: '/ai-risk', icon: Brain },
+        { name: 'Welfare Actions', path: '/interventions', icon: HandHeart },
+        { name: 'Reports & Analytics', path: '/reports', icon: FileText },
+        { name: 'Resource Center', path: '/wellness', icon: HeartPulse },
+        { name: 'Settings', path: '/alerts', icon: Sliders },
       ];
     }
 
