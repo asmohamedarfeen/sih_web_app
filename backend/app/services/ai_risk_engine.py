@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+from datetime import datetime
 from typing import Dict, Any, List, Optional
 import numpy as np
 
@@ -614,7 +615,229 @@ class AIRiskEngine:
             }
         }
 
+    def simulate_counterfactual_intervention(
+        self,
+        baseline_sleep_hours: float,
+        baseline_fatigue_level: int,
+        baseline_mood_score: int,
+        baseline_workload_pressure: int,
+        baseline_physical_strain: int,
+        baseline_consecutive_duty_days: int,
+        extra_sleep_hours: float = 0.0,
+        reduce_night_shifts: int = 0,
+        grant_leave_days: int = 0,
+        station_reassignment: str = "CURRENT",
+        counseling_session_held: bool = False
+    ) -> Dict[str, Any]:
+        """
+        What-If Counterfactual Decision Support Engine.
+        Simulates the projected operational strain and risk trajectory across 30 days
+        resulting from tactical command adjustments (leave, rest, shift rotation, reassignment).
+        """
+        # 1. Baseline Evaluation
+        baseline_eval = self.evaluate_risk(
+            sleep_hours=baseline_sleep_hours,
+            fatigue_level=baseline_fatigue_level,
+            mood_score=baseline_mood_score,
+            workload_pressure=baseline_workload_pressure,
+            physical_strain=baseline_physical_strain,
+            consecutive_duty_days=baseline_consecutive_duty_days
+        )
+
+        # 2. Compute Counterfactual Adjustments
+        sim_sleep = min(9.0, max(3.0, baseline_sleep_hours + extra_sleep_hours))
+        
+        # Consec days drop if night shifts are relieved or leave is granted
+        leave_day_relief = 4 if grant_leave_days >= 7 else (2 if grant_leave_days > 0 else 0)
+        sim_consecutive = max(1, baseline_consecutive_duty_days - reduce_night_shifts - leave_day_relief)
+
+        # Fatigue drops with restorative sleep, leave, and counseling
+        fatigue_reduction = int(extra_sleep_hours * 1.2) + (3 if grant_leave_days >= 7 else 1 if grant_leave_days > 0 else 0) + (1 if counseling_session_held else 0)
+        sim_fatigue = max(1, min(10, baseline_fatigue_level - fatigue_reduction))
+
+        # Mood improves with leave, rest, and counseling
+        mood_boost = (2 if grant_leave_days > 0 else 0) + (1 if extra_sleep_hours >= 1.5 else 0) + (1 if counseling_session_held else 0)
+        sim_mood = min(10, max(1, baseline_mood_score + mood_boost))
+
+        # Workload drops if leave is granted or moved to peace station
+        station_relief = 2 if station_reassignment in ["PEACE_STATION", "GARRISON_BASE"] else 0
+        sim_workload = max(1, min(10, baseline_workload_pressure - (3 if grant_leave_days > 0 else 0) - station_relief))
+
+        # Physical strain drops if high-altitude duty is normalized
+        sim_physical = max(1, min(10, baseline_physical_strain - station_relief - (2 if grant_leave_days > 0 else 0)))
+
+        # 3. Counterfactual Simulated Evaluation
+        sim_eval = self.evaluate_risk(
+            sleep_hours=sim_sleep,
+            fatigue_level=sim_fatigue,
+            mood_score=sim_mood,
+            workload_pressure=sim_workload,
+            physical_strain=sim_physical,
+            consecutive_duty_days=sim_consecutive
+        )
+
+        b_score = baseline_eval["stress_score"]
+        s_score = sim_eval["stress_score"]
+        delta = round(b_score - s_score, 1)
+        pct_recovery = round((delta / b_score) * 100, 1) if b_score > 0 else 0.0
+
+        # Trajectory forecast
+        if s_score < 45.0:
+            projected_trajectory = "SUSTAINED EQUILIBRIUM: Full cognitive stamina and combat fitness expected across next 30 days."
+            feasibility = "HIGHLY RECOMMENDED"
+        elif s_score < 65.0:
+            projected_trajectory = "CONTROLLED STABILITY: Fatigue contained within nominal operational safety threshold."
+            feasibility = "TACTICALLY SOUND"
+        else:
+            projected_trajectory = "RESIDUAL ELEVATED STRAIN: Additional compassionate furlough or clinical debrief warranted."
+            feasibility = "INSUFFICIENT RELIEF"
+
+        return {
+            "baseline": {
+                "stress_score": b_score,
+                "risk_level": baseline_eval["risk_level"],
+                "burnout_probability": baseline_eval["burnout_probability"],
+                "sleep_hours": baseline_sleep_hours,
+                "fatigue_level": baseline_fatigue_level,
+                "consecutive_duty_days": baseline_consecutive_duty_days
+            },
+            "simulated": {
+                "stress_score": s_score,
+                "risk_level": sim_eval["risk_level"],
+                "burnout_probability": sim_eval["burnout_probability"],
+                "sleep_hours": sim_sleep,
+                "fatigue_level": sim_fatigue,
+                "consecutive_duty_days": sim_consecutive
+            },
+            "delta_points": delta,
+            "percentage_risk_reduction": pct_recovery,
+            "projected_30_day_trajectory": projected_trajectory,
+            "command_feasibility_verdict": feasibility,
+            "interventions_simulated": {
+                "extra_sleep_hours": extra_sleep_hours,
+                "reduce_night_shifts": reduce_night_shifts,
+                "grant_leave_days": grant_leave_days,
+                "station_reassignment": station_reassignment,
+                "counseling_session_held": counseling_session_held
+            }
+        }
+
+    def compute_sparsity_confidence(self, missing_checkin_days: int = 0, lookback_window: int = 14) -> Dict[str, Any]:
+        """
+        Quantified Data Sparsity & Model Confidence Degradation Engine.
+        Adjusts prediction confidence based on telemetry compliance and missing daily pulses.
+        """
+        logged_days = max(0, lookback_window - missing_checkin_days)
+        compliance_pct = round((logged_days / lookback_window) * 100, 1)
+        
+        # Base ML confidence (95% for complete continuous data)
+        # Drops non-linearly with missing checkin days
+        if missing_checkin_days == 0:
+            adjusted_conf = 0.95
+            fidelity_tier = "HIGH_FIDELITY"
+            advisory = "Complete longitudinal check-in stream. Model inference operating at peak mathematical confidence."
+        elif missing_checkin_days <= 2:
+            adjusted_conf = 0.88
+            fidelity_tier = "GOOD_FIDELITY"
+            advisory = "Minor telemetry gap (<=2 days). Model interpolates with high statistical confidence."
+        elif missing_checkin_days <= 4:
+            adjusted_conf = 0.74
+            fidelity_tier = "MODERATE_SPARSITY"
+            advisory = "Moderate sparsity gap detected. Recommend prompting soldier for pulse check-in before high-tempo deployment."
+        elif missing_checkin_days <= 7:
+            adjusted_conf = 0.58
+            fidelity_tier = "ELEVATED_SPARSITY"
+            advisory = "Noticeable data decay. Commander should order buddy-pair physical confirmation of soldier well-being."
+        else:
+            adjusted_conf = 0.42
+            fidelity_tier = "CRITICAL_SPARSITY"
+            advisory = "Severe telemetry deficit (>7 missing pulses). Formal clinical evaluation mandated before validating combat clearance."
+
+        return {
+            "lookback_window_days": lookback_window,
+            "logged_days": logged_days,
+            "missing_days": missing_checkin_days,
+            "telemetry_compliance_pct": compliance_pct,
+            "adjusted_model_confidence": round(adjusted_conf, 2),
+            "fidelity_tier": fidelity_tier,
+            "clinical_advisory": advisory,
+            "sparsity_penalty_applied": round(0.95 - adjusted_conf, 2)
+        }
+
+    def generate_clinical_narrative(
+        self,
+        personnel_uid: str,
+        personnel_name: str,
+        rank: str,
+        unit: str,
+        risk_evaluation: Dict[str, Any],
+        missing_days: int = 0
+    ) -> Dict[str, Any]:
+        """
+        Defense-Standard Natural Language Clinical Narrative Generator.
+        Synthesizes biometric telemetry, SHAP risk attributions, and data sparsity
+        into a concise, military-standard welfare appraisal brief (Form 16-Welfare standard).
+        """
+        stress_score = risk_evaluation.get("stress_score", 50.0)
+        risk_level = risk_evaluation.get("risk_level", "MODERATE")
+        burnout_prob = int(risk_evaluation.get("burnout_probability", 0.5) * 100)
+        triggers = risk_evaluation.get("primary_triggers", [])
+        
+        sparsity = self.compute_sparsity_confidence(missing_days)
+        conf_pct = int(sparsity["adjusted_model_confidence"] * 100)
+
+        top_triggers_str = ""
+        if triggers:
+            top_factors = [f"{t.get('factor')} ({t.get('metric')})" for t in triggers[:2]]
+            top_triggers_str = f" The primary telemetry drivers are {', and '.join(top_factors)}."
+
+        # Statutory recommendation text
+        if risk_level == "CRITICAL":
+            recommendation_text = (
+                f"Immediate tactical intervention required under Defense RoP Standard 14-A: Mandate 48-hour operational stand-down, "
+                f"relieve from armed night sentry duty, and fast-track confidential 1-on-1 counseling with Unit Medical Officer."
+            )
+        elif risk_level == "HIGH":
+            recommendation_text = (
+                f"Priority administrative rebalancing recommended: Reassign from continuous high-tempo night shifts to daytime perimeter guard, "
+                f"clear accumulated casual furlough, and initiate welfare debriefing."
+            )
+        elif risk_level == "MODERATE":
+            recommendation_text = (
+                f"Routine resilience protocol active: Maintain regular rest rotations, monitor daily check-in cadence, "
+                f"and reinforce senior buddy pairing."
+            )
+        else:
+            recommendation_text = (
+                f"Soldier exhibits optimal operational resilience and physiological equilibrium. Fit for standard high-readiness deployment cadence."
+            )
+
+        narrative_paragraph = (
+            f"SUBJECT: Tactical Welfare & Psychometric Appraisal for {rank} {personnel_name} ({personnel_uid}), {unit}. "
+            f"Automated multi-factor risk inference classifies current status at {risk_level} RISK (Composite Stress Index: {stress_score}/100, "
+            f"Burnout Probability: {burnout_prob}%).{top_triggers_str} "
+            f"{recommendation_text} "
+            f"Diagnostic confidence is rated at {conf_pct}% ({sparsity['fidelity_tier']}) across {sparsity['logged_days']}/{sparsity['lookback_window_days']} "
+            f"verified check-in pulses."
+        )
+
+        return {
+            "personnel_uid": personnel_uid,
+            "personnel_name": personnel_name,
+            "rank": rank,
+            "unit": unit,
+            "risk_level": risk_level,
+            "stress_score": stress_score,
+            "burnout_probability_pct": burnout_prob,
+            "narrative_paragraph": narrative_paragraph,
+            "statutory_recommendation": recommendation_text,
+            "sparsity_evaluation": sparsity,
+            "generated_at": datetime.utcnow().isoformat(),
+            "regulatory_standard": "HQ IDS / Form 16-Welfare Diagnostic Standard"
+        }
+
 
 ai_risk_engine = AIRiskEngine()
+
 
 

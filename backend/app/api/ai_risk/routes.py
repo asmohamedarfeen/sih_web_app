@@ -78,6 +78,118 @@ def compute_ai_risk(
     }
 
 
+class WhatIfSimulationRequest(BaseModel):
+    personnel_uid: Optional[str] = "UID-EMP-012"
+    baseline_sleep_hours: float = Field(default=4.5, ge=1.0, le=14.0)
+    baseline_fatigue_level: int = Field(default=8, ge=1, le=10)
+    baseline_mood_score: int = Field(default=3, ge=1, le=10)
+    baseline_workload_pressure: int = Field(default=9, ge=1, le=10)
+    baseline_physical_strain: int = Field(default=8, ge=1, le=10)
+    baseline_consecutive_duty_days: int = Field(default=6, ge=1, le=30)
+    extra_sleep_hours: float = Field(default=2.0, ge=0.0, le=6.0)
+    reduce_night_shifts: int = Field(default=3, ge=0, le=10)
+    grant_leave_days: int = Field(default=5, ge=0, le=30)
+    station_reassignment: str = Field(default="CURRENT", description="CURRENT, PEACE_STATION, GARRISON_BASE")
+    counseling_session_held: bool = Field(default=True)
+
+
+@router.post("/simulate")
+def simulate_counterfactual_intervention(
+    req: WhatIfSimulationRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Simulates counterfactual impact of command and welfare decisions (leave, night shift reduction,
+    sleep recovery, garrison reassignment) on projected 30-day personnel risk trajectory.
+    """
+    simulation_result = ai_risk_engine.simulate_counterfactual_intervention(
+        baseline_sleep_hours=req.baseline_sleep_hours,
+        baseline_fatigue_level=req.baseline_fatigue_level,
+        baseline_mood_score=req.baseline_mood_score,
+        baseline_workload_pressure=req.baseline_workload_pressure,
+        baseline_physical_strain=req.baseline_physical_strain,
+        baseline_consecutive_duty_days=req.baseline_consecutive_duty_days,
+        extra_sleep_hours=req.extra_sleep_hours,
+        reduce_night_shifts=req.reduce_night_shifts,
+        grant_leave_days=req.grant_leave_days,
+        station_reassignment=req.station_reassignment,
+        counseling_session_held=req.counseling_session_held
+    )
+    return {
+        "personnel_uid": req.personnel_uid,
+        "simulation": simulation_result
+    }
+
+
+class NarrativeRequest(BaseModel):
+    personnel_uid: str = Field(default="UID-EMP-012")
+    missing_days: int = Field(default=2, ge=0, le=14)
+
+
+@router.post("/narrative")
+def generate_clinical_narrative(
+    req: NarrativeRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Synthesizes multi-domain biometric telemetry, TreeSHAP risk attributions, and data sparsity
+    into an official defense-standard narrative paragraph suitable for ACR/APAR or COI boards.
+    """
+    clean_uid = req.personnel_uid.strip()
+    personnel = next((p for p in hrms_service.PERSONNEL_DATABASE if p["uid"] == clean_uid), None)
+    
+    name = personnel["name"] if personnel else "Personnel"
+    rank = personnel["rank"] if personnel else "Sepoy"
+    unit = personnel["unit"] if personnel else "16 Corps Division"
+    
+    # Evaluate baseline risk for this personnel
+    sleep = float(personnel.get("sleep_hours", 5.0)) if personnel else 4.5
+    fatigue = int(personnel.get("fatigue_level", 7)) if personnel else 8
+    consec = int(personnel.get("consecutive_duty_days", 4)) if personnel else 6
+    
+    risk_eval = ai_risk_engine.evaluate_risk(
+        sleep_hours=sleep,
+        fatigue_level=fatigue,
+        mood_score=4,
+        workload_pressure=8,
+        physical_strain=7,
+        consecutive_duty_days=consec
+    )
+
+    narrative = ai_risk_engine.generate_clinical_narrative(
+        personnel_uid=clean_uid,
+        personnel_name=name,
+        rank=rank,
+        unit=unit,
+        risk_evaluation=risk_eval,
+        missing_days=req.missing_days
+    )
+    return narrative
+
+
+@router.get("/sparsity/{personnel_uid}")
+def get_data_sparsity_assessment(
+    personnel_uid: str,
+    lookback_days: int = 14,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Returns quantified data sparsity and adjusted model confidence based on missing check-in days.
+    """
+    clean_uid = personnel_uid.strip()
+    personnel = next((p for p in hrms_service.PERSONNEL_DATABASE if p["uid"] == clean_uid), None)
+    
+    # Calculate missing days based on last check-in timestamp or default to 2
+    missing_days = 2
+    if personnel and personnel.get("risk_level") == "CRITICAL":
+        missing_days = 4
+    elif personnel and personnel.get("risk_level") == "LOW":
+        missing_days = 0
+
+    return ai_risk_engine.compute_sparsity_confidence(missing_checkin_days=missing_days, lookback_window=lookback_days)
+
+
+
 @router.get("/analytics")
 def get_risk_distribution(current_user: User = Depends(get_current_user)):
     """

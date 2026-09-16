@@ -122,6 +122,35 @@ export const aiRiskService = {
     const response = await apiClient.get<BehavioralChangeOverview>('/ai-risk/behavioral-change-overview');
     return response.data;
   },
+
+  async simulateWhatIf(data: {
+    personnel_uid?: string;
+    baseline_sleep_hours: number;
+    baseline_fatigue_level: number;
+    baseline_mood_score: number;
+    baseline_workload_pressure: number;
+    baseline_physical_strain: number;
+    baseline_consecutive_duty_days: number;
+    extra_sleep_hours: number;
+    reduce_night_shifts: number;
+    grant_leave_days: number;
+    station_reassignment: string;
+    counseling_session_held: boolean;
+  }): Promise<any> {
+    const response = await apiClient.post('/ai-risk/simulate', data);
+    return response.data;
+  },
+
+  async generateNarrative(data: { personnel_uid: string; missing_days?: number }): Promise<any> {
+    const response = await apiClient.post('/ai-risk/narrative', data);
+    return response.data;
+  },
+
+  async getSparsityInfo(uid: string): Promise<any> {
+    const response = await apiClient.get(`/ai-risk/sparsity/${uid}`);
+    return response.data;
+  },
 };
+
 
 

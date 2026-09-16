@@ -27,6 +27,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { personnelService } from '../../services/personnelService';
+import { WhatIfSimulator } from '../../components/analytics/WhatIfSimulator';
+import { Form16WelfareDossier } from '../../components/reports/Form16WelfareDossier';
 
 
 // ============================================================================
@@ -170,6 +172,7 @@ export const CommanderDashboard: React.FC = () => {
   const [hoveredTrendPoint, setHoveredTrendPoint] = useState<{ month: string; value: number } | null>(null);
   const [swappedRosters, setSwappedRosters] = useState<Record<string, boolean>>({});
   const [isSwapping, setIsSwapping] = useState<string | null>(null);
+  const [activeDossierUid, setActiveDossierUid] = useState<string | null>(null);
 
   const handleExecuteRosterSwap = async (
     sourceUid: string,
@@ -887,9 +890,17 @@ export const CommanderDashboard: React.FC = () => {
             </div>
 
             <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between">
-              <span className="text-[10px] text-slate-400">
-                Post: Night Sentry (00:00 - 06:00)
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] text-slate-400">
+                  Post: Night Sentry (00:00 - 06:00)
+                </span>
+                <button
+                  onClick={() => setActiveDossierUid('UID-EMP-012')}
+                  className="text-[10px] text-amber-300 hover:text-amber-200 underline font-bold cursor-pointer"
+                >
+                  Form 16 Dossier 🖨️
+                </button>
+              </div>
               {swappedRosters['UID-EMP-012'] ? (
                 <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-500/30">
                   <CheckCircle2 className="w-3.5 h-3.5" />
@@ -947,9 +958,17 @@ export const CommanderDashboard: React.FC = () => {
             </div>
 
             <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between">
-              <span className="text-[10px] text-slate-400">
-                Post: Battery Patrol (06:00 - 18:00)
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] text-slate-400">
+                  Post: Battery Patrol (06:00 - 18:00)
+                </span>
+                <button
+                  onClick={() => setActiveDossierUid('UID-EMP-013')}
+                  className="text-[10px] text-indigo-300 hover:text-indigo-200 underline font-bold cursor-pointer"
+                >
+                  Form 16 Dossier 🖨️
+                </button>
+              </div>
               {swappedRosters['UID-EMP-013'] ? (
                 <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-500/30">
                   <CheckCircle2 className="w-3.5 h-3.5" />
@@ -977,6 +996,16 @@ export const CommanderDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* "What-If" Counterfactual Intervention Simulator */}
+      <WhatIfSimulator
+        personnelUid="UID-EMP-012"
+        initialSleep={4.5}
+        initialFatigue={8}
+        initialDutyDays={6}
+        initialStress={91.6}
+        onApplyPlan={(plan) => showToast(`Command Protocol Updated: ${plan}`)}
+      />
 
       {/* ===================================================================== */}
       {/* ROW 2: 4 CORE VISUALIZATIONS (DONUT, PROGRESS BARS, LINE CHART, RADAR)*/}
@@ -2046,6 +2075,15 @@ export const CommanderDashboard: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Printable Form 16-Welfare Dossier Modal */}
+      {activeDossierUid && (
+        <Form16WelfareDossier
+          personnelUid={activeDossierUid}
+          isOpen={!!activeDossierUid}
+          onClose={() => setActiveDossierUid(null)}
+        />
       )}
     </div>
   );

@@ -28,11 +28,14 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { wellnessService, AssessmentSubmission } from '../../services/wellnessService';
+import { ClinicalNarrativeCard } from '../../components/ai/ClinicalNarrativeCard';
+import { Form16WelfareDossier } from '../../components/reports/Form16WelfareDossier';
 
 export const PersonnelDashboard: React.FC = () => {
   const { user } = useAuthStore();
   const [activeSection, setActiveSection] = useState<'all' | 'score' | 'checkin' | 'insights' | 'activities' | 'progress'>('all');
   const [showPrivacyMatrix, setShowPrivacyMatrix] = useState(false);
+  const [showDossierModal, setShowDossierModal] = useState(false);
 
 
   // Daily Check-in Form State
@@ -181,6 +184,12 @@ export const PersonnelDashboard: React.FC = () => {
             >
               <CheckCircle2 className="w-4 h-4 text-accent" />
               <span>Record Daily Check-in</span>
+            </button>
+            <button
+              onClick={() => setShowDossierModal(true)}
+              className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-extrabold border border-slate-700 shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
+            >
+              <span>Form 16 Dossier 🖨️</span>
             </button>
           </div>
         </div>
@@ -731,6 +740,9 @@ export const PersonnelDashboard: React.FC = () => {
             </span>
           </div>
 
+          {/* Clinical Narrative & Sparsity Meter Card */}
+          <ClinicalNarrativeCard personnelUid={user?.uid || 'UID-EMP-012'} missingDays={2} />
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Insight 1: Circadian Recovery */}
             <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft relative overflow-hidden flex flex-col justify-between">
@@ -1048,6 +1060,12 @@ export const PersonnelDashboard: React.FC = () => {
           </div>
         </section>
       )}
+      {/* Printable Form 16-Welfare Dossier Modal */}
+      <Form16WelfareDossier
+        personnelUid={user?.uid || 'UID-EMP-012'}
+        isOpen={showDossierModal}
+        onClose={() => setShowDossierModal(false)}
+      />
     </div>
   );
 };
