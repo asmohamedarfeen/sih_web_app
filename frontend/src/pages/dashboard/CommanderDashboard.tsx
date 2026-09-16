@@ -29,6 +29,7 @@ import {
 import { personnelService } from '../../services/personnelService';
 import { WhatIfSimulator } from '../../components/analytics/WhatIfSimulator';
 import { Form16WelfareDossier } from '../../components/reports/Form16WelfareDossier';
+import { UnitHierarchyTree } from '../../components/organization/UnitHierarchyTree';
 
 
 // ============================================================================
@@ -1006,6 +1007,9 @@ export const CommanderDashboard: React.FC = () => {
         initialStress={91.6}
         onApplyPlan={(plan) => showToast(`Command Protocol Updated: ${plan}`)}
       />
+
+      {/* Interactive Unit Hierarchy Tree (Corps -> Division -> Brigade -> Battalion -> Company) */}
+      <UnitHierarchyTree />
 
       {/* ===================================================================== */}
       {/* ROW 2: 4 CORE VISUALIZATIONS (DONUT, PROGRESS BARS, LINE CHART, RADAR)*/}

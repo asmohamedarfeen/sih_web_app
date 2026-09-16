@@ -21,9 +21,11 @@ import {
   Clock,
   Activity,
   Sliders,
+  GitFork,
 } from 'lucide-react';
 import { useAuthStore, getRoleDashboardRoute } from '../store/authStore';
 import { authService } from '../services/authService';
+import { LanguageSelector } from '../components/common/LanguageSelector';
 
 export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
@@ -129,6 +131,7 @@ export const DashboardLayout: React.FC = () => {
     if (user?.role === 'PERSONNEL') {
       return [
         { name: 'Personal Dashboard', path: '/dashboard/personnel', icon: LayoutDashboard },
+        { name: 'Unit Hierarchy Tree', path: '/organization', icon: GitFork },
         { name: 'Daily Check-ins', path: '/wellness', icon: HeartPulse },
         { name: 'AI Health Insights', path: '/ai-risk', icon: Brain },
         { name: 'Recovery Activities', path: '/interventions', icon: HandHeart },
@@ -140,6 +143,7 @@ export const DashboardLayout: React.FC = () => {
     if (isCommander) {
       return [
         { name: 'Dashboard', path: '/dashboard/commander', icon: LayoutDashboard },
+        { name: 'Unit Hierarchy', path: '/organization', icon: GitFork },
         { name: 'Force Overview', path: '/personnel', icon: Users },
         { name: 'Unit Analysis', path: '/analytics', icon: BarChart3 },
         { name: 'Risk & Alerts', path: '/alerts', icon: AlertTriangle, badge: '4' },
@@ -154,6 +158,7 @@ export const DashboardLayout: React.FC = () => {
     if (user?.role === 'WELFARE_OFFICER' || user?.role === 'MEDICAL_OFFICER') {
       return [
         { name: 'Dashboard', path: '/dashboard/welfare', icon: LayoutDashboard },
+        { name: 'Unit Hierarchy', path: '/organization', icon: GitFork },
         { name: 'Personnel Overview', path: '/personnel', icon: Users },
         { name: 'Risk Analysis', path: '/analytics', icon: Activity },
         { name: 'AI Predictions', path: '/ai-risk', icon: Brain },
@@ -166,6 +171,7 @@ export const DashboardLayout: React.FC = () => {
 
     return [
       { name: 'System Command', path: getRoleDashboardRoute(user?.role), icon: LayoutDashboard },
+      { name: 'Unit Hierarchy Tree', path: '/organization', icon: GitFork },
       { name: 'Personnel Directory', path: '/personnel', icon: Users },
       { name: 'Wellness Check-ins', path: '/wellness', icon: HeartPulse },
       { name: 'AI Risk Diagnostics', path: '/ai-risk', icon: Brain },
@@ -271,6 +277,9 @@ export const DashboardLayout: React.FC = () => {
 
         {/* Right User & Role Info */}
         <div className="flex items-center gap-3">
+          {/* Multi-Lingual Regional Language Selector */}
+          <LanguageSelector compact={isCommander} />
+
           {!isCommander && (
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border bg-secondary-900 text-accent border-secondary-700 shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />

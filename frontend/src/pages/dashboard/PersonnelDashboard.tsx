@@ -30,10 +30,14 @@ import { useAuthStore } from '../../store/authStore';
 import { wellnessService, AssessmentSubmission } from '../../services/wellnessService';
 import { ClinicalNarrativeCard } from '../../components/ai/ClinicalNarrativeCard';
 import { Form16WelfareDossier } from '../../components/reports/Form16WelfareDossier';
+import { UnitHierarchyTree } from '../../components/organization/UnitHierarchyTree';
+import { useLanguageStore } from '../../localization';
+import { LanguageSelector } from '../../components/common/LanguageSelector';
 
 export const PersonnelDashboard: React.FC = () => {
   const { user } = useAuthStore();
-  const [activeSection, setActiveSection] = useState<'all' | 'score' | 'checkin' | 'insights' | 'activities' | 'progress'>('all');
+  const { t } = useLanguageStore();
+  const [activeSection, setActiveSection] = useState<'all' | 'score' | 'checkin' | 'insights' | 'activities' | 'progress' | 'hierarchy'>('all');
   const [showPrivacyMatrix, setShowPrivacyMatrix] = useState(false);
   const [showDossierModal, setShowDossierModal] = useState(false);
 
@@ -156,40 +160,43 @@ export const PersonnelDashboard: React.FC = () => {
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
-              Jai Hind, {user?.full_name || 'Major Alex Morgan'}
+              {t('jai_hind')}, {user?.full_name || 'Major Alex Morgan'}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 mt-1.5 max-w-2xl leading-relaxed font-medium">
-              Your personal daily wellness cockpit. Track your biological recovery, log daily field telemetry, review AI health recommendations, and access tactical resilience protocols.
+              {t('welcome_soldier')}
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            {/* Frontline Regional Language Selector */}
+            <LanguageSelector />
+
             <button
               onClick={() => setSosTriggered(!sosTriggered)}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold border flex items-center gap-2 transition-all cursor-pointer shadow-xs ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold border flex items-center gap-1.5 transition-all cursor-pointer shadow-xs ${
                 sosTriggered
                   ? 'bg-danger text-white border-danger animate-pulse'
                   : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
               }`}
             >
               <AlertTriangle className={`w-4 h-4 ${sosTriggered ? 'text-white' : 'text-danger'}`} />
-              <span>{sosTriggered ? 'SOS Active (Command Alerted)' : 'SOS Distress Alert'}</span>
+              <span>{sosTriggered ? t('sos_active') : t('sos_distress_alert')}</span>
             </button>
             <button
               onClick={() => {
                 const el = document.getElementById('daily-checkin-section');
                 el?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-extrabold shadow-lg shadow-primary/20 flex items-center gap-2 transition-all cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-extrabold shadow-lg shadow-primary/20 flex items-center gap-1.5 transition-all cursor-pointer"
             >
               <CheckCircle2 className="w-4 h-4 text-accent" />
-              <span>Record Daily Check-in</span>
+              <span>{t('record_daily_checkin')}</span>
             </button>
             <button
               onClick={() => setShowDossierModal(true)}
-              className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-extrabold border border-slate-700 shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
+              className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-extrabold border border-slate-700 shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
             >
-              <span>Form 16 Dossier 🖨️</span>
+              <span>{t('form_16_dossier')}</span>
             </button>
           </div>
         </div>
@@ -205,16 +212,16 @@ export const PersonnelDashboard: React.FC = () => {
                 <Shield className="w-5 h-5" />
               </div>
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="text-sm font-black text-white tracking-tight">
-                    Article 42-A Defense Medical Privilege & Anti-Stigma Guarantee Active
+                    {t('article_42a_title')}
                   </h3>
                   <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                    Non-Punitive Safe Harbor
+                    {t('non_punitive_badge')}
                   </span>
                 </div>
                 <p className="text-xs text-slate-300 mt-1 max-w-3xl leading-relaxed">
-                  Your subjective emotional responses, survey choices, and psychological check-ins are legally classified as <strong>Privileged Medical Records</strong>. They are encrypted (AES-256 GCM) and accessible <strong>ONLY</strong> to certified Medical Officers and Welfare Counselors.
+                  {t('article_42a_desc')}
                 </p>
               </div>
             </div>
@@ -223,7 +230,7 @@ export const PersonnelDashboard: React.FC = () => {
               className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs cursor-pointer transition-all flex items-center gap-1.5 shrink-0 self-start sm:self-auto"
             >
               <Lock className="w-3.5 h-3.5 text-emerald-400" />
-              <span>{showPrivacyMatrix ? 'Hide Privacy Barrier' : 'View Transparency Matrix'}</span>
+              <span>{showPrivacyMatrix ? t('hide_privacy_barrier') : t('view_transparency_matrix')}</span>
             </button>
           </div>
 
@@ -271,12 +278,13 @@ export const PersonnelDashboard: React.FC = () => {
 
         <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs">
           {[
-            { id: 'all', label: 'Complete View (5 Sections)' },
-            { id: 'score', label: '1. Wellness Score' },
-            { id: 'checkin', label: '2. Daily Check-in' },
+            { id: 'all', label: 'Complete View (6 Sections)' },
+            { id: 'score', label: `1. ${t('wellness_score_heading')}` },
+            { id: 'checkin', label: `2. ${t('checkin_heading')}` },
             { id: 'insights', label: '3. AI Insights' },
             { id: 'activities', label: '4. Wellness Activities' },
             { id: 'progress', label: '5. Personal Progress' },
+            { id: 'hierarchy', label: `6. ${t('unit_hierarchy')}` },
           ].map((sec) => (
             <button
               key={sec.id}
@@ -1060,6 +1068,24 @@ export const PersonnelDashboard: React.FC = () => {
           </div>
         </section>
       )}
+
+      {/* SECTION 6: INTERACTIVE UNIT HIERARCHY TREE */}
+      {(activeSection === 'all' || activeSection === 'hierarchy') && (
+        <section id="hierarchy-section" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-extrabold text-gray-900 uppercase tracking-[0.12em] flex items-center gap-2">
+              <Shield className="w-4 h-4 text-[#D4A017]" />
+              <span>Section 6 &bull; {t('unit_hierarchy')} (Corps &rarr; Division &rarr; Brigade &rarr; Battalion &rarr; Company)</span>
+            </h2>
+            <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-[#D4A017]/20 text-[#D4A017] border border-[#D4A017]/40">
+              FORCE ECHELON MATRIX
+            </span>
+          </div>
+
+          <UnitHierarchyTree />
+        </section>
+      )}
+
       {/* Printable Form 16-Welfare Dossier Modal */}
       <Form16WelfareDossier
         personnelUid={user?.uid || 'UID-EMP-012'}

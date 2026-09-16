@@ -11,6 +11,7 @@ import { InterventionsPage } from '../pages/interventions';
 import { AlertsPage } from '../pages/alerts';
 import { AnalyticsPage } from '../pages/analytics';
 import { ReportsPage } from '../pages/reports';
+import { OrganizationPage } from '../pages/organization';
 import { useAuthStore, getRoleDashboardRoute } from '../store/authStore';
 
 export const AppRoutes: React.FC = () => {
@@ -104,6 +105,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="/alerts" element={<AlertsPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/organization" element={<OrganizationPage />} />
         </Route>
       </Route>
 
