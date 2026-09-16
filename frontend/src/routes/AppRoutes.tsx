@@ -55,7 +55,7 @@ export const AppRoutes: React.FC = () => {
           <Route
             element={
               <RoleProtectedRoute
-                allowedRoles={['PERSONNEL', 'SUPER_ADMIN', 'ADMIN']}
+                allowedRoles={['PERSONNEL', 'COMMANDER', 'SUPER_ADMIN', 'ADMIN']}
               />
             }
           >
