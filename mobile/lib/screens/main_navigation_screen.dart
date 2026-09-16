@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/services/localization_service.dart';
+import '../../core/widgets/language_selector_sheet.dart';
 import '../../core/theme/app_theme.dart';
 import 'soldier/soldier_dashboard_screen.dart';
 import 'soldier/wellness_checkin_screen.dart';
@@ -9,7 +11,6 @@ import 'welfare/welfare_dashboard_screen.dart';
 import 'commander/commander_dashboard_screen.dart';
 import 'admin/admin_dashboard_screen.dart';
 import 'auth/login_screen.dart';
-
 import 'soldier/screen_time_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -40,6 +41,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context);
+    final loc = Provider.of<LocalizationService>(context);
     final user = auth.currentUser;
 
     final List<Widget> pages = [
@@ -57,7 +59,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             const SizedBox(width: 8),
             Text(
               user?.role == 'SOLDIER'
-                  ? 'SOLDIER PULSE'
+                  ? loc.t('app_title', 'SOLDIER PULSE')
                   : user?.role == 'WELFARE_OFFICER'
                       ? 'WELFARE HUB'
                       : user?.role == 'COMMANDER'
@@ -68,6 +70,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ],
         ),
         actions: [
+          // Regional Language Toggle Button
+          IconButton(
+            tooltip: loc.t('language_select', 'Regional Language'),
+            icon: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(loc.currentLanguageModel.flag, style: const TextStyle(fontSize: 15)),
+                const SizedBox(width: 4),
+                const Icon(Icons.language, size: 18),
+              ],
+            ),
+            onPressed: () => LanguageSelectorSheet.show(context),
+          ),
           IconButton(
             tooltip: 'Logout',
             icon: const Icon(Icons.logout, size: 20),
@@ -97,26 +112,26 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           unselectedItemColor: AppColors.textSecondary,
           selectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800),
           unselectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_outlined),
-              activeIcon: Icon(Icons.dashboard),
-              label: 'Dashboard',
+              icon: const Icon(Icons.dashboard_outlined),
+              activeIcon: const Icon(Icons.dashboard),
+              label: loc.t('dashboard', 'Dashboard'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.monitor_heart_outlined),
-              activeIcon: Icon(Icons.monitor_heart),
-              label: 'Check-in',
+              icon: const Icon(Icons.monitor_heart_outlined),
+              activeIcon: const Icon(Icons.monitor_heart),
+              label: loc.t('checkin', 'Check-in'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.phonelink_ring_outlined),
-              activeIcon: Icon(Icons.phonelink_ring),
-              label: 'Screen Time',
+              icon: const Icon(Icons.phonelink_ring_outlined),
+              activeIcon: const Icon(Icons.phonelink_ring),
+              label: loc.t('screen_time', 'Screen Time'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
-              label: 'Dossier',
+              icon: const Icon(Icons.person_outline),
+              activeIcon: const Icon(Icons.person),
+              label: loc.t('dossier', 'Dossier'),
             ),
           ],
         ),

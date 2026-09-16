@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/sync_service.dart';
+import '../../core/services/localization_service.dart';
+import '../../core/widgets/language_selector_sheet.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/wellness_model.dart';
 import 'wellness_checkin_screen.dart';
@@ -907,6 +909,34 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Language Selector Action Pill
+                  InkWell(
+                    onTap: () => LanguageSelectorSheet.show(context),
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.white24),
+                      ),
+                      child: Consumer<LocalizationService>(
+                        builder: (ctx, loc, _) => Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(loc.currentLanguageModel.flag, style: const TextStyle(fontSize: 13)),
+                            const SizedBox(width: 4),
+                            Text(
+                              loc.currentLanguageModel.code.toUpperCase(),
+                              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900),
+                            ),
+                            const Icon(Icons.keyboard_arrow_down, color: Colors.white70, size: 14),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
                   IconButton(
                     tooltip: 'View Full Dossier',
                     padding: const EdgeInsets.all(4),
