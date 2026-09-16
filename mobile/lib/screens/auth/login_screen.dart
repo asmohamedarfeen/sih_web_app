@@ -45,12 +45,63 @@ class _LoginScreenState extends State<LoginScreen> {
                 'Enter Mac/Server LAN IP and port:',
                 style: TextStyle(color: Color(0xFF8D99AE), fontSize: 12),
               ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  ActionChip(
+                    avatar: const Icon(Icons.usb, size: 14, color: AppColors.accent),
+                    label: const Text('USB Cable (127.0.0.1:8000)', style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w700)),
+                    backgroundColor: const Color(0xFF1E3A8A),
+                    onPressed: () {
+                      controller.text = '127.0.0.1:8000';
+                      setDialogState(() {
+                        testResult = null;
+                      });
+                    },
+                  ),
+                  ActionChip(
+                    avatar: const Icon(Icons.wifi_tethering, size: 14, color: AppColors.accent),
+                    label: const Text('Hotspot (10.12.29.184:8000)', style: TextStyle(fontSize: 11, color: Colors.white)),
+                    backgroundColor: const Color(0xFF1B3B6F),
+                    onPressed: () {
+                      controller.text = '10.12.29.184:8000';
+                      setDialogState(() {
+                        testResult = null;
+                      });
+                    },
+                  ),
+                  ActionChip(
+                    avatar: const Icon(Icons.wifi, size: 14, color: AppColors.accent),
+                    label: const Text('Wi-Fi (10.214.234.51:8000)', style: TextStyle(fontSize: 11, color: Colors.white)),
+                    backgroundColor: const Color(0xFF1B3B6F),
+                    onPressed: () {
+                      controller.text = '10.214.234.51:8000';
+                      setDialogState(() {
+                        testResult = null;
+                      });
+                    },
+                  ),
+                  ActionChip(
+                    avatar: const Icon(Icons.phone_android, size: 14, color: AppColors.accent),
+                    label: const Text('Emulator (10.0.2.2:8000)', style: TextStyle(fontSize: 11, color: Colors.white)),
+                    backgroundColor: const Color(0xFF1B3B6F),
+                    onPressed: () {
+                      controller.text = '10.0.2.2:8000';
+                      setDialogState(() {
+                        testResult = null;
+                      });
+                    },
+                  ),
+                ],
+              ),
               const SizedBox(height: 12),
               TextField(
                 controller: controller,
                 style: const TextStyle(color: Colors.white, fontSize: 14),
                 decoration: InputDecoration(
-                  hintText: 'e.g. 10.56.52.238:8000',
+                  hintText: 'e.g. 127.0.0.1:8000',
                   hintStyle: const TextStyle(color: Color(0xFF475569)),
                   filled: true,
                   fillColor: const Color(0xFF0F2640),

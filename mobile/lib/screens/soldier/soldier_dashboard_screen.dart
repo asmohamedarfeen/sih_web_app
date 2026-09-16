@@ -871,57 +871,67 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
         children: [
           // Greeting Row
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Good Morning,',
-                    style: TextStyle(color: Color(0xFFCBD5E1), fontSize: 13, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    soldierName,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.3,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Good Morning,',
+                      style: TextStyle(color: Color(0xFFCBD5E1), fontSize: 13, fontWeight: FontWeight.w500),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  const Text(
-                    '10 Para SF • INF-9412',
-                    style: TextStyle(color: AppColors.accent, fontSize: 11, fontWeight: FontWeight.w700),
-                  ),
-                ],
+                    const SizedBox(height: 2),
+                    Text(
+                      soldierName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.3,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    const Text(
+                      '10 Para SF • INF-9412',
+                      style: TextStyle(color: AppColors.accent, fontSize: 11, fontWeight: FontWeight.w700),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
                     tooltip: 'View Full Dossier',
+                    padding: const EdgeInsets.all(4),
+                    constraints: const BoxConstraints(),
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const SoldierDossierScreen()),
                       );
                     },
-                    icon: const Icon(Icons.badge_outlined, color: AppColors.accent, size: 24),
+                    icon: const Icon(Icons.badge_outlined, color: AppColors.accent, size: 22),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 6),
                   InkWell(
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const SoldierDossierScreen()),
                       );
                     },
-                    borderRadius: BorderRadius.circular(26),
+                    borderRadius: BorderRadius.circular(22),
                     child: CircleAvatar(
-                      radius: 26,
+                      radius: 22,
                       backgroundColor: AppColors.primary,
                       child: Text(
                         soldierName.isNotEmpty ? soldierName[0] : 'A',
-                        style: const TextStyle(color: AppColors.accent, fontSize: 20, fontWeight: FontWeight.w900),
+                        style: const TextStyle(color: AppColors.accent, fontSize: 18, fontWeight: FontWeight.w900),
                       ),
                     ),
                   ),

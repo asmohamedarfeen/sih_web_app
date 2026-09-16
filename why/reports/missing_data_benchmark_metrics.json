@@ -1,0 +1,138 @@
+{
+  "XGBoost (Native Sparsity-Aware)": {
+    "accuracy": 0.705,
+    "f1_weighted": 0.6988,
+    "f1_macro": 0.6466,
+    "precision_weighted": 0.7015,
+    "recall_weighted": 0.705,
+    "high_risk_recall": 0.4344,
+    "high_risk_detected": 53,
+    "high_risk_total": 122,
+    "high_risk_missed_as_low": 6,
+    "high_risk_missed_as_med": 63,
+    "roc_auc_ovr": 0.8295,
+    "pr_auc_macro": 0.6971,
+    "log_loss": 0.6814,
+    "training_time_sec": 0.583,
+    "inference_latency_us": 5.49,
+    "confusion_matrix": [
+      [
+        438,
+        80,
+        3
+      ],
+      [
+        123,
+        214,
+        20
+      ],
+      [
+        6,
+        63,
+        53
+      ]
+    ]
+  },
+  "Random Forest (Median Imputed)": {
+    "accuracy": 0.708,
+    "f1_weighted": 0.6983,
+    "f1_macro": 0.6361,
+    "precision_weighted": 0.713,
+    "recall_weighted": 0.708,
+    "high_risk_recall": 0.3525,
+    "high_risk_detected": 43,
+    "high_risk_total": 122,
+    "high_risk_missed_as_low": 8,
+    "high_risk_missed_as_med": 71,
+    "roc_auc_ovr": 0.827,
+    "pr_auc_macro": 0.6938,
+    "log_loss": 0.6827,
+    "training_time_sec": 0.24,
+    "inference_latency_us": 26.07,
+    "confusion_matrix": [
+      [
+        444,
+        77,
+        0
+      ],
+      [
+        126,
+        221,
+        10
+      ],
+      [
+        8,
+        71,
+        43
+      ]
+    ]
+  },
+  "Support Vector Machine (Imputed+Scaled)": {
+    "accuracy": 0.696,
+    "f1_weighted": 0.69,
+    "f1_macro": 0.6395,
+    "precision_weighted": 0.6902,
+    "recall_weighted": 0.696,
+    "high_risk_recall": 0.4508,
+    "high_risk_detected": 55,
+    "high_risk_total": 122,
+    "high_risk_missed_as_low": 12,
+    "high_risk_missed_as_med": 55,
+    "roc_auc_ovr": 0.8228,
+    "pr_auc_macro": 0.6818,
+    "log_loss": 0.6848,
+    "training_time_sec": 1.292,
+    "inference_latency_us": 99.11,
+    "confusion_matrix": [
+      [
+        434,
+        85,
+        2
+      ],
+      [
+        123,
+        207,
+        27
+      ],
+      [
+        12,
+        55,
+        55
+      ]
+    ]
+  },
+  "Logistic Regression (Imputed+Scaled)": {
+    "accuracy": 0.704,
+    "f1_weighted": 0.6988,
+    "f1_macro": 0.6491,
+    "precision_weighted": 0.7007,
+    "recall_weighted": 0.704,
+    "high_risk_recall": 0.4508,
+    "high_risk_detected": 55,
+    "high_risk_total": 122,
+    "high_risk_missed_as_low": 9,
+    "high_risk_missed_as_med": 58,
+    "roc_auc_ovr": 0.8314,
+    "pr_auc_macro": 0.7045,
+    "log_loss": 0.6695,
+    "training_time_sec": 0.019,
+    "inference_latency_us": 0.94,
+    "confusion_matrix": [
+      [
+        434,
+        86,
+        1
+      ],
+      [
+        118,
+        215,
+        24
+      ],
+      [
+        9,
+        58,
+        55
+      ]
+    ]
+  }
+}

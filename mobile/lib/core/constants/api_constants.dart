@@ -5,14 +5,46 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiConstants {
   static const String prefHostKey = 'pswms_gateway_host';
-  // Mac Local Area Network IP for physical devices (e.g. iPhone)
-  static const String defaultLocalHost = '10.56.52.238:8000';
+  // USB Cable Reverse Port Forwarding bridge (works offline and across any network)
+  static const String defaultLocalHost = '127.0.0.1:8000';
   static String? customHost;
+
+  /// Candidate hosts to automatically test in order of priority
+  static List<String> get candidateHosts => [
+    '127.0.0.1:8000',      // USB Reverse Port Forwarding (adb reverse - works offline/any network)
+    '10.12.29.184:8000',   // Current Mac IP
+    '10.191.200.180:8000', // Previous Hotspot IP
+    '10.214.234.51:8000',  // Wi-Fi Mac IP
+    defaultLocalHost,
+    if (!kIsWeb && Platform.isAndroid) '10.0.2.2:8000', // Android Studio Emulator
+  ];
+
+  static Future<bool> autoDiscoverWorkingHost() async {
+    // If the currently selected host is already working, keep it
+    if (await testConnection(activeHost)) {
+      return true;
+    }
+
+    // Try each candidate host
+    for (final host in candidateHosts) {
+      if (await testConnection(host)) {
+        await setCustomHost(host);
+        return true;
+      }
+    }
+    return false;
+  }
 
   static Future<void> loadSavedHost() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       customHost = prefs.getString(prefHostKey);
+      
+      // If no host saved, or the saved host no longer responds (e.g. switched Wi-Fi/Hotspot)
+      final hostWorking = customHost != null && customHost!.isNotEmpty && await testConnection(customHost);
+      if (!hostWorking) {
+        await autoDiscoverWorkingHost();
+      }
     } catch (_) {}
   }
 
@@ -34,7 +66,7 @@ class ApiConstants {
     final cleanBase = url.endsWith('/api/v1') ? url.substring(0, url.length - 7) : url;
     final healthUrl = '$cleanBase/health';
     try {
-      final response = await http.get(Uri.parse(healthUrl)).timeout(const Duration(seconds: 4));
+      final response = await http.get(Uri.parse(healthUrl)).timeout(const Duration(seconds: 3));
       return response.statusCode == 200;
     } catch (_) {
       return false;
@@ -47,9 +79,7 @@ class ApiConstants {
     }
     if (kIsWeb) {
       return '127.0.0.1:8000';
-    } else if (Platform.isAndroid) {
-      return '10.0.2.2:8000';
-    } else if (Platform.isIOS) {
+    } else if (Platform.isAndroid || Platform.isIOS) {
       return defaultLocalHost;
     } else {
       return '127.0.0.1:8000';

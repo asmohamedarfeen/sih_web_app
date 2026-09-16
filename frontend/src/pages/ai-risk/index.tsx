@@ -4,11 +4,14 @@ import {
   Sparkles,
   CheckCircle2,
   Cpu,
+  Activity,
 } from 'lucide-react';
 import { aiRiskService, EvaluationResult } from '../../services/aiRiskService';
+import { RiskForecastResult } from '../../types/riskForecasting';
 
 export const AIRiskPage: React.FC = () => {
   const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null);
+  const [forecast, setForecast] = useState<RiskForecastResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
 
   const [simForm, setSimForm] = useState({
@@ -30,6 +33,17 @@ export const AIRiskPage: React.FC = () => {
     try {
       const res = await aiRiskService.computeRisk(simForm);
       setEvaluation(res.evaluation);
+
+      // Compute 30-day ML forecast
+      const fcRes = await aiRiskService.computeForecast({
+        personnel_uid: simForm.personnel_uid,
+        current_stress_score: res.evaluation.stress_score,
+        sleep_hours: simForm.sleep_hours,
+        consecutive_duty_days: simForm.consecutive_duty_days,
+        leave_deferrals: 2,
+        deployment_months: 8,
+      });
+      setForecast(fcRes.forecast);
     } catch (err) {
       console.error('Failed to run AI prediction:', err);
     } finally {
@@ -197,6 +211,67 @@ export const AIRiskPage: React.FC = () => {
                     ))}
                   </div>
                 </div>
+
+                {/* 30-Day ML Risk Forecasting Section */}
+                {forecast && (
+                  <div className="mt-4 p-4 rounded-2xl bg-gradient-to-br from-slate-950 via-[#162A45] to-[#0A192F] text-white border border-[#D4A017]/40 shadow-lg space-y-3.5">
+                    <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-lg bg-[#D4A017]/20 border border-[#D4A017]/40 flex items-center justify-center text-[#D4A017]">
+                          <Sparkles className="w-3.5 h-3.5" />
+                        </div>
+                        <span className="text-xs font-black uppercase tracking-wider text-white">
+                          30-Day ML Risk Forecasting
+                        </span>
+                      </div>
+                      <span className="text-[9px] font-mono text-emerald-400 bg-white/10 px-2 py-0.5 rounded">
+                        Ridge ML &bull; {forecast.confidence}% Confidence
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 items-center">
+                      <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <div className="text-[9px] font-extrabold uppercase text-slate-400">Current Risk</div>
+                        <div className="text-lg font-black text-white mt-0.5">
+                          {forecast.current_risk_tier}{' '}
+                          <span className="text-xs font-mono text-slate-300 font-bold">({forecast.current_risk_score}%)</span>
+                        </div>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/40">
+                        <div className="text-[9px] font-extrabold uppercase text-[#D4A017]">Predicted in 30 Days</div>
+                        <div className="text-lg font-black text-rose-300 mt-0.5">
+                          {forecast.predicted_30d_risk_tier}{' '}
+                          <span className="text-xs font-mono text-white font-bold">({forecast.predicted_30d_score}%)</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Milestones */}
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-white/10">
+                      <div className="text-[9px] font-bold text-slate-400 uppercase mb-1.5 flex items-center gap-1">
+                        <Activity className="w-3 h-3 text-[#D4A017]" />
+                        <span>Longitudinal Trajectory (Day 0 &rarr; Day 30)</span>
+                      </div>
+                      <div className="grid grid-cols-5 gap-1 text-center">
+                        {forecast.trajectory.map((pt) => (
+                          <div key={pt.day} className="p-1 rounded bg-white/5 border border-white/10">
+                            <div className="text-[7px] font-bold text-slate-400">{pt.label}</div>
+                            <div className="text-[10px] font-black text-white font-mono">{pt.score}%</div>
+                            <div className="text-[7px] font-bold text-amber-400">{pt.risk_tier}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-[#D4A017]/10 border border-[#D4A017]/30 text-[10px] text-slate-200 flex items-center gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D4A017] shrink-0" />
+                      <span>
+                        <strong className="text-[#D4A017]">Benefits:</strong> Supports proactive planning and preventive action.
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

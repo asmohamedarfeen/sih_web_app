@@ -40,7 +40,7 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await ApiService.post(
+      var response = await ApiService.post(
         ApiConstants.login,
         {'email': email.trim(), 'password': password.trim()},
       );
@@ -67,7 +67,33 @@ class AuthService extends ChangeNotifier {
         return false;
       }
     } catch (e) {
-      _errorMessage = 'Network connection failed to ${ApiConstants.baseUrl}. Ensure iPhone and Mac are on the same Wi-Fi.';
+      // First attempt failed with network error; try auto-discovering an active host (e.g. hotspot/USB)
+      final discovered = await ApiConstants.autoDiscoverWorkingHost();
+      if (discovered) {
+        try {
+          final retryResponse = await ApiService.post(
+            ApiConstants.login,
+            {'email': email.trim(), 'password': password.trim()},
+          );
+          if (retryResponse.statusCode == 200) {
+            final data = jsonDecode(retryResponse.body);
+            final token = data['access_token'];
+            final userJson = data['user'];
+
+            await ApiService.setToken(token);
+            _currentUser = UserModel.fromJson(userJson);
+
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString(_userCacheKey, jsonEncode(userJson));
+
+            _isLoading = false;
+            notifyListeners();
+            return true;
+          }
+        } catch (_) {}
+      }
+
+      _errorMessage = 'Network connection failed to ${ApiConstants.baseUrl}. Ensure your phone and Mac are connected to the same Wi-Fi / Hotspot (Host: ${ApiConstants.activeHost}).';
       _isLoading = false;
       notifyListeners();
       return false;

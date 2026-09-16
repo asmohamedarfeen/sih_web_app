@@ -1,4 +1,7 @@
 import { apiClient } from './apiClient';
+import { RiskForecastResult } from '../types/riskForecasting';
+import { EmotionalStabilityResult, EmotionalStabilityOverview } from '../types/emotionalStability';
+import { BehavioralChangeResult, BehavioralChangeOverview } from '../types/behavioralChange';
 
 export interface EvaluationResult {
   stress_score: number;
@@ -52,4 +55,73 @@ export const aiRiskService = {
     const response = await apiClient.get<RiskAnalytics>('/ai-risk/analytics');
     return response.data;
   },
+
+  async computeForecast(data: {
+    personnel_uid?: string;
+    current_stress_score: number;
+    sleep_hours?: number;
+    consecutive_duty_days?: number;
+    leave_deferrals?: number;
+    deployment_months?: number;
+  }): Promise<{ personnel_uid: string; forecast: RiskForecastResult }> {
+    const response = await apiClient.post('/ai-risk/forecast', data);
+    return response.data;
+  },
+
+  async getRiskForecast(uid: string): Promise<{ personnel_uid: string; name: string; rank: string; unit: string; forecast: RiskForecastResult }> {
+    const response = await apiClient.get(`/ai-risk/forecast/${uid}`);
+    return response.data;
+  },
+
+  async computeEmotionalStability(data: {
+    personnel_uid?: string;
+    mood: number;
+    stress: number;
+    sleep: number;
+    energy: number;
+    voice: number;
+    anxiety: number;
+  }): Promise<{ personnel_uid: string; emotional_stability: EmotionalStabilityResult }> {
+    const response = await apiClient.post('/ai-risk/emotional-stability', data);
+    return response.data;
+  },
+
+  async getEmotionalStability(uid: string): Promise<{ personnel_uid: string; name: string; rank: string; unit: string; emotional_stability: EmotionalStabilityResult }> {
+    const response = await apiClient.get(`/ai-risk/emotional-stability/${uid}`);
+    return response.data;
+  },
+
+  async getEmotionalStabilityOverview(): Promise<EmotionalStabilityOverview> {
+    const response = await apiClient.get<EmotionalStabilityOverview>('/ai-risk/emotional-stability-overview');
+    return response.data;
+  },
+
+  async computeBehavioralChange(data: {
+    personnel_uid?: string;
+    current_leave_days: number;
+    historical_leave_days: number;
+    current_overtime_hours: number;
+    historical_overtime_hours: number;
+    current_training_attendance: number;
+    historical_training_attendance: number;
+    current_performance_rating: number;
+    historical_performance_rating: number;
+    current_wellness_participation: number;
+    historical_wellness_participation: number;
+  }): Promise<{ personnel_uid: string; behavioral_change: BehavioralChangeResult }> {
+    const response = await apiClient.post('/ai-risk/behavioral-change', data);
+    return response.data;
+  },
+
+  async getBehavioralChange(uid: string): Promise<{ personnel_uid: string; name: string; rank: string; unit: string; behavioral_change: BehavioralChangeResult }> {
+    const response = await apiClient.get(`/ai-risk/behavioral-change/${uid}`);
+    return response.data;
+  },
+
+  async getBehavioralChangeOverview(): Promise<BehavioralChangeOverview> {
+    const response = await apiClient.get<BehavioralChangeOverview>('/ai-risk/behavioral-change-overview');
+    return response.data;
+  },
 };
+
+

@@ -1,4 +1,6 @@
 import { apiClient } from './apiClient';
+import { RiskForecastResult } from '../types/riskForecasting';
+import { BehavioralChangeResult } from '../types/behavioralChange';
 
 export interface PersonnelRecord {
   uid: string;
@@ -23,6 +25,8 @@ export interface PersonnelRecord {
   duty_shifts?: any[];
   welfare_history?: any[];
   leave_history?: any[];
+  risk_forecast?: RiskForecastResult;
+  behavioral_change?: BehavioralChangeResult;
 }
 
 export const personnelService = {

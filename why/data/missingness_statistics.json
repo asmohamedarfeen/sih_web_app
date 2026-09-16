@@ -1,0 +1,93 @@
+{
+  "total_records": 5000,
+  "columns_with_missing_values": 17,
+  "total_missing_cells": 14119,
+  "overall_missing_pct": 16.61,
+  "feature_details": {
+    "hrv_rmssd": {
+      "missing_count": 1283,
+      "missing_pct": 25.66,
+      "target_rate_pct": 25.0
+    },
+    "deep_sleep_ratio": {
+      "missing_count": 1264,
+      "missing_pct": 25.28,
+      "target_rate_pct": 25.0
+    },
+    "avg_sleep_hours": {
+      "missing_count": 1004,
+      "missing_pct": 20.08,
+      "target_rate_pct": 20.0
+    },
+    "resting_heart_rate": {
+      "missing_count": 963,
+      "missing_pct": 19.26,
+      "target_rate_pct": 20.0
+    },
+    "daily_step_count": {
+      "missing_count": 948,
+      "missing_pct": 18.96,
+      "target_rate_pct": 20.0
+    },
+    "hydration_adherence_ratio": {
+      "missing_count": 1531,
+      "missing_pct": 30.62,
+      "target_rate_pct": 30.0
+    },
+    "late_night_screen_minutes": {
+      "missing_count": 737,
+      "missing_pct": 14.74,
+      "target_rate_pct": 15.0
+    },
+    "screen_time_hours": {
+      "missing_count": 773,
+      "missing_pct": 15.46,
+      "target_rate_pct": 15.0
+    },
+    "sentiment_polarity": {
+      "missing_count": 1009,
+      "missing_pct": 20.18,
+      "target_rate_pct": 20.0
+    },
+    "negative_affect_score": {
+      "missing_count": 1028,
+      "missing_pct": 20.56,
+      "target_rate_pct": 20.0
+    },
+    "linguistic_fatigue_index": {
+      "missing_count": 979,
+      "missing_pct": 19.58,
+      "target_rate_pct": 20.0
+    },
+    "self_isolation_score": {
+      "missing_count": 749,
+      "missing_pct": 14.98,
+      "target_rate_pct": 15.0
+    },
+    "cognitive_overload_score": {
+      "missing_count": 733,
+      "missing_pct": 14.66,
+      "target_rate_pct": 15.0
+    },
+    "shift_irregularity_score": {
+      "missing_count": 392,
+      "missing_pct": 7.84,
+      "target_rate_pct": 8.0
+    },
+    "leave_deficit_days": {
+      "missing_count": 241,
+      "missing_pct": 4.82,
+      "target_rate_pct": 5.0
+    },
+    "peer_incident_count": {
+      "missing_count": 237,
+      "missing_pct": 4.74,
+      "target_rate_pct": 5.0
+    },
+    "overtime_hours": {
+      "missing_count": 248,
+      "missing_pct": 4.96,
+      "target_rate_pct": 5.0
+    }
+  }
+}

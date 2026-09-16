@@ -351,6 +351,84 @@ export const PersonnelDashboard: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* ML 30-Day Risk Forecasting Card for Soldier */}
+          <div className="p-6 rounded-3xl bg-gradient-to-br from-[#0F172A] via-[#162A45] to-[#0A192F] text-white border border-[#D4A017]/40 shadow-xl relative overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-[#D4A017]/20 border border-[#D4A017]/50 flex items-center justify-center text-[#D4A017]">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-black text-white">Risk Forecasting</h3>
+                    <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#D4A017] text-slate-950 font-black">
+                      30-Day ML Projection
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-300 font-medium">
+                    <strong className="text-[#D4A017]">Purpose:</strong> Predicts future stress levels instead of only reporting current conditions.
+                  </p>
+                </div>
+              </div>
+              <span className="text-[9px] font-mono text-emerald-400 bg-white/10 px-2.5 py-1 rounded-lg border border-white/10 self-start sm:self-auto">
+                Ridge ML Model &bull; 94% Confidence
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-11 gap-3.5 my-4 items-center">
+              <div className="sm:col-span-5 p-4 rounded-2xl bg-white/5 border border-white/10">
+                <div className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Current Risk</div>
+                <div className="text-2xl font-black text-white mt-1">
+                  Moderate <span className="text-sm font-bold text-slate-300 font-mono">(58%)</span>
+                </div>
+                <div className="text-[10px] text-slate-400 mt-1">Real-Time Operational Baseline</div>
+              </div>
+
+              <div className="sm:col-span-1 text-center font-black text-rose-400 flex flex-col items-center">
+                <TrendingUp className="w-5 h-5" />
+                <span className="text-[10px] mt-0.5 font-mono">+16%</span>
+              </div>
+
+              <div className="sm:col-span-5 p-4 rounded-2xl bg-orange-950/40 border border-orange-500/50">
+                <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#D4A017]">Predicted in 30 Days</div>
+                <div className="text-2xl font-black text-orange-300 mt-1">
+                  High <span className="text-sm font-bold text-white font-mono">(74%)</span>
+                </div>
+                <div className="text-[10px] text-slate-300 mt-1">Projected Allostatic Accumulation</div>
+              </div>
+            </div>
+
+            {/* Stepper */}
+            <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 mb-3.5">
+              <div className="text-[11px] font-bold text-slate-300 mb-2 flex items-center gap-1.5">
+                <Activity className="w-3.5 h-3.5 text-[#D4A017]" />
+                <span>30-Day Milestone Trajectory Curve</span>
+              </div>
+              <div className="grid grid-cols-5 gap-1.5 text-center">
+                {[
+                  { day: 'Day 0 (Today)', score: '58%', tier: 'Moderate', color: 'text-amber-400' },
+                  { day: 'Day 7', score: '62%', tier: 'Moderate', color: 'text-amber-400' },
+                  { day: 'Day 14', score: '67%', tier: 'High', color: 'text-orange-400' },
+                  { day: 'Day 21', score: '71%', tier: 'High', color: 'text-orange-400' },
+                  { day: 'Day 30', score: '74%', tier: 'High', color: 'text-orange-300' },
+                ].map((m) => (
+                  <div key={m.day} className="p-1.5 rounded-xl bg-white/5 border border-white/10">
+                    <div className="text-[8px] font-bold text-slate-400">{m.day}</div>
+                    <div className="text-xs font-black text-white font-mono mt-0.5">{m.score}</div>
+                    <div className={`text-[8px] font-bold ${m.color}`}>{m.tier}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-[#D4A017]/10 border border-[#D4A017]/30 text-xs text-slate-200 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-[#D4A017] shrink-0" />
+              <span>
+                <strong className="text-[#D4A017]">Benefits:</strong> Supports proactive planning and preventive action. Engage in guided rest rotations to avert High risk transition.
+              </span>
+            </div>
+          </div>
         </section>
       )}
 

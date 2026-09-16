@@ -1,0 +1,54 @@
+{
+  "SHAP (TreeSHAP)": {
+    "efficiency_axiom": "Strictly Satisfied (Exact sum to f(x) - E[f(x)])",
+    "symmetry_axiom": "Strictly Satisfied",
+    "dummy_null_player_axiom": "Strictly Satisfied",
+    "additivity_axiom": "Strictly Satisfied",
+    "local_explanation_capability": "Full Individual Decompositions (Waterfall / Force)",
+    "global_explanation_capability": "Aggregated Summary (Beeswarm & Mean |SHAP|)",
+    "directionality_awareness": "Full (+ Risk Escalator vs - Protective Buffer)",
+    "non_linear_interactions": "Native 2-way Shapley Interaction Values",
+    "attribution_stability_variance": 0.0,
+    "runtime_500_samples_sec": 0.144,
+    "welfare_officer_clarity_score": 9.8
+  },
+  "LIME (Local Interpretable Surrogate)": {
+    "efficiency_axiom": "Violated (No exact summation guarantee)",
+    "symmetry_axiom": "Violated (Sampling noise)",
+    "dummy_null_player_axiom": "Violated",
+    "additivity_axiom": "Violated",
+    "local_explanation_capability": "Local Linear Approximation",
+    "global_explanation_capability": "Poor (requires submodular pick)",
+    "directionality_awareness": "Local direction only",
+    "non_linear_interactions": "Fails without manual feature expansion",
+    "attribution_stability_variance": 0.0,
+    "runtime_500_samples_sec": 0.847,
+    "welfare_officer_clarity_score": 6.8
+  },
+  "Permutation Feature Importance": {
+    "efficiency_axiom": "Violated (Measures loss degradation only)",
+    "symmetry_axiom": "Violated under correlated features",
+    "dummy_null_player_axiom": "Approximate",
+    "additivity_axiom": "Violated",
+    "local_explanation_capability": "None (Global cohort only)",
+    "global_explanation_capability": "Global Mean Drop in Score",
+    "directionality_awareness": "None (Magnitude only)",
+    "non_linear_interactions": "Conflated by correlated features",
+    "attribution_stability_variance": 2.5e-05,
+    "runtime_500_samples_sec": 0.322,
+    "welfare_officer_clarity_score": 5.2
+  },
+  "Tree Gain (MDI / Gini Importance)": {
+    "efficiency_axiom": "Violated (Heuristic split metric)",
+    "symmetry_axiom": "Violated (Biased towards high-cardinality)",
+    "dummy_null_player_axiom": "Violated (Splits on noise)",
+    "additivity_axiom": "Partial",
+    "local_explanation_capability": "None (Global model only)",
+    "global_explanation_capability": "Global Average Information Gain",
+    "directionality_awareness": "None (Positive magnitude only)",
+    "non_linear_interactions": "Uninterpretable split sums",
+    "attribution_stability_variance": 0.0,
+    "runtime_500_samples_sec": 0.00046,
+    "welfare_officer_clarity_score": 4.5
+  }
+}

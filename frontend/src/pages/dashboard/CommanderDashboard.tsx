@@ -21,6 +21,9 @@ import {
   Layers,
   X,
   Send,
+  Mic,
+  Moon,
+  Zap,
 } from 'lucide-react';
 
 // ============================================================================
@@ -421,6 +424,373 @@ export const CommanderDashboard: React.FC = () => {
             </div>
           );
         })}
+      </div>
+
+      {/* ===================================================================== */}
+      {/* EMOTIONAL STABILITY INDEX (ESI) - EXECUTIVE COMMAND SURVEILLANCE       */}
+      {/* ===================================================================== */}
+      <div id="commander-emotional-stability-panel" className="p-5 rounded-2xl bg-gradient-to-br from-[#0C1929] via-[#132840] to-[#0A1624] text-white border-2 border-emerald-500/40 shadow-xl relative overflow-hidden">
+        {/* Ambient Glow */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Top Header & Metadata */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-4 border-b border-white/10 relative z-10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-emerald-400 shadow-inner">
+              <Activity className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <h3 className="text-base sm:text-lg font-black tracking-wide text-white flex items-center gap-2">
+                  Emotional Stability Index
+                </h3>
+                <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-400 text-slate-950">
+                  Command Intelligence
+                </span>
+                <span className="text-[10px] font-mono text-slate-300 bg-white/10 px-2.5 py-0.5 rounded-full border border-white/15">
+                  Algorithm: <strong className="text-emerald-300">Weighted Moving Average or LSTM</strong>
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 font-medium mt-0.5">
+                <strong className="text-emerald-400">Purpose:</strong> Measures emotional consistency over time across high-tempo operational units.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 self-start lg:self-auto">
+            <div className="text-right hidden sm:block">
+              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Temporal Model</span>
+              <span className="text-xs font-bold text-slate-200">7-Day Recency Weighted WMA</span>
+            </div>
+            <div className="px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-bold flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              95.8% Model Confidence
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content: Core Score + 6 Factors + Trajectory */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-4 relative z-10">
+          {/* Col 1: Hero ESI Score Box (Output: 82 • Stable) */}
+          <div className="lg:col-span-4 p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+                  Unit Output Benchmark
+                </span>
+                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-500/30">
+                  Division Aggregation
+                </span>
+              </div>
+              <div className="mt-3 flex items-baseline gap-3">
+                <span className="text-4xl sm:text-5xl font-black text-emerald-400 tracking-tight">
+                  82%
+                </span>
+                <div className="flex flex-col">
+                  <span className="text-lg font-black text-white leading-tight">
+                    Stable
+                  </span>
+                  <span className="text-[11px] text-slate-300 font-medium">
+                    High Affective Consistency
+                  </span>
+                </div>
+              </div>
+              <div className="w-full bg-white/10 rounded-full h-2 mt-3 overflow-hidden">
+                <div className="bg-gradient-to-r from-emerald-500 to-teal-400 h-2 rounded-full" style={{ width: '82%' }} />
+              </div>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-white/10 space-y-1.5 text-xs">
+              <div className="flex items-center justify-between text-slate-300">
+                <span className="text-slate-400">Volatility Standard Deviation:</span>
+                <span className="font-mono font-bold text-emerald-300">&sigma; = 1.18 (Low)</span>
+              </div>
+              <div className="flex items-center justify-between text-slate-300">
+                <span className="text-slate-400">Active Duty Threshold:</span>
+                <span className="font-mono font-bold text-white">&ge; 75.0% Required</span>
+              </div>
+              <p className="text-[11px] text-slate-300 leading-relaxed pt-1">
+                <strong>Command Assessment:</strong> Unit exhibits strong baseline emotional regulation despite ongoing high-altitude watch rotations.
+              </p>
+            </div>
+          </div>
+
+          {/* Col 2: The 6 Factor Input Gauges */}
+          <div className="lg:col-span-8 p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+                Algorithm Inputs / 6-Factor Multi-Modal Telemetry
+              </span>
+              <span className="text-[10px] font-mono text-slate-400">
+                Weights Sum: 100%
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+              {[
+                { factor: 'Mood', score: 84, status: 'Optimal', weight: '22%', icon: Brain, desc: 'Affective valence & daily balance' },
+                { factor: 'Stress', score: 78, status: 'Regulated', weight: '20%', icon: Activity, desc: 'Allostatic stress resistance' },
+                { factor: 'Sleep', score: 80, status: 'Restorative', weight: '18%', icon: Moon, desc: 'Circadian stability & deep rest' },
+                { factor: 'Energy', score: 85, status: 'High Vitality', weight: '16%', icon: Zap, desc: 'Self-reported wellbeing' },
+                { factor: 'Voice', score: 88, status: 'Acoustic Steady', weight: '12%', icon: Mic, desc: 'Vocal jitter & pitch micro-tremors' },
+                { factor: 'Anxiety', score: 76, status: 'Controlled', weight: '12%', icon: ShieldCheck, desc: 'Hypervigilance recovery rate' },
+              ].map((item) => {
+                const FactorIcon = item.icon;
+                return (
+                  <div key={item.factor} className="p-2.5 rounded-lg bg-black/25 border border-white/10 hover:border-emerald-500/40 transition-colors">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="flex items-center gap-1.5 font-bold text-white">
+                        <FactorIcon className="w-3.5 h-3.5 text-emerald-400" />
+                        {item.factor}
+                      </span>
+                      <span className="font-mono font-black text-emerald-300">{item.score}%</span>
+                    </div>
+                    <div className="w-full bg-white/10 rounded-full h-1.5 my-1.5 overflow-hidden">
+                      <div className="bg-emerald-400 h-1.5 rounded-full" style={{ width: `${item.score}%` }} />
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-slate-400">
+                      <span className="text-emerald-400 font-semibold">{item.status}</span>
+                      <span className="font-mono text-slate-400">W: {item.weight}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* 7-Day Trajectory Sparkline Bar */}
+            <div className="mt-3 pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">7-Day Trajectory:</span>
+                <div className="flex items-center gap-1 font-mono text-[11px] flex-wrap">
+                  {['Day -6: 79%', 'Day -5: 80%', 'Day -4: 81%', 'Day -3: 82%', 'Day -2: 81%', 'Yest: 83%', 'Today: 82%'].map((pt, i) => (
+                    <span key={i} className="px-1.5 py-0.5 rounded bg-white/10 text-emerald-300 text-[10px]">
+                      {pt}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                Consistency Variance: Minimal (&plusmn;1.4%)
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ===================================================================== */}
+      {/* BEHAVIORAL CHANGE DETECTION - EXECUTIVE COMMAND ANOMALY SURVEILLANCE  */}
+      {/* ===================================================================== */}
+      <div id="commander-behavioral-change-panel" className="p-5 rounded-2xl bg-gradient-to-br from-[#111C2E] via-[#17253D] to-[#0D1624] text-white border-2 border-indigo-400/40 shadow-xl relative overflow-hidden">
+        {/* Ambient Glow */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Header with Title, Badge, and AI Process */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-4 border-b border-white/10 relative z-10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/50 flex items-center justify-center text-indigo-300 shadow-inner">
+              <Sliders className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <h3 className="text-base sm:text-lg font-black tracking-wide text-white flex items-center gap-2">
+                  Behavioral Change Detection
+                </h3>
+                <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-indigo-400 text-slate-950">
+                  Anomaly Surveillance
+                </span>
+                <span className="text-[10px] font-mono text-slate-300 bg-white/10 px-2.5 py-0.5 rounded-full border border-white/15">
+                  AI Process: <strong className="text-indigo-300">Compare: Current behavior VS Historical behavior</strong>
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 font-medium mt-0.5">
+                <strong className="text-indigo-400">Purpose:</strong> Detects unusual changes in a person&apos;s behavior over time across battalion rosters.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 self-start lg:self-auto">
+            <div className="text-right hidden sm:block">
+              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Comparison Window</span>
+              <span className="text-xs font-bold text-slate-200">14-Day Current vs 90-Day Baseline</span>
+            </div>
+            <div className="px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold flex items-center gap-1.5">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              14 High-Shift Anomaly Flags
+            </div>
+          </div>
+        </div>
+
+        {/* Content Grid: Unit Score + 5 Domains + High-Shift Troops Triage */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-4 relative z-10">
+          {/* Col 1: Unit Behavior Change Score */}
+          <div className="lg:col-span-4 p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+                  Force Anomaly Drift
+                </span>
+                <span className="text-[10px] font-mono text-indigo-300 bg-indigo-950/60 px-2 py-0.5 rounded-md border border-indigo-500/30">
+                  Unit Aggregate
+                </span>
+              </div>
+              <div className="mt-3 flex items-baseline gap-3">
+                <span className="text-4xl sm:text-5xl font-black text-indigo-300 tracking-tight">
+                  28
+                </span>
+                <span className="text-sm font-mono text-slate-400">/ 100</span>
+                <div className="flex flex-col">
+                  <span className="text-sm font-black text-emerald-300 uppercase leading-tight">
+                    Mild Unit Drift
+                  </span>
+                  <span className="text-[10px] text-slate-400">
+                    89% Troops Stable
+                  </span>
+                </div>
+              </div>
+              <div className="w-full bg-white/10 rounded-full h-2 mt-3 overflow-hidden">
+                <div className="bg-gradient-to-r from-teal-500 to-indigo-500 h-2 rounded-full" style={{ width: '28%' }} />
+              </div>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-white/10 space-y-2 text-xs">
+              <div className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">
+                Top Unit Outliers (Behavior Change Score)
+              </div>
+              <div className="space-y-1.5">
+                {[
+                  { name: 'Havildar Ramesh Chand', unit: 'High Altitude Guard', score: 88, issue: 'Overtime + Leave Spike' },
+                  { name: 'Subedar Gurpreet Singh', unit: 'Field Artillery 3rd Bn', score: 74, issue: 'Reduced Wellness Adherence' },
+                  { name: 'Sepoy Vikram Rathore', unit: 'Infantry 2nd Bn', score: 72, issue: 'Missing Drills & Training' },
+                ].map((soldier, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-white/5">
+                    <div>
+                      <div className="font-bold text-white text-[11px]">{soldier.name}</div>
+                      <div className="text-[9px] text-slate-400">{soldier.unit} &bull; {soldier.issue}</div>
+                    </div>
+                    <span className="px-2 py-0.5 rounded font-mono font-black text-xs bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                      BCS: {soldier.score}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Col 2: The 5 Evaluated Behavior Domains (Current VS Historical) */}
+          <div className="lg:col-span-8 p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+                5 Monitored Behavioral Domains &bull; Current VS Historical Baseline Comparison
+              </span>
+              <span className="text-[10px] font-mono text-indigo-300">
+                Continuous ML Telemetry
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {[
+                {
+                  label: 'Suddenly taking many leave days',
+                  current: '4.8 days avg/mo',
+                  historical: '1.2 days avg/mo',
+                  shift: '+300% surge',
+                  anomalyPct: '18.4% affected',
+                  flag: 'Leave Spike',
+                  statusColor: 'text-amber-300',
+                  icon: Calendar
+                },
+                {
+                  label: 'Working excessive overtime',
+                  current: '24.5 hrs/wk avg',
+                  historical: '7.2 hrs/wk avg',
+                  shift: '+240% surge',
+                  anomalyPct: '24.2% affected',
+                  flag: 'Excessive Overtime',
+                  statusColor: 'text-rose-300',
+                  icon: Clock
+                },
+                {
+                  label: 'Missing training',
+                  current: '74.2% drill attendance',
+                  historical: '95.8% drill attendance',
+                  shift: '-21.6% drop',
+                  anomalyPct: '12.0% affected',
+                  flag: 'Drill Absences',
+                  statusColor: 'text-amber-300',
+                  icon: ShieldCheck
+                },
+                {
+                  label: 'Declining performance',
+                  current: '72.0 / 100 appraisal',
+                  historical: '89.4 / 100 appraisal',
+                  shift: '-17.4 pts',
+                  anomalyPct: '15.6% affected',
+                  flag: 'Performance Dip',
+                  statusColor: 'text-amber-300',
+                  icon: TrendingUp
+                },
+                {
+                  label: 'Reduced wellness participation',
+                  current: '44.0% check-in rate',
+                  historical: '91.2% check-in rate',
+                  shift: '-47.2% drop',
+                  anomalyPct: '28.1% affected',
+                  flag: 'Disengagement',
+                  statusColor: 'text-rose-300',
+                  icon: HeartPulse
+                },
+              ].map((domain, i) => {
+                const DomainIcon = domain.icon;
+                return (
+                  <div key={i} className={`p-2.5 rounded-lg bg-black/25 border border-white/10 ${i === 4 ? 'sm:col-span-2' : ''}`}>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="flex items-center gap-1.5 font-bold text-white">
+                        <DomainIcon className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                        <span>{domain.label}</span>
+                      </span>
+                      <span className={`font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/10 ${domain.statusColor}`}>
+                        {domain.flag}
+                      </span>
+                    </div>
+
+                    <div className="mt-2 grid grid-cols-3 gap-1 text-[10px] font-mono border-t border-white/5 pt-1.5 text-center">
+                      <div>
+                        <span className="text-slate-400 block text-[9px] uppercase">Historical</span>
+                        <span className="text-slate-300 font-bold">{domain.historical}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block text-[9px] uppercase">Current</span>
+                        <span className="text-white font-bold">{domain.current}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block text-[9px] uppercase">Net Shift</span>
+                        <span className={domain.statusColor}>{domain.shift}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Directive Footer */}
+            <div className="mt-3 pt-2.5 border-t border-white/10 text-xs text-slate-300 flex items-center justify-between">
+              <span className="text-[11px] text-slate-300">
+                <strong>Executive Action:</strong> 14 flagged individuals queued for proactive counseling stand-down.
+              </span>
+              <button
+                onClick={() => {
+                  handleDispatchCommand('Behavioral Anomaly Stand-Down & Overtime Roster Rebalancing');
+                }}
+                className="px-3 py-1 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-[11px] cursor-pointer shadow-sm transition-all shrink-0"
+              >
+                Rebalance Rosters
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* ===================================================================== */}

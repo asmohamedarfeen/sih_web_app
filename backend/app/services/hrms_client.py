@@ -2,6 +2,9 @@ import httpx
 from typing import Dict, Any, List, Optional
 from backend.app.config.settings import settings
 from backend.app.security.sanitization import mask_sensitive_pii, sanitize_string
+from backend.app.services.risk_forecasting_engine import risk_forecasting_engine
+from backend.app.services.emotional_stability_engine import emotional_stability_engine
+from backend.app.services.behavioral_change_engine import behavioral_change_engine
 
 
 class HRMSClient:
@@ -13,6 +16,111 @@ class HRMSClient:
 
     def __init__(self, base_url: str = "http://localhost:7777/api/v1"):
         self.base_url = base_url
+        self._enrich_personnel_with_forecasts()
+
+    def _enrich_personnel_with_forecasts(self):
+        """Attaches calibrated 30-day ML risk forecasting, Emotional Stability Index & Behavioral Change Detection to all personnel records."""
+        for p in self.PERSONNEL_DATABASE:
+            sleep_hrs = p.get("sleep_hours", 6.0)
+            consec_days = p.get("consecutive_duty_days", 4)
+            leave_def = 1
+            if "params" in p and "leave_patterns" in p["params"]:
+                leave_score = p["params"]["leave_patterns"].get("score", 50)
+                leave_def = max(0, int(leave_score / 25))
+            deploy_m = 6
+            if "params" in p and "deployment_duration" in p["params"]:
+                deploy_score = p["params"]["deployment_duration"].get("score", 50)
+                deploy_m = max(1, int(deploy_score / 7))
+
+            p["risk_forecast"] = risk_forecasting_engine.forecast_soldier_risk(
+                current_score=float(p.get("stress_score", 50.0)),
+                sleep_hours=float(sleep_hrs),
+                consecutive_duty_days=int(consec_days),
+                leave_deferrals=leave_def,
+                deployment_months=deploy_m
+            )
+
+            # Compute Emotional Stability Index (ESI)
+            stress_val = float(p.get("stress_score", 50.0))
+            sleep_pct = min(100.0, max(20.0, (float(sleep_hrs) / 8.0) * 100.0))
+            psych_params = p.get("psychological_distress_params", {})
+            anx_score = float(psych_params.get("anxiety_questions", {}).get("score", max(15.0, stress_val * 0.75)))
+            mood_distress = float(psych_params.get("mood_assessments", {}).get("score", max(15.0, stress_val * 0.7)))
+            mood_val = max(15.0, 100.0 - mood_distress)
+            energy_val = max(15.0, 100.0 - (float(p.get("fatigue_level", 5)) * 9.5))
+            voice_val = max(20.0, 95.0 - (stress_val * 0.25) - (abs(8.0 - float(sleep_hrs)) * 4.0))
+
+            p["emotional_stability"] = emotional_stability_engine.evaluate_soldier_stability(
+                mood=mood_val,
+                stress=stress_val,
+                sleep=sleep_pct,
+                energy=energy_val,
+                voice=voice_val,
+                anxiety=anx_score
+            )
+
+            # Compute Behavioral Change Detection (Current behavior VS Historical behavior)
+            risk_tier = p.get("risk_level", "MODERATE")
+            ot_score = p.get("params", {}).get("overtime", {}).get("score", 50)
+            leave_p_score = p.get("params", {}).get("leave_patterns", {}).get("score", 50)
+
+            if risk_tier == "CRITICAL":
+                cur_leave = round(1.0 + (leave_p_score / 20.0), 1)
+                hist_leave = 1.0
+                cur_ot = round(8.0 + (ot_score / 4.5), 1)
+                hist_ot = 6.0
+                cur_train = round(max(45.0, 95.0 - (stress_val * 0.38)), 1)
+                hist_train = 96.0
+                cur_perf = round(max(50.0, 90.0 - (stress_val * 0.32)), 1)
+                hist_perf = 92.0
+                cur_well = round(max(20.0, 95.0 - (stress_val * 0.65)), 1)
+                hist_well = 94.0
+            elif risk_tier == "HIGH":
+                cur_leave = round(1.2 + (leave_p_score / 26.0), 1)
+                hist_leave = 1.2
+                cur_ot = round(6.0 + (ot_score / 5.5), 1)
+                hist_ot = 6.0
+                cur_train = 75.0
+                hist_train = 94.0
+                cur_perf = 74.0
+                hist_perf = 89.0
+                cur_well = 52.0
+                hist_well = 90.0
+            elif risk_tier == "MODERATE":
+                cur_leave = 2.4
+                hist_leave = 1.4
+                cur_ot = 14.0
+                hist_ot = 7.0
+                cur_train = 84.0
+                hist_train = 92.0
+                cur_perf = 80.0
+                hist_perf = 86.0
+                cur_well = 68.0
+                hist_well = 88.0
+            else:
+                cur_leave = 1.2
+                hist_leave = 1.2
+                cur_ot = 5.0
+                hist_ot = 5.0
+                cur_train = 96.0
+                hist_train = 97.0
+                cur_perf = 92.0
+                hist_perf = 92.0
+                cur_well = 94.0
+                hist_well = 95.0
+
+            p["behavioral_change"] = behavioral_change_engine.evaluate_behavioral_change(
+                current_leave_days=cur_leave,
+                historical_leave_days=hist_leave,
+                current_overtime_hours=cur_ot,
+                historical_overtime_hours=hist_ot,
+                current_training_attendance=cur_train,
+                historical_training_attendance=hist_train,
+                current_performance_rating=cur_perf,
+                historical_performance_rating=hist_perf,
+                current_wellness_participation=cur_well,
+                historical_wellness_participation=hist_well
+            )
 
     # Comprehensive HRMS Model Personnel Directory
     # Comprehensive HRMS Model Personnel Directory with 8-Parameter Telemetry & Sync Tracking

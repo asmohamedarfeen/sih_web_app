@@ -1,0 +1,126 @@
+{
+  "XGBoost": {
+    "accuracy": 0.719,
+    "precision_macro": 0.7133,
+    "precision_weighted": 0.7188,
+    "recall_macro": 0.6457,
+    "recall_weighted": 0.719,
+    "f1_macro": 0.6689,
+    "f1_weighted": 0.7147,
+    "roc_auc_ovr": 0.8399,
+    "pr_auc_macro": 0.712,
+    "log_loss": 0.6573,
+    "training_time_sec": 0.543,
+    "inference_latency_us": 4.82,
+    "confusion_matrix": [
+      [
+        436,
+        82,
+        3
+      ],
+      [
+        114,
+        226,
+        17
+      ],
+      [
+        5,
+        60,
+        57
+      ]
+    ]
+  },
+  "Random Forest": {
+    "accuracy": 0.717,
+    "precision_macro": 0.7303,
+    "precision_weighted": 0.7218,
+    "recall_macro": 0.6283,
+    "recall_weighted": 0.717,
+    "f1_macro": 0.6564,
+    "f1_weighted": 0.7105,
+    "roc_auc_ovr": 0.8376,
+    "pr_auc_macro": 0.7126,
+    "log_loss": 0.6591,
+    "training_time_sec": 0.24,
+    "inference_latency_us": 28.22,
+    "confusion_matrix": [
+      [
+        440,
+        80,
+        1
+      ],
+      [
+        118,
+        228,
+        11
+      ],
+      [
+        4,
+        69,
+        49
+      ]
+    ]
+  },
+  "Support Vector Machine (SVM)": {
+    "accuracy": 0.719,
+    "precision_macro": 0.7056,
+    "precision_weighted": 0.7182,
+    "recall_macro": 0.6505,
+    "recall_weighted": 0.719,
+    "f1_macro": 0.6706,
+    "f1_weighted": 0.7156,
+    "roc_auc_ovr": 0.836,
+    "pr_auc_macro": 0.716,
+    "log_loss": 0.6565,
+    "training_time_sec": 1.221,
+    "inference_latency_us": 96.08,
+    "confusion_matrix": [
+      [
+        432,
+        86,
+        3
+      ],
+      [
+        108,
+        228,
+        21
+      ],
+      [
+        7,
+        56,
+        59
+      ]
+    ]
+  },
+  "Logistic Regression": {
+    "accuracy": 0.723,
+    "precision_macro": 0.7152,
+    "precision_weighted": 0.7238,
+    "recall_macro": 0.6521,
+    "recall_weighted": 0.723,
+    "f1_macro": 0.6742,
+    "f1_weighted": 0.7196,
+    "roc_auc_ovr": 0.844,
+    "pr_auc_macro": 0.7269,
+    "log_loss": 0.643,
+    "training_time_sec": 0.012,
+    "inference_latency_us": 0.56,
+    "confusion_matrix": [
+      [
+        433,
+        85,
+        3
+      ],
+      [
+        107,
+        232,
+        18
+      ],
+      [
+        5,
+        59,
+        58
+      ]
+    ]
+  }
+}
