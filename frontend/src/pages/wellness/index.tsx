@@ -146,7 +146,35 @@ export const WellnessPage: React.FC = () => {
       </div>
 
       {/* ========================================================================= */}
+      {/* DEFENSE MEDICAL PRIVILEGE & STATUTORY CONFIDENTIALITY BANNER             */}
+      {/* ========================================================================= */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-primary-950 to-slate-900 border border-emerald-500/30 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-black text-white tracking-tight">
+                Article 42-A Defense Medical Privilege & Statutory Confidentiality Active
+              </h3>
+              <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                Non-Punitive Safe Harbor
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-300 mt-0.5">
+              Psychometric pulse responses, biometric logs, and screening inventories are legally protected under defense clinical privilege. They are invisible to line commanders and prohibited from influencing annual performance appraisals (APAR).
+            </p>
+          </div>
+        </div>
+        <span className="text-[10px] font-mono text-emerald-300 bg-emerald-950/60 px-3 py-1.5 rounded-lg border border-emerald-500/30 shrink-0 self-start sm:self-auto">
+          MHA Directive 2026-WEL Protected
+        </span>
+      </div>
+
+      {/* ========================================================================= */}
       {/* SECTION: PERSONNEL SELF-ASSESSMENT SCORES (WELFARE OFFICER VIEW) */}
+
       {/* ========================================================================= */}
       <div className="p-6 sm:p-7 rounded-3xl bg-white border border-slate-200/90 shadow-card-soft space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">

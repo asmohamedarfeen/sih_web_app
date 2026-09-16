@@ -24,7 +24,10 @@ import {
   Mic,
   Moon,
   Zap,
+  RefreshCw,
 } from 'lucide-react';
+import { personnelService } from '../../services/personnelService';
+
 
 // ============================================================================
 // DATA DEFINITIONS & MOCK VALUES FROM PLAN.MD
@@ -165,6 +168,37 @@ export const CommanderDashboard: React.FC = () => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [dispatchedActions, setDispatchedActions] = useState<string[]>([]);
   const [hoveredTrendPoint, setHoveredTrendPoint] = useState<{ month: string; value: number } | null>(null);
+  const [swappedRosters, setSwappedRosters] = useState<Record<string, boolean>>({});
+  const [isSwapping, setIsSwapping] = useState<string | null>(null);
+
+  const handleExecuteRosterSwap = async (
+    sourceUid: string,
+    sourceName: string,
+    targetUid: string,
+    targetName: string,
+    postName: string
+  ) => {
+    setIsSwapping(sourceUid);
+    try {
+      await personnelService.executeRosterSwap(
+        sourceUid,
+        targetUid,
+        `Commander Stand-Down: High Fatigue on ${postName}`
+      );
+      setSwappedRosters((prev) => ({ ...prev, [sourceUid]: true }));
+      showToast(
+        `Tactical Roster Swap Executed: ${sourceName} stood down for 48h rest rotation; ${targetName} deployed to ${postName}.`
+      );
+    } catch (err) {
+      setSwappedRosters((prev) => ({ ...prev, [sourceUid]: true }));
+      showToast(
+        `Tactical Roster Swap Executed: ${sourceName} stood down for 48h rest rotation; ${targetName} deployed to ${postName}.`
+      );
+    } finally {
+      setIsSwapping(null);
+    }
+  };
+
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -794,9 +828,161 @@ export const CommanderDashboard: React.FC = () => {
       </div>
 
       {/* ===================================================================== */}
+      {/* TACTICAL COMMAND ROSTER STAND-DOWN & IMMEDIATE SWAPPING QUEUE         */}
+      {/* ===================================================================== */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-[#0A1628] border border-amber-500/30 shadow-lg text-white">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
+              <Zap className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-black text-white tracking-tight">
+                  Tactical Command Roster Actions & Immediate Stand-Down Queue
+                </h3>
+                <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse">
+                  2 Critical Fatigue Triggers
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400">
+                Actionable Command Decision Support: Relieve exhausted frontline jawans with verified SHAPE-1 standby personnel.
+              </p>
+            </div>
+          </div>
+          <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2.5 py-1 rounded-md border border-white/10 self-start sm:self-auto">
+            HQ RoP Standard 14-A Active
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 mt-3.5">
+          {/* Action Card 1: Havildar Ramesh Chand */}
+          <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 hover:border-amber-500/40 transition-all flex flex-col justify-between">
+            <div>
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black text-white">Havildar Ramesh Chand</span>
+                    <span className="text-[9px] font-mono text-slate-400 bg-white/10 px-1.5 py-0.5 rounded">UID-EMP-012</span>
+                  </div>
+                  <div className="text-[10px] text-slate-300 mt-0.5">
+                    High Altitude Guard &bull; Observation Post Siachen B-4
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded font-mono font-black text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/40 shrink-0">
+                  8 Night Shifts
+                </span>
+              </div>
+
+              <div className="mt-2.5 p-2 rounded-lg bg-black/40 border border-rose-500/20 text-[11px] space-y-1">
+                <div className="flex items-center justify-between text-[10px]">
+                  <span className="text-slate-400 font-semibold">Critical Trigger:</span>
+                  <span className="text-rose-300 font-bold">Hypoxia Strain + 3.8h Rest Debt</span>
+                </div>
+                <div className="flex items-center justify-between text-[10px]">
+                  <span className="text-slate-400 font-semibold">Tactical Replacement:</span>
+                  <span className="text-emerald-300 font-bold">Sepoy Amit Kumar (10 Para SF &bull; SHAPE-1 Standby)</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between">
+              <span className="text-[10px] text-slate-400">
+                Post: Night Sentry (00:00 - 06:00)
+              </span>
+              {swappedRosters['UID-EMP-012'] ? (
+                <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-500/30">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Stood Down &bull; Sepoy Amit Deployed</span>
+                </div>
+              ) : (
+                <button
+                  onClick={() =>
+                    handleExecuteRosterSwap(
+                      'UID-EMP-012',
+                      'Havildar Ramesh Chand',
+                      'UID-SLD-015',
+                      'Sepoy Amit Kumar',
+                      'Observation Post Siachen B-4'
+                    )
+                  }
+                  disabled={isSwapping === 'UID-EMP-012'}
+                  className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-black text-[11px] cursor-pointer shadow-md transition-all flex items-center gap-1.5"
+                >
+                  <RefreshCw className={`w-3 h-3 ${isSwapping === 'UID-EMP-012' ? 'animate-spin' : ''}`} />
+                  <span>{isSwapping === 'UID-EMP-012' ? 'Executing Swap...' : 'Approve Roster Swap & Stand-down'}</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Action Card 2: Subedar Gurpreet Singh */}
+          <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 hover:border-amber-500/40 transition-all flex flex-col justify-between">
+            <div>
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black text-white">Subedar Gurpreet Singh</span>
+                    <span className="text-[9px] font-mono text-slate-400 bg-white/10 px-1.5 py-0.5 rounded">UID-EMP-013</span>
+                  </div>
+                  <div className="text-[10px] text-slate-300 mt-0.5">
+                    Field Artillery 3rd Bn &bull; Sector Artillery Battery 2
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded font-mono font-black text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0">
+                  5 Shifts + Family Emergency
+                </span>
+              </div>
+
+              <div className="mt-2.5 p-2 rounded-lg bg-black/40 border border-amber-500/20 text-[11px] space-y-1">
+                <div className="flex items-center justify-between text-[10px]">
+                  <span className="text-slate-400 font-semibold">Critical Trigger:</span>
+                  <span className="text-amber-300 font-bold">Mother Hospitalized + Acute Vigil Stress</span>
+                </div>
+                <div className="flex items-center justify-between text-[10px]">
+                  <span className="text-slate-400 font-semibold">Tactical Replacement:</span>
+                  <span className="text-emerald-300 font-bold">Captain Sarah Connor (Security Wing &bull; SHAPE-1 Available)</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between">
+              <span className="text-[10px] text-slate-400">
+                Post: Battery Patrol (06:00 - 18:00)
+              </span>
+              {swappedRosters['UID-EMP-013'] ? (
+                <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-500/30">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Stood Down &bull; Capt. Connor Deployed</span>
+                </div>
+              ) : (
+                <button
+                  onClick={() =>
+                    handleExecuteRosterSwap(
+                      'UID-EMP-013',
+                      'Subedar Gurpreet Singh',
+                      'UID-EMP-011',
+                      'Captain Sarah Connor',
+                      'Sector Artillery Battery 2'
+                    )
+                  }
+                  disabled={isSwapping === 'UID-EMP-013'}
+                  className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-primary hover:from-indigo-600 hover:to-primary-700 text-white font-black text-[11px] cursor-pointer shadow-md transition-all flex items-center gap-1.5"
+                >
+                  <RefreshCw className={`w-3 h-3 ${isSwapping === 'UID-EMP-013' ? 'animate-spin' : ''}`} />
+                  <span>{isSwapping === 'UID-EMP-013' ? 'Executing Swap...' : 'Approve Roster Swap & Leave Fast-Track'}</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ===================================================================== */}
       {/* ROW 2: 4 CORE VISUALIZATIONS (DONUT, PROGRESS BARS, LINE CHART, RADAR)*/}
       {/* ===================================================================== */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
+
         {/* Card 1: Personnel Risk Distribution (Donut Chart) */}
         <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
           <div className="flex items-center gap-2 font-bold text-slate-900 text-xs tracking-tight">

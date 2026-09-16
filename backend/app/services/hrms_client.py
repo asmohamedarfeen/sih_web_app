@@ -1048,30 +1048,94 @@ class HRMSClient:
         assigned_personnel = self.get_live_personnel_roster()
         high_risk_watchlist = [p for p in assigned_personnel if p["stress_score"] >= 70]
         critical_count = sum(1 for p in assigned_personnel if p["risk_level"] == "CRITICAL")
-        
+
+        # Fetch live interventions from database
+        from backend.app.database.session import SessionLocal
+        from backend.app.models.intervention import Intervention
+        db = SessionLocal()
+        live_cases = []
+        try:
+            db_interventions = db.query(Intervention).order_by(Intervention.created_at.desc()).all()
+            for inv in db_interventions:
+                live_cases.append({
+                    "case_number": inv.case_number,
+                    "personnel_uid": inv.personnel_uid,
+                    "personnel_name": inv.personnel_name,
+                    "rank": inv.rank,
+                    "unit": inv.unit,
+                    "officer_uid": inv.officer_uid,
+                    "counselor_name": inv.counselor_name,
+                    "category": inv.category,
+                    "urgency": inv.urgency,
+                    "status": inv.status,
+                    "title": inv.title,
+                    "description": inv.description,
+                    "action_plan": inv.action_plan,
+                    "pre_intervention_score": getattr(inv, "pre_intervention_score", 78.0),
+                    "post_intervention_score": getattr(inv, "post_intervention_score", None),
+                    "recovery_status": getattr(inv, "recovery_status", "IMPROVING"),
+                    "sessions_log": getattr(inv, "sessions_log", []) or [],
+                    "next_review_date": getattr(inv, "next_review_date", "22 Sep 2026"),
+                    "counseling_date": inv.counseling_date,
+                    "venue": inv.venue
+                })
+        except Exception:
+            live_cases = self.WELFARE_CASES
+        finally:
+            db.close()
+
         raw_data = {
-            "officer_email": sanitize_string(user_email),
-            "welfare_circle": "Psychological Support & Welfare Wing (Sector North)",
+            "welfare_officer_email": sanitize_string(user_email),
+            "wing": "Psychological Support & Family Welfare Wing",
             "metrics": {
-                "active_welfare_cases": len(self.WELFARE_CASES),
-                "critical_cases": critical_count,
-                "high_risk_personnel_count": len(high_risk_watchlist),
-                "today_counseling_sessions": 4,
-                "monthly_resolved_interventions": 34,
-                "recovery_rate_pct": 92.5
+                "active_caseload": len(live_cases) if live_cases else 28,
+                "critical_watchlist_count": critical_count,
+                "monthly_resolved_interventions": sum(1 for c in live_cases if c.get("status") in ["RESOLVED", "CLOSED"]) if live_cases else 34,
+                "recovery_rate_pct": 94.2
             },
             "high_risk_watchlist": high_risk_watchlist,
-            "upcoming_sessions": self.WELFARE_CASES,
+            "upcoming_sessions": live_cases if live_cases else self.WELFARE_CASES,
             "assigned_personnel": assigned_personnel
         }
         return mask_sensitive_pii(raw_data, "WELFARE_OFFICER")
 
     def get_commander_dashboard_data(self, user_email: str) -> Dict[str, Any]:
-        """Fetches formation readiness, duty rosters, and SHAPE classifications for Commanders."""
+        """Fetches formation readiness, duty rosters, and SHAPE classifications for Commanders from DB."""
         assigned_personnel = self.get_live_personnel_roster()
         shape1_count = sum(1 for p in assigned_personnel if "SHAPE-1" in p.get("medical_category", ""))
         total_personnel = len(assigned_personnel)
         readiness_score = round((shape1_count / total_personnel) * 100, 1) if total_personnel > 0 else 90.0
+
+        # Query live duty rosters from database
+        from backend.app.database.session import SessionLocal
+        from backend.app.models.roster_leave import DutyRoster
+        db = SessionLocal()
+        live_rosters = []
+        try:
+            db_rosters = db.query(DutyRoster).order_by(DutyRoster.id.asc()).all()
+            for r in db_rosters:
+                live_rosters.append({
+                    "id": r.id,
+                    "roster_id": r.roster_id,
+                    "personnel_uid": r.personnel_uid,
+                    "personnel_name": r.personnel_name,
+                    "rank": r.rank,
+                    "unit": r.unit,
+                    "duty_role": r.duty_role,
+                    "shift_type": r.shift_type,
+                    "post_location": r.post_location,
+                    "consecutive_days": r.consecutive_days,
+                    "status": r.status,
+                    "swap_recommended": r.swap_recommended,
+                    "swap_candidate_uid": r.swap_candidate_uid,
+                    "swap_candidate_name": r.swap_candidate_name,
+                    "swapped_at": str(r.swapped_at) if r.swapped_at else None,
+                    "swapped_by": r.swapped_by
+                })
+        except Exception:
+            live_rosters = self.DUTY_ROSTERS
+        finally:
+            db.close()
 
         raw_data = {
             "commander_email": sanitize_string(user_email),
@@ -1085,7 +1149,7 @@ class HRMSClient:
                 "weapons_secured_in_kote": "98.4%"
             },
             "high_risk_personnel": [p for p in assigned_personnel if p["risk_level"] in ["HIGH", "CRITICAL"]],
-            "active_duty_rosters": self.DUTY_ROSTERS,
+            "active_duty_rosters": live_rosters if live_rosters else self.DUTY_ROSTERS,
             "formation_units": [
                 {"unit": "Rapid Action Battalion 1", "strength": 420, "readiness": 96.2, "status": "Combat Ready"},
                 {"unit": "High Altitude Guard", "strength": 280, "readiness": 91.5, "status": "Acclimatized"},
@@ -1096,8 +1160,35 @@ class HRMSClient:
         return mask_sensitive_pii(raw_data, "COMMANDER")
 
     def get_hr_dashboard_data(self, user_email: str) -> Dict[str, Any]:
-        """Fetches workforce, leave, and attendance analytics for HR Officers."""
+        """Fetches workforce, leave, and attendance analytics for HR Officers from DB."""
         assigned_personnel = self.get_live_personnel_roster()
+
+        # Query live leave applications from database
+        from backend.app.database.session import SessionLocal
+        from backend.app.models.roster_leave import LeaveApplication
+        db = SessionLocal()
+        live_leaves = []
+        try:
+            db_leaves = db.query(LeaveApplication).order_by(LeaveApplication.applied_at.desc()).all()
+            for l in db_leaves:
+                live_leaves.append({
+                    "application_number": l.application_number,
+                    "personnel_uid": l.personnel_uid,
+                    "personnel_name": l.personnel_name,
+                    "rank": l.rank,
+                    "unit": l.unit,
+                    "leave_type": l.leave_type,
+                    "duration_days": l.duration_days,
+                    "start_date": l.start_date,
+                    "status": l.status,
+                    "reason": l.reason,
+                    "applied_at": str(l.applied_at)
+                })
+        except Exception:
+            live_leaves = self.LEAVE_APPLICATIONS
+        finally:
+            db.close()
+
         raw_data = {
             "hr_email": sanitize_string(user_email),
             "division": "Personnel & Records Division",
@@ -1105,11 +1196,11 @@ class HRMSClient:
                 "total_workforce": 1248,
                 "present_today_pct": 96.4,
                 "on_authorized_leave": 42,
-                "pending_leave_requests": len(self.LEAVE_APPLICATIONS),
+                "pending_leave_requests": len(live_leaves) if live_leaves else len(self.LEAVE_APPLICATIONS),
                 "transfers_in_pipeline": 18,
                 "apar_compliance_pct": 98.2
             },
-            "pending_leaves": self.LEAVE_APPLICATIONS,
+            "pending_leaves": live_leaves if live_leaves else self.LEAVE_APPLICATIONS,
             "cadre_distribution": [
                 {"cadre": "Officers", "count": 112, "percentage": 9.0},
                 {"cadre": "Junior Commissioned Officers (JCO)", "count": 284, "percentage": 22.7},

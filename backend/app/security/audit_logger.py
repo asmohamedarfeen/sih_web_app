@@ -48,5 +48,17 @@ class AuditLogger:
         logger.info(f"AUDIT_EVENT: {json.dumps(log_payload)}")
         return log_payload
 
+    @staticmethod
+    def log_security_event(event_type: str, user_email: str, details: str, extra_metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        return AuditLogger.log_data_access(
+            user_email=user_email,
+            user_role="OFFICER",
+            user_uid=None,
+            endpoint=f"/security/{event_type.lower()}",
+            action=event_type,
+            client_ip="INTERNAL_DISPATCH",
+            extra_metadata={"details": details, **(extra_metadata or {})}
+        )
+
 
 audit_logger = AuditLogger()

@@ -39,4 +39,14 @@ export const personnelService = {
     const response = await apiClient.get<PersonnelRecord>(`/personnel/${uid}`);
     return response.data;
   },
+
+  async executeRosterSwap(sourcePersonnelUid: string, targetPersonnelUid: string, reason?: string): Promise<any> {
+    const response = await apiClient.post('/personnel/roster-swap', {
+      source_personnel_uid: sourcePersonnelUid,
+      target_personnel_uid: targetPersonnelUid,
+      reason: reason || 'Tactical Fatigue De-escalation & Stand-Down Rotation'
+    });
+    return response.data;
+  },
 };
+

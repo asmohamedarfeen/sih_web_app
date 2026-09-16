@@ -30,6 +30,14 @@ class Intervention(Base):
     counseling_date = Column(String(100), nullable=True)
     venue = Column(String(255), nullable=True)
     
+    # Closed-Loop Recovery & Clinical Milestones
+    pre_intervention_score = Column(Float, default=78.0)
+    post_intervention_score = Column(Float, nullable=True)
+    recovery_status = Column(String(50), default="IMPROVING") # IMPROVING, STABLE, RELAPSE_RISK, RECOVERED
+    sessions_log = Column(JSON, default=list) # List of session debrief notes and clinical milestones
+    next_review_date = Column(String(100), nullable=True)
+
     timeline = Column(JSON, nullable=True) # list of milestones
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+

@@ -1,6 +1,12 @@
 from backend.app.database.session import engine, SessionLocal, Base
 from backend.app.models.user import User, RoleEnum
+from backend.app.models.roster_leave import DutyRoster, LeaveApplication
+from backend.app.models.intervention import Intervention
+from backend.app.models.alert import SystemAlert
+from backend.app.models.assessment import Assessment
+from backend.app.models.ai_prediction import AIPrediction
 from backend.app.security.passwords import get_password_hash
+
 
 
 DEMO_USERS = [
@@ -250,22 +256,38 @@ def init_database_and_seed():
     """Initializes tables and seeds initial role accounts with HRMS metadata."""
     Base.metadata.create_all(bind=engine)
 
-    # Automatically ensure new columns exist in SQLite users table
+    # Automatically ensure new columns exist in SQLite users and interventions tables
     with engine.connect() as conn:
         from sqlalchemy import text
         cursor = conn.execute(text("PRAGMA table_info(users)"))
-        existing_cols = {row[1] for row in cursor.fetchall()}
+        existing_user_cols = {row[1] for row in cursor.fetchall()}
         
-        new_cols = {
+        new_user_cols = {
             "uid": "VARCHAR(50)",
             "force_id": "VARCHAR(50)",
             "regimental_number": "VARCHAR(50)",
             "branch": "VARCHAR(100)",
         }
-        for col, col_type in new_cols.items():
-            if col not in existing_cols:
+        for col, col_type in new_user_cols.items():
+            if col not in existing_user_cols:
                 conn.execute(text(f"ALTER TABLE users ADD COLUMN {col} {col_type}"))
+        
+        # Interventions table column migration
+        cursor = conn.execute(text("PRAGMA table_info(welfare_interventions)"))
+        existing_int_cols = {row[1] for row in cursor.fetchall()}
+        new_int_cols = {
+            "pre_intervention_score": "FLOAT DEFAULT 78.0",
+            "post_intervention_score": "FLOAT",
+            "recovery_status": "VARCHAR(50) DEFAULT 'IMPROVING'",
+            "sessions_log": "JSON",
+            "next_review_date": "VARCHAR(100)",
+        }
+        for col, col_type in new_int_cols.items():
+            if col not in existing_int_cols:
+                conn.execute(text(f"ALTER TABLE welfare_interventions ADD COLUMN {col} {col_type}"))
+        
         conn.commit()
+
 
     db = SessionLocal()
     try:
@@ -400,6 +422,123 @@ def init_database_and_seed():
                     severity="HIGH",
                     trigger_reason="6 consecutive night shifts with sleep deficit (Score 78/100)",
                     recommendation="Schedule cognitive debrief session with Welfare Officer."
+                )
+            ])
+
+        # Seed Initial Duty Rosters if empty
+        from backend.app.models.roster_leave import DutyRoster, LeaveApplication
+        if db.query(DutyRoster).count() == 0:
+            db.add_all([
+                DutyRoster(
+                    roster_id="RST-2026-001",
+                    personnel_uid="UID-EMP-012",
+                    personnel_name="Havildar Ramesh Chand",
+                    rank="Havildar",
+                    unit="High Altitude Guard",
+                    duty_role="High Altitude Sentry",
+                    shift_type="Night Watch (00:00 - 06:00)",
+                    post_location="Observation Post Siachen B-4",
+                    consecutive_days=8,
+                    status="ACTIVE",
+                    swap_recommended=True,
+                    swap_candidate_uid="UID-SLD-015",
+                    swap_candidate_name="Sepoy Amit Kumar"
+                ),
+                DutyRoster(
+                    roster_id="RST-2026-002",
+                    personnel_uid="UID-EMP-013",
+                    personnel_name="Subedar Gurpreet Singh",
+                    rank="Subedar",
+                    unit="Field Artillery 3rd Bn",
+                    duty_role="Field Battery Commander",
+                    shift_type="Day Patrol (06:00 - 18:00)",
+                    post_location="Sector Artillery Battery 2",
+                    consecutive_days=5,
+                    status="ACTIVE",
+                    swap_recommended=True,
+                    swap_candidate_uid="UID-EMP-011",
+                    swap_candidate_name="Captain Sarah Connor"
+                ),
+                DutyRoster(
+                    roster_id="RST-2026-003",
+                    personnel_uid="UID-EMP-010",
+                    personnel_name="Major Alex Morgan",
+                    rank="Major",
+                    unit="Rapid Action Battalion 1",
+                    duty_role="Tactical Convoy Escort",
+                    shift_type="Night Watch (22:00 - 06:00)",
+                    post_location="Convoy Route Alpha",
+                    consecutive_days=6,
+                    status="ACTIVE",
+                    swap_recommended=False
+                ),
+                DutyRoster(
+                    roster_id="RST-2026-004",
+                    personnel_uid="UID-SLD-015",
+                    personnel_name="Sepoy Amit Kumar",
+                    rank="Sepoy / Commando",
+                    unit="10 Para Special Forces",
+                    duty_role="Reserve Quick Reaction Standby",
+                    shift_type="Rest Rotation / Standby",
+                    post_location="Forward Base Camp",
+                    consecutive_days=1,
+                    status="ACTIVE",
+                    swap_recommended=False
+                ),
+                DutyRoster(
+                    roster_id="RST-2026-005",
+                    personnel_uid="UID-EMP-011",
+                    personnel_name="Captain Sarah Connor",
+                    rank="Captain",
+                    unit="Special Security Wing",
+                    duty_role="Perimeter Patrol Incharge",
+                    shift_type="Day Duty (08:00 - 16:00)",
+                    post_location="Main HQ Perimeter",
+                    consecutive_days=2,
+                    status="ACTIVE",
+                    swap_recommended=False
+                )
+            ])
+
+        # Seed Initial Leave Applications if empty
+        if db.query(LeaveApplication).count() == 0:
+            db.add_all([
+                LeaveApplication(
+                    application_number="LVE-2026-041",
+                    personnel_uid="UID-EMP-013",
+                    personnel_name="Subedar Gurpreet Singh",
+                    rank="Subedar",
+                    unit="Field Artillery 3rd Bn",
+                    leave_type="Compassionate Family Leave",
+                    duration_days=5,
+                    start_date="Tomorrow",
+                    status="APPROVED",
+                    reason="Mother hospitalized for urgent cardiac surgery.",
+                    reviewed_by="Col. Kabir Khan (HR Officer)"
+                ),
+                LeaveApplication(
+                    application_number="LVE-2026-042",
+                    personnel_uid="UID-EMP-012",
+                    personnel_name="Havildar Ramesh Chand",
+                    rank="Havildar",
+                    unit="High Altitude Guard",
+                    leave_type="Annual Furlough",
+                    duration_days=14,
+                    start_date="20 Sep 2026",
+                    status="PENDING",
+                    reason="Fatigue de-escalation after 6-month continuous high altitude post."
+                ),
+                LeaveApplication(
+                    application_number="LVE-2026-043",
+                    personnel_uid="UID-EMP-010",
+                    personnel_name="Major Alex Morgan",
+                    rank="Major",
+                    unit="Rapid Action Battalion 1",
+                    leave_type="Casual Leave",
+                    duration_days=3,
+                    start_date="25 Sep 2026",
+                    status="PENDING",
+                    reason="Family visit and routine rest."
                 )
             ])
 

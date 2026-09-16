@@ -1,5 +1,19 @@
 import { apiClient } from './apiClient';
 
+export interface CounselingSessionItem {
+  session_number?: number;
+  date?: string;
+  timestamp?: string;
+  counselor?: string;
+  counselor_name?: string;
+  notes: string;
+  stress_reading?: number;
+  observed_stress_score?: number;
+  coping_rating?: number;
+  recovery_status?: string;
+  stress_reduction_pct?: number;
+}
+
 export interface InterventionCase {
   id: number;
   case_number: string;
@@ -19,6 +33,11 @@ export interface InterventionCase {
   approved_amount: number;
   counseling_date: string;
   venue: string;
+  pre_intervention_score?: number;
+  post_intervention_score?: number;
+  recovery_status?: 'IMPROVING' | 'STABLE' | 'RELAPSE_RISK' | 'RECOVERED';
+  sessions_log?: CounselingSessionItem[];
+  next_review_date?: string;
   timeline: Array<{ date: string; event: string }>;
   created_at: string;
 }
@@ -41,8 +60,23 @@ export const interventionService = {
     requested_amount?: number;
     counseling_date?: string;
     venue?: string;
+    pre_intervention_score?: number;
   }): Promise<{ status: string; message: string; case: InterventionCase }> {
     const response = await apiClient.post('/interventions/', data);
+    return response.data;
+  },
+
+  async logSessionDebrief(
+    id: number,
+    data: {
+      counselor_notes: string;
+      observed_stress_score: number;
+      recovery_status?: string;
+      next_review_date?: string;
+      coping_rating?: number;
+    }
+  ): Promise<any> {
+    const response = await apiClient.post(`/interventions/${id}/sessions`, data);
     return response.data;
   },
 
