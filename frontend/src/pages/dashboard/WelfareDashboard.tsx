@@ -32,6 +32,10 @@ import { RiskForecastResult } from '../../types/riskForecasting';
 import { EmotionalStabilityResult } from '../../types/emotionalStability';
 import { BehavioralChangeResult } from '../../types/behavioralChange';
 import { ClosedLoopRecoveryTracker } from '../../components/analytics/ClosedLoopRecoveryTracker';
+import { WeakSignalBreakdownCard } from '../../components/analytics/WeakSignalBreakdownCard';
+import { RiskEvolutionChart } from '../../components/analytics/RiskEvolutionChart';
+import { SystemTrustMeterCard } from '../../components/trust/SystemTrustMeterCard';
+import { MultiSourceSignalFusionCard } from '../../components/analytics/MultiSourceSignalFusionCard';
 
 export interface PriorityPersonnel {
   id: string;
@@ -1025,6 +1029,18 @@ export const WelfareDashboard: React.FC = () => {
       </div>
 
       {/* ========================================================================= */}
+      {/* 3b. SYSTEM TRUST METER & MULTI-SOURCE SIGNAL FUSION CARD                  */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-5">
+          <SystemTrustMeterCard />
+        </div>
+        <div className="lg:col-span-7">
+          <MultiSourceSignalFusionCard />
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
       {/* 4. ROW 2: AI HEALTH MODULES (Left) + CRITICAL WELFARE ALERT (Hero Right)   */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -1734,6 +1750,28 @@ export const WelfareDashboard: React.FC = () => {
               </div>
             );
           })()}
+
+          {/* Weak Signal Breakdown (Explainable AI / XAI) */}
+          <div className="mt-4">
+            <WeakSignalBreakdownCard
+              personnelName={selectedPersonnel.name}
+              riskScore={selectedPersonnel.riskScore}
+              confidence={selectedPersonnel.confidence}
+            />
+          </div>
+
+          {/* Longitudinal Risk Evolution & Operational Milestone Timeline */}
+          <div className="mt-4">
+            <RiskEvolutionChart
+              personnelName={selectedPersonnel.name}
+              windowDays={60}
+            />
+          </div>
+
+          {/* Closed-Loop Post-Intervention Recovery Monitoring */}
+          <div className="mt-4">
+            <ClosedLoopRecoveryTracker personnelUid={selectedPersonnel.id || selectedPersonnel.jcNumber} />
+          </div>
 
           {/* Sub-block: Recommended Actions & Initiate Action Button */}
           <div className="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">

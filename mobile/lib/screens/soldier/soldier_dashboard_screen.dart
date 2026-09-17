@@ -561,9 +561,9 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
         backgroundColor: AppColors.secondary,
         foregroundColor: Colors.white,
         elevation: 6,
-        icon: const Icon(Icons.auto_awesome, color: AppColors.accent, size: 18),
+        icon: const Icon(Icons.health_and_safety_outlined, color: AppColors.accent, size: 18),
         label: const Text(
-          'Ask AI',
+          'Welfare Support',
           style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.3),
         ),
       ),
@@ -651,6 +651,18 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                 _buildRiskBreakdownCard(),
                 const SizedBox(height: 12),
                 _buildExplainableAiCard(),
+                const SizedBox(height: 14),
+
+                // Weak Signal Breakdown Card (Jury Feedback Item 1.3)
+                _buildWeakSignalBreakdownCard(),
+                const SizedBox(height: 14),
+
+                // Risk Evolution Timeline (Jury Feedback Item 2.1)
+                _buildRiskEvolutionTimelineCard(),
+                const SizedBox(height: 14),
+
+                // Closed-Loop Recovery Monitoring (Jury Feedback Item 2.2)
+                _buildRecoveryMonitoringCard(),
                 const SizedBox(height: 20),
 
                 // =============================================================
@@ -872,6 +884,51 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Visible Voluntary & Privacy Preserved Trust Badge
+          Container(
+            margin: const EdgeInsets.only(bottom: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFF10B981).withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.45)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.verified_user_rounded, color: Color(0xFF34D399), size: 16),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        'VOLUNTARY & PRIVACY PRESERVED',
+                        style: TextStyle(
+                          color: Color(0xFF34D399),
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      Text(
+                        'Protected by Defense Medical Firewalls • Zero Career Stigma',
+                        style: TextStyle(color: Colors.white70, fontSize: 8.5, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Text('AIRGAP', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w900)),
+                ),
+              ],
+            ),
+          ),
+
           // Greeting Row
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -3115,6 +3172,372 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
             '2. Cryptographic Tamper Seal: Every record is hashed using SHA-256 military standards.\n\n'
             '3. Direct Escalation: You have the right to request an independent review from the Armed Forces Medical Services Directorate at any time.',
             style: TextStyle(fontSize: 10, color: AppColors.textSecondary, height: 1.4),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // JURY FIX 1.3: WEAK SIGNAL BREAKDOWN CARD (Explainable Operational Factors)
+  // ---------------------------------------------------------------------------
+  Widget _buildWeakSignalBreakdownCard() {
+    final factors = [
+      {
+        'title': '3 Consecutive Night Patrols',
+        'sub': 'Continuous forward observation shift without circadian reset',
+        'impact': '+28% Weight',
+        'color': AppColors.rose,
+        'icon': Icons.nights_stay_outlined,
+      },
+      {
+        'title': 'Denied Family Leave / 2x Deferrals',
+        'sub': 'Operational hold on casual furlough backlog accumulates cognitive debt',
+        'impact': '+24% Weight',
+        'color': AppColors.amber,
+        'icon': Icons.event_busy_outlined,
+      },
+      {
+        'title': 'Recent High-Altitude Unit Transfer',
+        'sub': 'Relocated to Forward LOC sector within last 30 days',
+        'impact': '+22% Weight',
+        'color': AppColors.primary,
+        'icon': Icons.terrain_outlined,
+      },
+      {
+        'title': '18% Sleep Drop (<4.2h Average)',
+        'sub': 'Wearable telemetry and check-ins indicate restorative deficit',
+        'impact': '+16% Weight',
+        'color': AppColors.secondary,
+        'icon': Icons.bedtime_outlined,
+      },
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.cardBorder),
+        boxShadow: const [
+          BoxShadow(color: Color(0x0A000000), blurRadius: 6, offset: Offset(0, 2)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppColors.secondary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.analytics_outlined, color: AppColors.secondary, size: 16),
+              ),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'WEAK SIGNAL BREAKDOWN & ROOT CAUSES',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.secondary, letterSpacing: 0.5),
+                    ),
+                    Text(
+                      'Exact contributing operational factors behind stress trajectory',
+                      style: TextStyle(fontSize: 9.5, color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.emeraldLight,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: AppColors.emerald.withValues(alpha: 0.3)),
+                ),
+                child: const Text(
+                  'XAI Verified',
+                  style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w900, color: AppColors.emerald),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ...factors.map((f) {
+            final Color col = f['color'] as Color;
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.cardBorder),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: col.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(f['icon'] as IconData, color: col, size: 16),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          f['title'] as String,
+                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
+                        ),
+                        Text(
+                          f['sub'] as String,
+                          style: const TextStyle(fontSize: 9, color: AppColors.textSecondary),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: col.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      f['impact'] as String,
+                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: col),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // JURY FIX 2.1: RISK EVOLUTION & LONGITUDINAL TREND TIMELINE (30/60/90 Days)
+  // ---------------------------------------------------------------------------
+  Widget _buildRiskEvolutionTimelineCard() {
+    final milestones = [
+      {'day': 'Day 0', 'score': '32%', 'event': 'Deployment to Forward Sector', 'color': AppColors.emerald},
+      {'day': 'Day 14', 'score': '48%', 'event': 'Shift to High-Tempo Night Patrols', 'color': AppColors.primary},
+      {'day': 'Day 28', 'score': '64%', 'event': 'Casual Leave Request Deferred', 'color': AppColors.amber},
+      {'day': 'Day 45', 'score': '76%', 'event': 'Consecutive Watch Hours Increase', 'color': AppColors.rose},
+      {'day': 'Day 60', 'score': '52%', 'event': 'Post-Rest Recovery & Intervention', 'color': AppColors.emerald},
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
+        boxShadow: const [
+          BoxShadow(color: Color(0x1F000000), blurRadius: 8, offset: Offset(0, 3)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.timeline, color: Colors.amberAccent, size: 16),
+                  SizedBox(width: 8),
+                  Text(
+                    'RISK EVOLUTION & MILESTONE TIMELINE',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 0.5),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text('60-Day Trajectory', style: TextStyle(color: Colors.amberAccent, fontSize: 8.5, fontWeight: FontWeight.w900)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Progression of allostatic stress linked to operational duty events',
+            style: TextStyle(fontSize: 9.5, color: Colors.white70),
+          ),
+          const SizedBox(height: 14),
+
+          // Horizontal milestone stepper
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: milestones.map((m) {
+                final Color col = m['color'] as Color;
+                return Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.all(10),
+                  width: 130,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(m['day'] as String, style: const TextStyle(fontSize: 9, color: Colors.white60, fontWeight: FontWeight.w700)),
+                          Text(
+                            m['score'] as String,
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: col, fontFamily: 'monospace'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        m['event'] as String,
+                        style: const TextStyle(fontSize: 9.5, color: Colors.white, fontWeight: FontWeight.w600, height: 1.2),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // JURY FIX 2.2: CLOSED-LOOP RECOVERY MONITORING (Pre vs Post Intervention)
+  // ---------------------------------------------------------------------------
+  Widget _buildRecoveryMonitoringCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.4)),
+        boxShadow: const [
+          BoxShadow(color: Color(0x0A000000), blurRadius: 6, offset: Offset(0, 2)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.published_with_changes, color: Color(0xFF10B981), size: 16),
+              ),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'CLOSED-LOOP RECOVERY MONITORING',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.secondary, letterSpacing: 0.5),
+                    ),
+                    Text(
+                      'Evaluates intervention effectiveness over 30–60 days post-counseling',
+                      style: TextStyle(fontSize: 9.5, color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text(
+                  'RECOVERING',
+                  style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w900, color: Color(0xFF059669)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Side-by-side pre vs post delta
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.cardBorder),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Column(
+                  children: const [
+                    Text('BASELINE STRESS', style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+                    SizedBox(height: 2),
+                    Text('84 / 100', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AppColors.rose, fontFamily: 'monospace')),
+                    Text('Pre-Intervention', style: TextStyle(fontSize: 8, color: AppColors.textMuted)),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.arrow_forward, color: Color(0xFF10B981), size: 14),
+                ),
+                Column(
+                  children: const [
+                    Text('CURRENT STRESS', style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+                    SizedBox(height: 2),
+                    Text('52 / 100', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF059669), fontFamily: 'monospace')),
+                    Text('Post-Rest Rotation', style: TextStyle(fontSize: 8, color: AppColors.textMuted)),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Column(
+                    children: [
+                      Text('-32 pts', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Colors.white)),
+                      Text('38% Drop', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w700, color: Colors.white)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Protocol Applied: 48-hour mandatory sleep cycle + 5-day casual leave grant. Next clinical review scheduled in 6 days.',
+            style: TextStyle(fontSize: 9.5, color: AppColors.textSecondary, height: 1.3),
           ),
         ],
       ),

@@ -118,6 +118,56 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
         </button>
       </div>
 
+      {/* Quick Tactical Preset: 14-Day Deployment Extension Impact Simulator */}
+      <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <div className="p-2 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 shrink-0 mt-0.5">
+            <Compass className="w-4 h-4" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-wider text-amber-400">
+                Command Impact Scenario
+              </span>
+              <span className="text-[10px] font-mono text-slate-400">&bull; Tactical Counterfactual</span>
+            </div>
+            <p className="text-xs font-bold text-white mt-0.5">
+              "Simulate Impact: What happens to unit fatigue if deployment is extended by 14 days?"
+            </p>
+            <p className="text-[11px] text-slate-300 mt-0.5">
+              Proactive planning: Test operational shift adjustments and rest rotations before signing movement orders.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => {
+              setExtraSleep(0);
+              setReduceNightShifts(0);
+              setGrantLeaveDays(0);
+              setStationReassignment('CURRENT');
+              setCounselingHeld(false);
+            }}
+            className="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-xs font-black transition-all cursor-pointer"
+          >
+            Simulate +14d Overload
+          </button>
+          <button
+            onClick={() => {
+              setExtraSleep(2.0);
+              setReduceNightShifts(3);
+              setGrantLeaveDays(7);
+              setStationReassignment('PEACE_STATION');
+              setCounselingHeld(true);
+            }}
+            className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black transition-all cursor-pointer shadow-md"
+          >
+            Apply Mitigation
+          </button>
+        </div>
+      </div>
+
       {appliedNotice && (
         <div className="p-3.5 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-2 animate-fade-in">
           <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />

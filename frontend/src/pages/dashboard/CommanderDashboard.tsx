@@ -31,6 +31,7 @@ import { WhatIfSimulator } from '../../components/analytics/WhatIfSimulator';
 import { Form16WelfareDossier } from '../../components/reports/Form16WelfareDossier';
 import { UnitHierarchyTree } from '../../components/organization/UnitHierarchyTree';
 import { RiskMomentumBadge, RiskMomentumData } from '../../components/analytics/RiskMomentumBadge';
+import { MultiSourceSignalFusionCard } from '../../components/analytics/MultiSourceSignalFusionCard';
 
 
 // ============================================================================
@@ -682,6 +683,31 @@ export const CommanderDashboard: React.FC = () => {
         </div>
       )}
 
+      {/* Strict RBAC Command Confidentiality Safeguard Banner */}
+      <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 border-2 border-emerald-500/40 text-white flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 shrink-0">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/40">
+                Command Echelon Access Scope &bull; Aggregated Readiness Only
+              </span>
+              <span className="text-[10px] font-mono text-slate-400">Strict RBAC Boundary</span>
+            </div>
+            <p className="text-xs text-slate-200 mt-1 font-medium">
+              <strong>Confidentiality Safeguard:</strong> This view displays operational readiness, watch fatigue, and roster rebalancing directives only. Individual psychological check-ins, psychiatric assessments, and counseling logs are strictly restricted to the <strong>Welfare &amp; Medical Officer Hub</strong>.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="px-3 py-1 rounded-xl bg-white/10 text-emerald-300 font-mono text-[11px] font-bold border border-white/15">
+            Medical Airgap Enforced
+          </span>
+        </div>
+      </div>
+
       {/* ===================================================================== */}
       {/* ROW 1: 5 LARGE EXECUTIVE COMMAND CENTER KPI CARDS                     */}
       {/* ===================================================================== */}
@@ -1262,6 +1288,9 @@ export const CommanderDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Multi-Source Signal Fusion Flow Indicator (Jury Fix Item 2.5) */}
+      <MultiSourceSignalFusionCard />
 
       {/* "What-If" Counterfactual Intervention Simulator */}
       <WhatIfSimulator

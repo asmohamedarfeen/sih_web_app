@@ -154,6 +154,10 @@ export const PersonnelDashboard: React.FC = () => {
               <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-[0.15em] bg-primary-50 text-primary-700 border border-primary-200 shadow-xs">
                 Personnel Self-Care &amp; Readiness Terminal
               </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-900 border border-emerald-400 shadow-xs">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+                Voluntary &amp; Privacy Preserved
+              </span>
               <span className="text-xs text-slate-500 font-mono font-semibold">
                 &bull; UID: <span className="text-primary-700 font-bold">{user?.uid || 'UID-EMP-010'}</span>
               </span>

@@ -11,7 +11,7 @@ import 'welfare/welfare_dashboard_screen.dart';
 import 'commander/commander_dashboard_screen.dart';
 import 'admin/admin_dashboard_screen.dart';
 import 'auth/login_screen.dart';
-import 'soldier/screen_time_screen.dart';
+import 'soldier/duty_readiness_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -47,7 +47,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final List<Widget> pages = [
       _getPrimaryRoleDashboard(auth),
       const WellnessCheckinScreen(),
-      const ScreenTimeScreen(),
+      const DutyReadinessScreen(),
       const SoldierDossierScreen(),
     ];
 
@@ -124,9 +124,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               label: loc.t('checkin', 'Check-in'),
             ),
             BottomNavigationBarItem(
-              icon: const Icon(Icons.phonelink_ring_outlined),
-              activeIcon: const Icon(Icons.phonelink_ring),
-              label: loc.t('screen_time', 'Screen Time'),
+              icon: const Icon(Icons.schedule_outlined),
+              activeIcon: const Icon(Icons.schedule),
+              label: loc.t('duty_readiness', 'Duty & Readiness'),
             ),
             BottomNavigationBarItem(
               icon: const Icon(Icons.person_outline),
