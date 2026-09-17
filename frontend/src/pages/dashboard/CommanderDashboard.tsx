@@ -30,6 +30,7 @@ import { personnelService } from '../../services/personnelService';
 import { WhatIfSimulator } from '../../components/analytics/WhatIfSimulator';
 import { Form16WelfareDossier } from '../../components/reports/Form16WelfareDossier';
 import { UnitHierarchyTree } from '../../components/organization/UnitHierarchyTree';
+import { RiskMomentumBadge, RiskMomentumData } from '../../components/analytics/RiskMomentumBadge';
 
 
 // ============================================================================
@@ -56,6 +57,7 @@ interface BattalionData {
     rank: string;
     risk: number;
     issue: string;
+    momentum?: RiskMomentumData;
   }[];
 }
 
@@ -76,8 +78,60 @@ const BATTALION_DATABASE: Record<string, BattalionData> = {
       { name: 'E coy', risk: 'Low', stressScore: 19, headcount: 99 },
     ],
     flaggedPersonnel: [
-      { jcNumber: 'JC-4412', name: 'Subedar R. N. Yadav', rank: 'Subedar', risk: 78, issue: 'Continuous watch hours' },
-      { jcNumber: 'JC-5109', name: 'Naik Sandeep Singh', rank: 'Naik', risk: 76, issue: 'Overtime in forward observation' },
+      {
+        jcNumber: 'JC-4412',
+        name: 'Subedar R. N. Yadav',
+        rank: 'Subedar',
+        risk: 78,
+        issue: 'Continuous watch hours',
+        momentum: {
+          current_stress: 78,
+          velocity_pts_per_day: 1.4,
+          acceleration_pts_per_day2: 0.1,
+          momentum_state: 'ACCELERATING',
+          momentum_label: 'Accelerating Stress (+1.4 pts/day)',
+          severity: 'HIGH',
+          trajectory_arrow: '↗',
+          color: 'amber',
+          days_to_critical_threshold: 5,
+          decision_support: {
+            action_type: 'DUTY_REBALANCE',
+            urgency: 'HIGH',
+            headline: 'Rebalance Watch Rosters & Enforce 8h Sleep Cycle',
+            recommended_action: 'Subedar Yadav has accumulated 14 continuous night shifts. Rebalance watch rosters to preserve decision clarity.',
+            action_button_label: 'Execute Roster Rebalance',
+            action_code: 'REBALANCE_ROSTER_YADAV',
+            policy_mitigation: 'Watch Staggering Policy Directive',
+          },
+        },
+      },
+      {
+        jcNumber: 'JC-5109',
+        name: 'Naik Sandeep Singh',
+        rank: 'Naik',
+        risk: 76,
+        issue: 'Overtime in forward observation',
+        momentum: {
+          current_stress: 76,
+          velocity_pts_per_day: 1.8,
+          acceleration_pts_per_day2: 0.2,
+          momentum_state: 'ACCELERATING',
+          momentum_label: 'Post-Deployment Strain (+1.8 pts/day)',
+          severity: 'HIGH',
+          trajectory_arrow: '↗',
+          color: 'amber',
+          days_to_critical_threshold: 5,
+          decision_support: {
+            action_type: 'RELIEF_ROTATION',
+            urgency: 'HIGH',
+            headline: 'Relieve from Forward Post to Support Base',
+            recommended_action: 'Extended forward observation duty causing progressive fatigue. Rotate to secondary tier post.',
+            action_button_label: 'Order Forward Relief Rotation',
+            action_code: 'RELIEF_FORWARD_SANDEEP',
+            policy_mitigation: 'Forward Sector Exposure Limit Protocol',
+          },
+        },
+      },
     ],
   },
   Bravo: {
@@ -96,9 +150,89 @@ const BATTALION_DATABASE: Record<string, BattalionData> = {
       { name: 'E coy', risk: 'Low', stressScore: 24, headcount: 98 },
     ],
     flaggedPersonnel: [
-      { jcNumber: 'JC-2748', name: 'Naik Rohit Sharma', rank: 'Naik / Section 2IC', risk: 86, issue: 'Prolonged deployment (>14 mos)' },
-      { jcNumber: 'JC-3102', name: 'Hav. Kuldeep Joshi', rank: 'Havildar', risk: 91, issue: 'Deployment overload in LOC sector' },
-      { jcNumber: 'JC-1904', name: 'Sepoy Tariq Lone', rank: 'Sepoy', risk: 84, issue: 'Deferred rotational leave' },
+      {
+        jcNumber: 'JC-2748',
+        name: 'Naik Rohit Sharma',
+        rank: 'Naik / Section 2IC',
+        risk: 86,
+        issue: 'Prolonged deployment (>14 mos)',
+        momentum: {
+          current_stress: 86,
+          velocity_pts_per_day: 4.8,
+          acceleration_pts_per_day2: 0.9,
+          momentum_state: 'ACUTE_SURGE',
+          momentum_label: 'Acute Stress Surge (+4.8 pts/day)',
+          severity: 'CRITICAL',
+          trajectory_arrow: '↑',
+          color: 'rose',
+          days_to_critical_threshold: 2,
+          critical_warning: 'Exceeding burnout threshold within 48 hours',
+          decision_support: {
+            action_type: 'WORKLOAD_ROTATION',
+            urgency: 'IMMEDIATE',
+            headline: 'Rotate Out of Night Watch & Grant 7-Day Decompression Furlough',
+            recommended_action: 'Personnel has endured >14 months continuous LOC watch. Stress velocity +4.8 pts/day indicates imminent collapse.',
+            action_button_label: 'Execute 7-Day Roster Stand-Down',
+            action_code: 'ROSTER_STAND_DOWN_ROHIT',
+            policy_mitigation: 'Article 14 Rotational Relief Protocol',
+          },
+        },
+      },
+      {
+        jcNumber: 'JC-3102',
+        name: 'Hav. Kuldeep Joshi',
+        rank: 'Havildar',
+        risk: 91,
+        issue: 'Deployment overload in LOC sector',
+        momentum: {
+          current_stress: 91,
+          velocity_pts_per_day: 3.2,
+          acceleration_pts_per_day2: 0.4,
+          momentum_state: 'ACUTE_SURGE',
+          momentum_label: 'LOC Overload Surge (+3.2 pts/day)',
+          severity: 'CRITICAL',
+          trajectory_arrow: '↑',
+          color: 'rose',
+          days_to_critical_threshold: 0,
+          critical_warning: 'Already operating above critical threshold (91)',
+          decision_support: {
+            action_type: 'CLINICAL_REFERRAL',
+            urgency: 'IMMEDIATE',
+            headline: 'Refer to Unit Medical Officer for Neuro-Fatigue Evaluation',
+            recommended_action: 'LOC deployment overload with composite risk 91. Immediate medical decompression required.',
+            action_button_label: 'Order UMO Evaluation & Stand-Down',
+            action_code: 'UMO_REFERRAL_KULDEEP',
+            policy_mitigation: 'Operational Fatigue Safety Protocol',
+          },
+        },
+      },
+      {
+        jcNumber: 'JC-1904',
+        name: 'Sepoy Tariq Lone',
+        rank: 'Sepoy',
+        risk: 84,
+        issue: 'Deferred rotational leave',
+        momentum: {
+          current_stress: 84,
+          velocity_pts_per_day: 2.1,
+          acceleration_pts_per_day2: 0.2,
+          momentum_state: 'ACCELERATING',
+          momentum_label: 'Accelerating Stress (+2.1 pts/day)',
+          severity: 'HIGH',
+          trajectory_arrow: '↗',
+          color: 'amber',
+          days_to_critical_threshold: 4,
+          decision_support: {
+            action_type: 'LEAVE_CLEARANCE',
+            urgency: 'HIGH',
+            headline: 'Clear Deferred Rotational Casual Leave Immediately',
+            recommended_action: 'Furlough deferred twice due to border alert. Clear 10-day casual leave to restore baseline allostatic stability.',
+            action_button_label: 'Clear 10-Day Casual Leave',
+            action_code: 'CLEAR_LEAVE_TARIQ',
+            policy_mitigation: 'Mandatory Rotational Leave Restitution',
+          },
+        },
+      },
     ],
   },
   Charlie: {
@@ -117,8 +251,60 @@ const BATTALION_DATABASE: Record<string, BattalionData> = {
       { name: 'E coy', risk: 'Low', stressScore: 29, headcount: 96 },
     ],
     flaggedPersonnel: [
-      { jcNumber: 'JC-3910', name: 'Hav. Amit Kumar', rank: 'Havildar', risk: 88, issue: 'Family domestic distress + sleep deficit' },
-      { jcNumber: 'JC-4821', name: 'Sepoy Vikas Thapa', rank: 'Sepoy', risk: 82, issue: 'Denied compassionate leave' },
+      {
+        jcNumber: 'JC-3910',
+        name: 'Hav. Amit Kumar',
+        rank: 'Havildar',
+        risk: 88,
+        issue: 'Family domestic distress + sleep deficit',
+        momentum: {
+          current_stress: 88,
+          velocity_pts_per_day: 2.8,
+          acceleration_pts_per_day2: 0.3,
+          momentum_state: 'ACCELERATING',
+          momentum_label: 'Acute Personal Stress (+2.8 pts/day)',
+          severity: 'HIGH',
+          trajectory_arrow: '↗',
+          days_to_critical_threshold: 1,
+          color: 'rose',
+          decision_support: {
+            action_type: 'COMPASSIONATE_LEAVE',
+            urgency: 'IMMEDIATE',
+            headline: 'Approve Emergency Family Welfare Leave (14 Days)',
+            recommended_action: 'Critical domestic distress combined with severe sleep deficit. Direct approval of compassionate leave bypass.',
+            action_button_label: 'Grant 14-Day Compassionate Leave',
+            action_code: 'COMPASSIONATE_LEAVE_AMIT',
+            policy_mitigation: 'Article 22 Compassionate Leave Priority',
+          },
+        },
+      },
+      {
+        jcNumber: 'JC-4821',
+        name: 'Sepoy Vikas Thapa',
+        rank: 'Sepoy',
+        risk: 82,
+        issue: 'Denied compassionate leave',
+        momentum: {
+          current_stress: 82,
+          velocity_pts_per_day: 1.9,
+          acceleration_pts_per_day2: 0.1,
+          momentum_state: 'ACCELERATING',
+          momentum_label: 'Elevated Grievance Stress (+1.9 pts/day)',
+          severity: 'HIGH',
+          trajectory_arrow: '↗',
+          days_to_critical_threshold: 3,
+          color: 'amber',
+          decision_support: {
+            action_type: 'COMMANDER_HEARING',
+            urgency: 'HIGH',
+            headline: 'Schedule Subedar Major & CO Grievance Interview',
+            recommended_action: 'Resolve pending grievance on denied leave within 24 hours to defuse escalating discontent.',
+            action_button_label: 'Order Grievance Interview',
+            action_code: 'GRIEVANCE_HEARING_VIKAS',
+            policy_mitigation: 'Welfare Grievance Redressal Mechanism',
+          },
+        },
+      },
     ],
   },
   Delta: {
@@ -137,7 +323,33 @@ const BATTALION_DATABASE: Record<string, BattalionData> = {
       { name: 'E coy', risk: 'Low', stressScore: 17, headcount: 105 },
     ],
     flaggedPersonnel: [
-      { jcNumber: 'JC-6204', name: 'Naik Manoj Tiwari', rank: 'Naik', risk: 69, issue: 'Zero leave taken in 11 months' },
+      {
+        jcNumber: 'JC-6204',
+        name: 'Naik Manoj Tiwari',
+        rank: 'Naik',
+        risk: 69,
+        issue: 'Zero leave taken in 11 months',
+        momentum: {
+          current_stress: 69,
+          velocity_pts_per_day: 0.8,
+          acceleration_pts_per_day2: 0.0,
+          momentum_state: 'STABLE',
+          momentum_label: 'Latent Fatigue Accumulation (+0.8 pts/day)',
+          severity: 'MODERATE',
+          trajectory_arrow: '→',
+          color: 'blue',
+          days_to_critical_threshold: 20,
+          decision_support: {
+            action_type: 'MANDATORY_LEAVE',
+            urgency: 'MEDIUM',
+            headline: 'Schedule Planned Annual Furlough Window',
+            recommended_action: 'Zero leave utilization over 11 months creates latent burnout risk. Schedule upcoming 20-day leave roster slot.',
+            action_button_label: 'Queue Mandatory Leave',
+            action_code: 'QUEUE_LEAVE_TIWARI',
+            policy_mitigation: 'Annual Rest & Recuperation SOP',
+          },
+        },
+      },
     ],
   },
   Echo: {
@@ -156,8 +368,61 @@ const BATTALION_DATABASE: Record<string, BattalionData> = {
       { name: 'E coy', risk: 'Low', stressScore: 28, headcount: 93 },
     ],
     flaggedPersonnel: [
-      { jcNumber: 'JC-1108', name: 'Subedar Gurpreet Singh', rank: 'Subedar', risk: 89, issue: 'Severe circadian disruption & night vigils' },
-      { jcNumber: 'JC-5811', name: 'Sepoy Vikram Rathore', rank: 'Sepoy', risk: 87, issue: 'Wearable sleep telemetry < 4.1h/day' },
+      {
+        jcNumber: 'JC-1108',
+        name: 'Subedar Gurpreet Singh',
+        rank: 'Subedar',
+        risk: 89,
+        issue: 'Severe circadian disruption & night vigils',
+        momentum: {
+          current_stress: 89,
+          velocity_pts_per_day: 3.9,
+          acceleration_pts_per_day2: 0.6,
+          momentum_state: 'ACUTE_SURGE',
+          momentum_label: 'Circadian Disruption Surge (+3.9 pts/day)',
+          severity: 'CRITICAL',
+          trajectory_arrow: '↑',
+          color: 'rose',
+          days_to_critical_threshold: 1,
+          critical_warning: 'Exceeding burnout threshold within 24 hours',
+          decision_support: {
+            action_type: 'DUTY_SWAP',
+            urgency: 'IMMEDIATE',
+            headline: 'Reassign Night Watch Vigil Roster to Charlie Coy',
+            recommended_action: 'Consecutive night vigils causing severe sleep disruption. Rebalance duty roster to Charlie Coy.',
+            action_button_label: 'Execute Roster Swap',
+            action_code: 'SWAP_ROSTER_GURPREET',
+            policy_mitigation: 'Circadian Duty Rebalancing SOP',
+          },
+        },
+      },
+      {
+        jcNumber: 'JC-5811',
+        name: 'Sepoy Vikram Rathore',
+        rank: 'Sepoy',
+        risk: 87,
+        issue: 'Wearable sleep telemetry < 4.1h/day',
+        momentum: {
+          current_stress: 87,
+          velocity_pts_per_day: 3.1,
+          acceleration_pts_per_day2: 0.4,
+          momentum_state: 'ACUTE_SURGE',
+          momentum_label: 'Sleep Debt Acceleration (+3.1 pts/day)',
+          severity: 'CRITICAL',
+          trajectory_arrow: '↑',
+          color: 'rose',
+          days_to_critical_threshold: 1,
+          decision_support: {
+            action_type: 'DECOMPRESSION_REST',
+            urgency: 'IMMEDIATE',
+            headline: 'Mandate 48-Hour Decompression Rest Cycle',
+            recommended_action: 'Telemetry confirms sleep deficit < 4.1h for 5 consecutive nights. Mandate 48-hour restorative bunk rest.',
+            action_button_label: 'Authorize 48h Rest Cycle',
+            action_code: 'DECOMPRESSION_REST_VIKRAM',
+            policy_mitigation: 'Tactical Sleep Restoration SOP',
+          },
+        },
+      },
     ],
   },
 };
@@ -1538,6 +1803,149 @@ export const CommanderDashboard: React.FC = () => {
       </div>
 
       {/* ===================================================================== */}
+      {/* SECTION 19: OPERATIONAL RISK MOMENTUM & REAL-TIME ACTION DIRECTIVES   */}
+      {/* (Top 1% Principle #1 & #3: d(Stress)/dt Velocity Radar & Directives)  */}
+      {/* ===================================================================== */}
+      <div className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 via-[#0E231B] to-slate-900 border border-[#D4A017]/30 shadow-xl text-white space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#D4A017]/20 border border-[#D4A017]/40 flex items-center justify-center text-[#D4A017] shrink-0">
+              <Zap className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#D4A017]">
+                  Top 1% Operational Intelligence &bull; Section 19
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300 font-mono text-[10px] font-bold animate-pulse">
+                  Acute Surge Alert
+                </span>
+              </div>
+              <h3 className="text-base sm:text-lg font-black text-white tracking-tight">
+                Risk Momentum &amp; Real-Time Command Action Directives
+              </h3>
+              <p className="text-xs text-slate-300">
+                Mathematical velocity <span className="font-mono text-[#D4A017] font-bold">V = d(Stress)/dt</span> tracks stress acceleration to intercept acute breakdowns before operational impairment.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-mono text-slate-400">
+              Threshold: &ge; +2.5 pts/day
+            </span>
+            <button
+              onClick={() => setActiveDecisionModal(true)}
+              className="px-3.5 py-1.5 rounded-xl bg-[#D4A017] text-slate-950 font-black text-xs hover:bg-[#c39213] transition-all cursor-pointer shadow-sm"
+            >
+              Open Command Decision Center &rarr;
+            </button>
+          </div>
+        </div>
+
+        {/* 3 Acute Velocity Personnel Action Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+          {[
+            {
+              id: 'JC-2748',
+              name: 'Naik Rohit Sharma',
+              unit: 'Bravo Bn &bull; C Coy',
+              role: 'Section 2IC',
+              stress: 86,
+              velocity: '+4.8 pts/day',
+              accel: '+0.9 pts/d²',
+              state: 'ACUTE_SURGE',
+              daysLeft: '2 Days',
+              actionCode: 'ROSTER_STAND_DOWN_ROHIT',
+              directive: 'Rotate Out of Night Watch & Grant 7-Day Furlough',
+              reason: 'Continuous LOC watch >14 mos. Acceleration +0.9 pts/d² indicates imminent collapse.',
+              badgeColor: 'bg-rose-500/20 border-rose-500/50 text-rose-300',
+              btnLabel: 'Execute 7-Day Stand-Down',
+            },
+            {
+              id: 'JC-1108',
+              name: 'Subedar Gurpreet Singh',
+              unit: 'Echo Bn &bull; A Coy',
+              role: 'Platoon Commander',
+              stress: 89,
+              velocity: '+3.9 pts/day',
+              accel: '+0.6 pts/d²',
+              state: 'ACUTE_SURGE',
+              daysLeft: '1 Day',
+              actionCode: 'SWAP_ROSTER_GURPREET',
+              directive: 'Reassign Night Watch Vigil Roster to Charlie Coy',
+              reason: 'Consecutive night vigils causing severe circadian disruption. Swap night duty roster.',
+              badgeColor: 'bg-rose-500/20 border-rose-500/50 text-rose-300',
+              btnLabel: 'Execute Roster Swap',
+            },
+            {
+              id: 'JC-3910',
+              name: 'Hav. Amit Kumar',
+              unit: 'Charlie Bn &bull; A Coy',
+              role: 'Signals Section',
+              stress: 88,
+              velocity: '+2.8 pts/day',
+              accel: '+0.3 pts/d²',
+              state: 'ACUTE_SURGE',
+              daysLeft: '1 Day',
+              actionCode: 'COMPASSIONATE_LEAVE_AMIT',
+              directive: 'Approve Emergency Family Welfare Leave (14 Days)',
+              reason: 'Domestic distress combined with acute sleep deficit. Direct compassionate bypass.',
+              badgeColor: 'bg-rose-500/20 border-rose-500/50 text-rose-300',
+              btnLabel: 'Grant 14-Day Leave',
+            },
+          ].map((item) => {
+            const isDispatched = dispatchedActions.includes(item.actionCode);
+            return (
+              <div
+                key={item.id}
+                className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-[#D4A017]/40 flex flex-col justify-between transition-all space-y-3"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] font-mono text-[#D4A017] font-bold block">{item.id}</span>
+                      <h4 className="text-sm font-bold text-white">{item.name}</h4>
+                      <span className="text-[10px] text-slate-400" dangerouslySetInnerHTML={{ __html: item.unit }} />
+                    </div>
+                    <div className="text-right">
+                      <div className="font-mono text-base font-black text-rose-400">
+                        &uarr; {item.velocity}
+                      </div>
+                      <span className="text-[10px] font-mono text-rose-300 font-bold block">
+                        Crit Limit: {item.daysLeft}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 p-2.5 rounded-xl bg-black/40 border border-white/5 space-y-1">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-[#D4A017] block">
+                      Recommended Directive
+                    </span>
+                    <p className="text-xs font-bold text-slate-100">{item.directive}</p>
+                    <p className="text-[11px] text-slate-400 leading-tight">{item.reason}</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => handleDispatchCommand(`Directive Executed [${item.actionCode}]: ${item.directive}`)}
+                  disabled={isDispatched}
+                  className={`w-full py-2 px-3 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-md ${
+                    isDispatched
+                      ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white'
+                  }`}
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>{isDispatched ? 'Directive Dispatched ✓' : item.btnLabel}</span>
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ===================================================================== */}
       {/* ROW 4: 3 CARDS (WELFARE PROGRESS, RESOURCES, AI COMMAND RECOMMENDATIONS)*/}
       {/* ===================================================================== */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
@@ -1944,29 +2352,53 @@ export const CommanderDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* Flagged Personnel */}
-              <div className="space-y-2">
-                <h4 className="font-black text-slate-900 text-xs uppercase tracking-wider">
-                  Flagged Personnel Requiring Welfare Intervention
-                </h4>
-                <div className="space-y-2">
-                  {selectedBattalion.flaggedPersonnel.map((p) => (
-                    <div key={p.jcNumber} className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-primary">{p.jcNumber}</span>
-                          <span className="font-bold text-slate-900">{p.name}</span>
-                          <span className="text-[10px] text-slate-500">({p.rank})</span>
+              {/* Flagged Personnel with Risk Momentum */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-black text-slate-900 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                    <Activity className="w-3.5 h-3.5 text-rose-600" />
+                    <span>Flagged Personnel &bull; Risk Velocity &amp; Action Directives</span>
+                  </h4>
+                  <span className="text-[10px] font-mono text-slate-500">
+                    Formula: V = &Delta;Stress / &Delta;t
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  {selectedBattalion.flaggedPersonnel.map((p) => {
+                    return (
+                      <div key={p.jcNumber} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono font-bold text-primary">{p.jcNumber}</span>
+                              <span className="font-bold text-slate-900 text-sm">{p.name}</span>
+                              <span className="text-xs text-slate-500">({p.rank})</span>
+                            </div>
+                            <p className="text-xs text-slate-600 mt-0.5">{p.issue}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-800 font-black text-xs">
+                              Risk: {p.risk}
+                            </span>
+                            {p.momentum && (
+                              <RiskMomentumBadge momentum={p.momentum} compact />
+                            )}
+                          </div>
                         </div>
-                        <p className="text-[11px] text-slate-600 mt-0.5">{p.issue}</p>
+
+                        {/* Full Momentum & Decision Support Widget */}
+                        {p.momentum && (
+                          <RiskMomentumBadge
+                            momentum={p.momentum}
+                            onActionClick={(actionCode) => {
+                              handleDispatchCommand(`Directive Executed for ${p.name}: ${actionCode}`);
+                            }}
+                          />
+                        )}
                       </div>
-                      <div className="text-right shrink-0">
-                        <span className="px-2 py-1 rounded bg-rose-100 text-rose-800 font-bold text-xs">
-                          Risk: {p.risk}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>

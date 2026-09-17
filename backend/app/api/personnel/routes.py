@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Query, HTTPException, status
 from backend.app.models.user import User, RoleEnum
 from backend.app.dependencies.auth import get_current_user, require_roles
 from backend.app.services.hrms_client import hrms_service
-from backend.app.security.sanitization import mask_sensitive_pii, sanitize_string
+from backend.app.security.sanitization import mask_sensitive_pii, sanitize_string, apply_confidentiality_firewall
 from backend.app.security.audit_logger import audit_logger
 
 router = APIRouter(prefix="/personnel", tags=["Personnel Management"])
@@ -31,6 +31,7 @@ def list_personnel(
 ):
     """
     Lists personnel directory with role-scoped filtering and anti-tampering sanitization.
+    Enforces Confidentiality Firewall: Commander views get clinical telemetry redacted.
     """
     records = hrms_service.PERSONNEL_DATABASE
 
@@ -49,7 +50,7 @@ def list_personnel(
         rl = sanitize_string(risk_level.upper())
         records = [r for r in records if r["risk_level"] == rl]
 
-    return mask_sensitive_pii(records, current_user.role.value)
+    return apply_confidentiality_firewall(records, current_user.role.value, current_user.uid)
 
 
 @router.get("/{uid}")
@@ -59,6 +60,8 @@ def get_personnel_dossier(
 ):
     """
     Retrieves full verified personnel profile dossier.
+    Enforces Confidentiality Firewall: Commanders receive operational readiness data ONLY,
+    while Certified Welfare/Medical Officers receive full clinical psychometric profiles.
     """
     clean_uid = sanitize_string(uid)
 
@@ -77,13 +80,48 @@ def get_personnel_dossier(
             detail=f"Personnel record with UID '{clean_uid}' not found."
         )
 
+    # Log access in cryptographic audit ledger
+    audit_logger.log_data_access(
+        user_email=current_user.email,
+        user_role=current_user.role.value,
+        user_uid=current_user.uid,
+        endpoint=f"/personnel/{clean_uid}",
+        action=f"VIEW_PERSONNEL_DOSSIER_{clean_uid}",
+        client_ip="INTERNAL_API",
+        extra_metadata={"target_uid": clean_uid, "unit": record.get("unit")}
+    )
+
     # Attach related duty, leave, and welfare case records
     dossier = dict(record)
     dossier["duty_shifts"] = [d for d in hrms_service.DUTY_ROSTERS if d["personnel_name"] == record["name"]]
     dossier["welfare_history"] = [w for w in hrms_service.WELFARE_CASES if w["personnel_uid"] == clean_uid]
     dossier["leave_history"] = [l for l in hrms_service.LEAVE_APPLICATIONS if l["personnel_name"] == record["name"]]
 
-    return mask_sensitive_pii(dossier, current_user.role.value)
+    return apply_confidentiality_firewall(dossier, current_user.role.value, current_user.uid)
+
+
+@router.get("/{uid}/trust-ledger")
+def get_soldier_trust_ledger(
+    uid: str,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Returns the soldier's personal Trust & Access Audit Ledger.
+    Provides verifiable cryptographic proof of who accessed their operational readiness record,
+    certifies that clinical mental health surveys remain sealed under Medical Privilege,
+    and displays the statutory Article 42-A non-punitive guarantee.
+    """
+    clean_uid = sanitize_string(uid)
+
+    # Personnel can only inspect their own trust ledger; officers and admins can audit
+    if current_user.role == RoleEnum.PERSONNEL and current_user.uid != clean_uid:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access forbidden: Personnel can only inspect their own Trust Ledger."
+        )
+
+    return audit_logger.get_personnel_access_ledger(clean_uid)
+
 
 
 from pydantic import BaseModel, Field

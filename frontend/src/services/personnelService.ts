@@ -29,6 +29,40 @@ export interface PersonnelRecord {
   behavioral_change?: BehavioralChangeResult;
 }
 
+export interface AccessLogEntry {
+  timestamp: string;
+  target_uid: string;
+  accessor_name: string;
+  accessor_role: string;
+  accessor_unit: string;
+  access_scope: string;
+  data_redactions: string[];
+  reason: string;
+  integrity_sha256: string;
+  status: string;
+}
+
+export interface TrustLedgerResponse {
+  personnel_uid: string;
+  audit_standard: string;
+  cryptographic_algorithm: string;
+  confidentiality_firewall_status: string;
+  unauthorized_access_attempts: number;
+  total_verified_inspections: number;
+  article_42a_protection: {
+    directive: string;
+    safe_harbor_statute: string;
+    legal_guarantee: string;
+    penalty_for_breach: string;
+  };
+  confidentiality_firewall_rules: {
+    command_scope: string;
+    medical_scope: string;
+    personnel_scope: string;
+  };
+  access_logs: AccessLogEntry[];
+}
+
 export const personnelService = {
   async getPersonnelList(params?: { search?: string; unit?: string; risk_level?: string }): Promise<PersonnelRecord[]> {
     const response = await apiClient.get<PersonnelRecord[]>('/personnel/', { params });
@@ -37,6 +71,11 @@ export const personnelService = {
 
   async getPersonnelDossier(uid: string): Promise<PersonnelRecord> {
     const response = await apiClient.get<PersonnelRecord>(`/personnel/${uid}`);
+    return response.data;
+  },
+
+  async getTrustLedger(uid: string): Promise<TrustLedgerResponse> {
+    const response = await apiClient.get<TrustLedgerResponse>(`/personnel/${uid}/trust-ledger`);
     return response.data;
   },
 
@@ -49,4 +88,5 @@ export const personnelService = {
     return response.data;
   },
 };
+
 

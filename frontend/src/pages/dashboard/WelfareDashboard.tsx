@@ -31,6 +31,7 @@ import { getWelfareFeatureDetail, WelfareFeatureDetail } from '../../utils/welfa
 import { RiskForecastResult } from '../../types/riskForecasting';
 import { EmotionalStabilityResult } from '../../types/emotionalStability';
 import { BehavioralChangeResult } from '../../types/behavioralChange';
+import { ClosedLoopRecoveryTracker } from '../../components/analytics/ClosedLoopRecoveryTracker';
 
 export interface PriorityPersonnel {
   id: string;
@@ -2299,6 +2300,13 @@ export const WelfareDashboard: React.FC = () => {
             </span>
           </div>
         </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 6.5. TOP 1% CLOSED-LOOP RECOVERY TRACKING (14/30/60-Day Trajectory Curve)  */}
+      {/* ========================================================================= */}
+      <div className="pt-2">
+        <ClosedLoopRecoveryTracker personnelUid={selectedPersonnel.jcNumber} />
       </div>
 
       {/* ========================================================================= */}

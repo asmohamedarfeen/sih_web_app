@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from backend.app.models.user import User
 from backend.app.dependencies.auth import get_current_user
 from backend.app.services.hrms_client import hrms_service
-from backend.app.security.sanitization import mask_sensitive_pii, sanitize_string
+from backend.app.security.sanitization import mask_sensitive_pii, sanitize_string, apply_confidentiality_firewall
 
 router = APIRouter(prefix="/reports", tags=["Reports & Dossiers"])
 
@@ -155,7 +155,7 @@ def generate_personnel_dossier_report(
         }
     }
 
-    return mask_sensitive_pii(dossier, current_user.role.value)
+    return apply_confidentiality_firewall(dossier, current_user.role.value, current_user.uid)
 
 
 

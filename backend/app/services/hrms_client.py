@@ -1,10 +1,11 @@
 import httpx
 from typing import Dict, Any, List, Optional
 from backend.app.config.settings import settings
-from backend.app.security.sanitization import mask_sensitive_pii, sanitize_string
+from backend.app.security.sanitization import mask_sensitive_pii, sanitize_string, apply_confidentiality_firewall
 from backend.app.services.risk_forecasting_engine import risk_forecasting_engine
 from backend.app.services.emotional_stability_engine import emotional_stability_engine
 from backend.app.services.behavioral_change_engine import behavioral_change_engine
+from backend.app.services.risk_momentum_engine import risk_momentum_engine
 
 
 class HRMSClient:
@@ -120,6 +121,14 @@ class HRMSClient:
                 historical_performance_rating=hist_perf,
                 current_wellness_participation=cur_well,
                 historical_wellness_participation=hist_well
+            )
+
+            # Compute Risk Momentum & Stress Acceleration (d(Stress)/dt)
+            p["risk_momentum"] = risk_momentum_engine.calculate_momentum(
+                current_stress=stress_val,
+                consecutive_duty_days=int(consec_days),
+                leave_deferrals=leave_def,
+                sleep_hours=float(sleep_hrs)
             )
 
     # Comprehensive HRMS Model Personnel Directory
@@ -1097,7 +1106,7 @@ class HRMSClient:
             "upcoming_sessions": live_cases if live_cases else self.WELFARE_CASES,
             "assigned_personnel": assigned_personnel
         }
-        return mask_sensitive_pii(raw_data, "WELFARE_OFFICER")
+        return apply_confidentiality_firewall(raw_data, "WELFARE_OFFICER")
 
     def get_commander_dashboard_data(self, user_email: str) -> Dict[str, Any]:
         """Fetches formation readiness, duty rosters, and SHAPE classifications for Commanders from DB."""
@@ -1157,7 +1166,7 @@ class HRMSClient:
                 {"unit": "Signals & Telemetry Wing", "strength": 238, "readiness": 97.4, "status": "Operational"}
             ]
         }
-        return mask_sensitive_pii(raw_data, "COMMANDER")
+        return apply_confidentiality_firewall(raw_data, "COMMANDER")
 
     def get_hr_dashboard_data(self, user_email: str) -> Dict[str, Any]:
         """Fetches workforce, leave, and attendance analytics for HR Officers from DB."""
@@ -1209,7 +1218,7 @@ class HRMSClient:
             ],
             "recent_personnel": assigned_personnel
         }
-        return mask_sensitive_pii(raw_data, "HR_OFFICER")
+        return apply_confidentiality_firewall(raw_data, "HR_OFFICER")
 
     def get_admin_dashboard_data(self, user_email: str) -> Dict[str, Any]:
         """Fetches platform telemetry, security audits, and organization summary for Administrators."""
@@ -1233,7 +1242,7 @@ class HRMSClient:
             },
             "all_personnel": assigned_personnel
         }
-        return mask_sensitive_pii(raw_data, "ADMIN")
+        return apply_confidentiality_firewall(raw_data, "ADMIN")
 
 
 # Singleton instance

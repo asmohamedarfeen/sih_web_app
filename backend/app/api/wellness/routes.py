@@ -3,11 +3,13 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from backend.app.database.session import get_db
-from backend.app.models.user import User
+from backend.app.models.user import User, RoleEnum
 from backend.app.models.assessment import Assessment
 from backend.app.dependencies.auth import get_current_user, get_optional_current_user
 from backend.app.services.ai_risk_engine import ai_risk_engine
 from backend.app.services.hrms_client import hrms_service
+from backend.app.security.sanitization import apply_confidentiality_firewall, sanitize_string
+from backend.app.security.audit_logger import audit_logger
 
 router = APIRouter(prefix="/wellness", tags=["Wellness & Assessments"])
 
@@ -23,6 +25,17 @@ class AssessmentCreate(BaseModel):
     notes: Optional[str] = None
 
 
+@router.get("/trust-ledger")
+def get_soldier_personal_trust_ledger(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Returns the authenticated soldier's personal Cryptographic Trust & Access Ledger.
+    Validates anti-stigma protection under Article 42-A and confirms medical privilege.
+    """
+    return audit_logger.get_personnel_access_ledger(current_user.uid)
+
+
 @router.get("/assessments")
 def get_assessment_history(
     personnel_uid: Optional[str] = None,
@@ -31,16 +44,27 @@ def get_assessment_history(
 ):
     """
     Retrieves assessment submission history.
+    Enforces Confidentiality Firewall: Commanders receive operational metrics only;
+    subjective mood and notes are redacted under Article 42-A Safe Harbor.
     """
+    target_uid = personnel_uid
+    if current_user.role == RoleEnum.PERSONNEL:
+        if personnel_uid and personnel_uid != current_user.uid:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access forbidden: Personnel can only access their own assessments."
+            )
+        target_uid = current_user.uid
+
     query = db.query(Assessment)
-    if personnel_uid:
-        query = query.filter(Assessment.personnel_uid == personnel_uid)
+    if target_uid:
+        query = query.filter(Assessment.personnel_uid == target_uid)
     
     records = query.order_by(Assessment.submitted_at.desc()).limit(50).all()
     
     # Fallback to simulated sample assessments if database is freshly initialized
     if not records:
-        return [
+        sample_records = [
             {
                 "id": 1,
                 "personnel_uid": "UID-EMP-012",
@@ -98,8 +122,28 @@ def get_assessment_history(
                 "submitted_at": "2026-09-04T08:45:00Z"
             }
         ]
+        records = sample_records
+    else:
+        records = [
+            {
+                "id": r.id,
+                "personnel_uid": r.personnel_uid,
+                "personnel_name": r.personnel_name,
+                "rank": r.rank,
+                "unit": r.unit,
+                "branch": r.branch,
+                "sleep_hours": r.sleep_hours,
+                "fatigue_level": r.fatigue_level,
+                "mood_score": r.mood_score,
+                "workload_pressure": r.workload_pressure,
+                "physical_strain": r.physical_strain,
+                "consecutive_duty_days": r.consecutive_duty_days,
+                "notes": r.notes,
+                "submitted_at": str(r.submitted_at)
+            } for r in records
+        ]
 
-    return records
+    return apply_confidentiality_firewall(records, current_user.role.value, current_user.uid)
 
 
 @router.post("/assessments")

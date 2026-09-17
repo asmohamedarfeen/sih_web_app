@@ -25,19 +25,21 @@ import {
   Compass,
   Lock,
   Award,
+  ShieldCheck,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { wellnessService, AssessmentSubmission } from '../../services/wellnessService';
 import { ClinicalNarrativeCard } from '../../components/ai/ClinicalNarrativeCard';
 import { Form16WelfareDossier } from '../../components/reports/Form16WelfareDossier';
 import { UnitHierarchyTree } from '../../components/organization/UnitHierarchyTree';
+import { TrustConfidentialityLedger } from '../../components/trust/TrustConfidentialityLedger';
 import { useLanguageStore } from '../../localization';
 import { LanguageSelector } from '../../components/common/LanguageSelector';
 
 export const PersonnelDashboard: React.FC = () => {
   const { user } = useAuthStore();
   const { t } = useLanguageStore();
-  const [activeSection, setActiveSection] = useState<'all' | 'score' | 'checkin' | 'insights' | 'activities' | 'progress' | 'hierarchy'>('all');
+  const [activeSection, setActiveSection] = useState<'all' | 'score' | 'checkin' | 'insights' | 'activities' | 'progress' | 'hierarchy' | 'trust'>('all');
   const [showPrivacyMatrix, setShowPrivacyMatrix] = useState(false);
   const [showDossierModal, setShowDossierModal] = useState(false);
 
@@ -225,13 +227,27 @@ export const PersonnelDashboard: React.FC = () => {
                 </p>
               </div>
             </div>
-            <button
-              onClick={() => setShowPrivacyMatrix(!showPrivacyMatrix)}
-              className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs cursor-pointer transition-all flex items-center gap-1.5 shrink-0 self-start sm:self-auto"
-            >
-              <Lock className="w-3.5 h-3.5 text-emerald-400" />
-              <span>{showPrivacyMatrix ? t('hide_privacy_barrier') : t('view_transparency_matrix')}</span>
-            </button>
+            <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+              <button
+                onClick={() => {
+                  setActiveSection('trust');
+                  setTimeout(() => {
+                    document.getElementById('trust-section')?.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+                className="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs cursor-pointer transition-all flex items-center gap-1.5 shadow-sm"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                <span>View Cryptographic Trust Ledger</span>
+              </button>
+              <button
+                onClick={() => setShowPrivacyMatrix(!showPrivacyMatrix)}
+                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs cursor-pointer transition-all flex items-center gap-1.5"
+              >
+                <Lock className="w-3.5 h-3.5 text-emerald-400" />
+                <span>{showPrivacyMatrix ? t('hide_privacy_barrier') : t('view_transparency_matrix')}</span>
+              </button>
+            </div>
           </div>
 
           {/* Expandable Transparency Matrix */}
@@ -278,13 +294,14 @@ export const PersonnelDashboard: React.FC = () => {
 
         <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs">
           {[
-            { id: 'all', label: 'Complete View (6 Sections)' },
+            { id: 'all', label: 'Complete View (7 Sections)' },
             { id: 'score', label: `1. ${t('wellness_score_heading')}` },
             { id: 'checkin', label: `2. ${t('checkin_heading')}` },
             { id: 'insights', label: '3. AI Insights' },
             { id: 'activities', label: '4. Wellness Activities' },
             { id: 'progress', label: '5. Personal Progress' },
             { id: 'hierarchy', label: `6. ${t('unit_hierarchy')}` },
+            { id: 'trust', label: '7. Trust & Confidentiality Ledger' },
           ].map((sec) => (
             <button
               key={sec.id}
@@ -1083,6 +1100,23 @@ export const PersonnelDashboard: React.FC = () => {
           </div>
 
           <UnitHierarchyTree />
+        </section>
+      )}
+
+      {/* SECTION 7: DEFENSE TRUST ARCHITECTURE & CONFIDENTIALITY LEDGER */}
+      {(activeSection === 'all' || activeSection === 'trust') && (
+        <section id="trust-section" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-extrabold text-gray-900 uppercase tracking-[0.12em] flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span>Section 7 &bull; Defense Trust Architecture & Confidentiality Ledger</span>
+            </h2>
+            <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+              ARTICLE 42-A ENFORCED
+            </span>
+          </div>
+
+          <TrustConfidentialityLedger personnelUid={user?.uid || 'UID-EMP-010'} />
         </section>
       )}
 

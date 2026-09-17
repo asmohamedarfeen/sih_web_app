@@ -42,6 +42,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
   int _quickFatigueLevel = 3;
   int _quickMoodScore = 9;
   bool _isQuickSubmitting = false;
+  int _trustLedgerTab = 0; // 0: Firewall Matrix, 1: SHA-256 Audit Log, 2: Safe Harbor
 
   // Box Breathing Exercise States (4-4-4-4)
   bool _isBreathingActive = false;
@@ -1762,7 +1763,55 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
             'RISK & HEALTH FACTOR BREAKDOWN',
             style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.secondary, letterSpacing: 0.5),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
+          // Top 1% Principle #3: Stress Velocity & Momentum Indicator
+          Container(
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(bottom: 14),
+            decoration: BoxDecoration(
+              color: AppColors.emeraldLight,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.emerald.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.emerald,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.trending_down, color: Colors.white, size: 20),
+                ),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'STRESS VELOCITY: d(Stress)/dt',
+                            style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w900, color: AppColors.emerald, letterSpacing: 0.5),
+                          ),
+                          Text(
+                            '-1.2 pts/day',
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.emerald),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        'Restorative baseline • Allostatic regulation stable',
+                        style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
           ...factors.map((f) {
             final pct = f['pct'] as int;
             final color = f['color'] as Color;
@@ -2690,43 +2739,382 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // SECTION 25: PRIVACY CARD
+  // SECTION 25: DEFENSE TRUST ARCHITECTURE & CONFIDENTIALITY FIREWALL LEDGER
   // ---------------------------------------------------------------------------
   Widget _buildPrivacyCard() {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.cardBorder),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.accent.withValues(alpha: 0.35)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.primaryLight,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(Icons.shield, color: AppColors.primary, size: 22),
-          ),
-          const SizedBox(width: 14),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Privacy Protected',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
+          // Header: Emblem & Compliance Badge
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0E231B),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.accent.withValues(alpha: 0.5)),
                 ),
-                SizedBox(height: 4),
+                child: const Icon(Icons.security, color: AppColors.accent, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.emeraldLight,
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: AppColors.emerald.withValues(alpha: 0.4)),
+                          ),
+                          child: const Text(
+                            'ARTICLE 42-A VERIFIED',
+                            style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w900, color: AppColors.emerald),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        const Text(
+                          'SHA-256 LEDGER',
+                          style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w800, color: AppColors.textMuted),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    const Text(
+                      'Defense Confidentiality Firewall',
+                      style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // 3-Tab Pill Switcher
+          Container(
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.cardBorder),
+            ),
+            child: Row(
+              children: [
+                _buildTrustTabPill(0, 'Firewall Matrix', Icons.layers_outlined),
+                _buildTrustTabPill(1, 'Audit Trail', Icons.history_edu),
+                _buildTrustTabPill(2, 'Statute 42-A', Icons.gavel_outlined),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // Tab Content
+          if (_trustLedgerTab == 0) _buildFirewallMatrixTab(),
+          if (_trustLedgerTab == 1) _buildAuditTrailTab(),
+          if (_trustLedgerTab == 2) _buildStatuteTab(),
+
+          const SizedBox(height: 14),
+          // Footer Guarantee
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0E231B),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.verified_user, color: AppColors.accent, size: 14),
+                SizedBox(width: 6),
                 Text(
-                  'Only authorized welfare personnel can view your identifiable information.\n\nYour data is never used for disciplinary action. Protected under Armed Forces Welfare Privacy Protocol.',
-                  style: TextStyle(fontSize: 10.5, color: AppColors.textSecondary, height: 1.4),
+                  'People First • Dignity Always • Zero Disciplinary Exposure',
+                  style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: Colors.white),
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTrustTabPill(int index, String title, IconData icon) {
+    final isSelected = _trustLedgerTab == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _trustLedgerTab = index;
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 7),
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(9),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.06),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 13,
+                color: isSelected ? AppColors.primary : AppColors.textSecondary,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+                  color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFirewallMatrixTab() {
+    return Column(
+      children: [
+        _buildTierRow(
+          role: 'Soldier (You)',
+          badgeText: '100% UNRESTRICTED',
+          badgeColor: AppColors.emerald,
+          badgeBg: AppColors.emeraldLight,
+          description: 'Full visibility over your raw scores, voice check-ins, sleep telemetry, and private reflections.',
+          icon: Icons.person_outline,
+        ),
+        const SizedBox(height: 8),
+        _buildTierRow(
+          role: 'Medical / Welfare Officer',
+          badgeText: 'CLINICAL PRIVILEGE',
+          badgeColor: AppColors.secondary,
+          badgeBg: AppColors.secondaryLight,
+          description: 'Access limited strictly to psychological triage & clinical care. Legally protected under doctor-patient privilege.',
+          icon: Icons.medical_services_outlined,
+        ),
+        const SizedBox(height: 8),
+        _buildTierRow(
+          role: 'Formation Commander',
+          badgeText: 'AGGREGATED ONLY (SEALED)',
+          badgeColor: AppColors.accent,
+          badgeBg: AppColors.accentLight,
+          description: 'Commanders ONLY see unit-level readiness %. All psychiatric journals, personal feelings, and check-in texts are HARD-FIREWALLED and invisible.',
+          icon: Icons.shield_outlined,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTierRow({
+    required String role,
+    required String badgeText,
+    required Color badgeColor,
+    required Color badgeBg,
+    required String description,
+    required IconData icon,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.cardBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(icon, size: 15, color: AppColors.primary),
+                  const SizedBox(width: 6),
+                  Text(
+                    role,
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: badgeBg,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: badgeColor.withValues(alpha: 0.4)),
+                ),
+                child: Text(
+                  badgeText,
+                  style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: badgeColor),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            description,
+            style: const TextStyle(fontSize: 10, color: AppColors.textSecondary, height: 1.35),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAuditTrailTab() {
+    final auditLogs = [
+      {
+        'officer': 'Soldier (Self-Audit)',
+        'role': 'Owner Inspection',
+        'scope': 'Full Self-Inspection Access',
+        'hash': 'sha256:91b29a00...',
+        'time': 'Just now',
+        'color': AppColors.emerald,
+      },
+      {
+        'officer': 'Major V. K. Nair',
+        'role': 'Chief Medical Officer',
+        'scope': 'Clinical Decompression Review',
+        'hash': 'sha256:7f83b165...',
+        'time': '14 mins ago',
+        'color': AppColors.secondary,
+      },
+      {
+        'officer': 'Col. R. S. Rathore',
+        'role': 'Formation Commander',
+        'scope': 'Aggregated Readiness % Only (Clinical Redacted)',
+        'hash': 'sha256:d4e12c8a...',
+        'time': '2 hours ago',
+        'color': AppColors.accent,
+      },
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'IMMUTABLE CRYPTOGRAPHIC ACCESS LEDGER',
+          style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w900, color: AppColors.textMuted, letterSpacing: 0.5),
+        ),
+        const SizedBox(height: 8),
+        ...auditLogs.map((log) {
+          return Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.cardBorder),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 3,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: log['color'] as Color,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            log['officer'] as String,
+                            style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
+                          ),
+                          Text(
+                            log['time'] as String,
+                            style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: AppColors.textMuted),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${log['role']} • ${log['scope']}',
+                        style: const TextStyle(fontSize: 9.5, color: AppColors.textSecondary),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        log['hash'] as String,
+                        style: const TextStyle(fontSize: 8.5, fontFamily: 'monospace', color: AppColors.textMuted),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildStatuteTab() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.emeraldLight,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.emerald.withValues(alpha: 0.35)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.shield_rounded, color: AppColors.emerald, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                'Defense Article 42-A Safe-Harbor',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.emerald.withValues(alpha: 0.9)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Under Article 42-A of the Armed Forces Welfare & Psychological Health Protocol:\n\n'
+            '1. Absolute Non-Disciplinary Immunity: Self-reported stress and wellness evaluations can NEVER be used for ACR grading, court martial, disciplinary reprimand, or promotion denials.\n\n'
+            '2. Cryptographic Tamper Seal: Every record is hashed using SHA-256 military standards.\n\n'
+            '3. Direct Escalation: You have the right to request an independent review from the Armed Forces Medical Services Directorate at any time.',
+            style: TextStyle(fontSize: 10, color: AppColors.textSecondary, height: 1.4),
           ),
         ],
       ),

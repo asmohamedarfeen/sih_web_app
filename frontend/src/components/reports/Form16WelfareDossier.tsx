@@ -4,6 +4,7 @@ import {
   X,
   Shield,
   Activity,
+  Lock,
 } from 'lucide-react';
 import { reportService, PersonnelDossierReport } from '../../services/reportService';
 
@@ -94,6 +95,36 @@ export const Form16WelfareDossier: React.FC<Form16WelfareDossierProps> = ({
                   <span className="text-amber-700 font-bold uppercase">CONFIDENTIAL // ARTICLE 42-A SAFE HARBOR</span>
                 </div>
               </div>
+
+              {/* Command Confidentiality Firewall Seal */}
+              {(dossier as any)?.confidentiality_firewall?.status === 'ACTIVE_COMMAND_FIREWALL' ? (
+                <div className="p-4 bg-amber-50 rounded-2xl border-2 border-amber-400/80 flex items-start gap-3 shadow-xs">
+                  <div className="p-2 rounded-xl bg-amber-500/20 text-amber-700 shrink-0">
+                    <Lock className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-1 text-xs">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-black uppercase tracking-wider text-amber-900">
+                        Command Review Mode &bull; Clinical Telemetry Redacted
+                      </span>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-200/70 text-amber-950 font-bold">
+                        MHA ARTICLE 42-A ENFORCED
+                      </span>
+                    </div>
+                    <p className="text-slate-700 leading-relaxed text-[11px]">
+                      In compliance with Defense Personnel Medical Confidentiality directives, subjective mood logs, psychometric questionnaires, and psychiatric session notes are sealed. This dossier provides <strong>Tactical Combat Readiness</strong> and <strong>Operational Roster Recommendations</strong> only.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-300 flex items-center justify-between text-xs text-emerald-900">
+                  <div className="flex items-center gap-2 font-bold">
+                    <Shield className="w-4 h-4 text-emerald-600" />
+                    <span>Certified Welfare / Medical Officer Full Clinical Privilege</span>
+                  </div>
+                  <span className="font-mono text-[10px] text-emerald-700">All 18-Domain Psychological Telemetry Unlocked</span>
+                </div>
+              )}
 
               {/* Section 1: Personnel Service Identity */}
               <div className="space-y-2">
