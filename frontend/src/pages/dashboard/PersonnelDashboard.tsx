@@ -210,23 +210,23 @@ export const PersonnelDashboard: React.FC = () => {
         {/* ===================================================================== */}
         {/* DEFENSE MEDICAL PRIVILEGE & SOLDIER TRUST LEDGER (ANTI-STIGMA SHIELD) */}
         {/* ===================================================================== */}
-        <div className="mt-5 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#0C1E38] via-[#0E2548] to-[#122F58] border border-emerald-500/30 text-white shadow-md">
+        <div className="mt-5 p-4 sm:p-5 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-slate-800 shadow-2xs">
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-800 shrink-0 shadow-2xs">
                 <Shield className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="text-sm font-black text-white tracking-tight">
+                  <h3 className="text-sm font-black text-slate-900 tracking-tight">
                     {t('article_42a_title')}
                   </h3>
-                  <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
                     {t('non_punitive_badge')}
                   </span>
                 </div>
-                <p className="text-xs text-slate-300 mt-1 max-w-3xl leading-relaxed">
+                <p className="text-xs text-slate-600 mt-1 max-w-3xl leading-relaxed">
                   {t('article_42a_desc')}
                 </p>
               </div>
@@ -239,16 +239,16 @@ export const PersonnelDashboard: React.FC = () => {
                     document.getElementById('trust-section')?.scrollIntoView({ behavior: 'smooth' });
                   }, 100);
                 }}
-                className="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs cursor-pointer transition-all flex items-center gap-1.5 shadow-sm"
+                className="px-3.5 py-1.5 rounded-xl bg-primary hover:bg-primary-600 text-white font-black text-xs cursor-pointer transition-all flex items-center gap-1.5 shadow-sm"
               >
                 <ShieldCheck className="w-4 h-4" />
                 <span>View Cryptographic Trust Ledger</span>
               </button>
               <button
                 onClick={() => setShowPrivacyMatrix(!showPrivacyMatrix)}
-                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs cursor-pointer transition-all flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-bold text-xs cursor-pointer transition-all flex items-center gap-1.5 shadow-2xs"
               >
-                <Lock className="w-3.5 h-3.5 text-emerald-400" />
+                <Lock className="w-3.5 h-3.5 text-primary" />
                 <span>{showPrivacyMatrix ? t('hide_privacy_barrier') : t('view_transparency_matrix')}</span>
               </button>
             </div>
@@ -256,13 +256,13 @@ export const PersonnelDashboard: React.FC = () => {
 
           {/* Expandable Transparency Matrix */}
           {showPrivacyMatrix && (
-            <div className="mt-4 pt-4 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-              <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
-                <div className="flex items-center gap-2 font-bold text-emerald-300 mb-1.5">
-                  <UserCheck className="w-4 h-4 text-emerald-400" />
+            <div className="mt-4 pt-4 border-t border-emerald-200 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+              <div className="p-3.5 rounded-xl bg-white border border-emerald-200 shadow-2xs">
+                <div className="flex items-center gap-2 font-bold text-emerald-900 mb-1.5">
+                  <UserCheck className="w-4 h-4 text-emerald-700" />
                   <span>What Certified Medical Officers See:</span>
                 </div>
-                <ul className="space-y-1 text-slate-300 text-[11px] list-disc list-inside">
+                <ul className="space-y-1 text-slate-600 text-[11px] list-disc list-inside">
                   <li>Full multi-domain distress breakdown (PHQ/GAD metrics).</li>
                   <li>Restorative sleep latency and biometric HRV trends.</li>
                   <li>Confidential debrief requests and therapy notes.</li>
@@ -270,27 +270,27 @@ export const PersonnelDashboard: React.FC = () => {
                 </ul>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-900/60 border border-white/10">
-                <div className="flex items-center gap-2 font-bold text-slate-200 mb-1.5">
-                  <Lock className="w-4 h-4 text-amber-400" />
+              <div className="p-3.5 rounded-xl bg-white border border-emerald-200 shadow-2xs">
+                <div className="flex items-center gap-2 font-bold text-slate-800 mb-1.5">
+                  <Lock className="w-4 h-4 text-amber-600" />
                   <span>What Your Unit Commander Sees (Masked):</span>
                 </div>
-                <ul className="space-y-1 text-slate-400 text-[11px] list-disc list-inside">
-                  <li><strong className="text-slate-200">ONLY</strong> High-Level Operational Readiness (Deployable vs Rest Recommended).</li>
+                <ul className="space-y-1 text-slate-600 text-[11px] list-disc list-inside">
+                  <li><strong className="text-slate-800">ONLY</strong> High-Level Operational Readiness (Deployable vs Rest Recommended).</li>
                   <li>Cumulative consecutive duty cycle count for roster balancing.</li>
-                  <li><strong className="text-rose-400">BLOCKED:</strong> Cannot see your private feelings, mood logs, or survey answers.</li>
-                  <li><strong className="text-emerald-400">PROTECTION:</strong> Telemetry CANNOT be cited in ACR/APAR annual appraisal.</li>
+                  <li><strong className="text-rose-600">BLOCKED:</strong> Cannot see your private feelings, mood logs, or survey answers.</li>
+                  <li><strong className="text-emerald-700">PROTECTION:</strong> Telemetry CANNOT be cited in ACR/APAR annual appraisal.</li>
                 </ul>
               </div>
             </div>
           )}
 
-          <div className="mt-3 pt-2.5 border-t border-white/10 flex flex-wrap items-center justify-between text-[11px] text-slate-400 gap-2">
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="mt-3 pt-2.5 border-t border-emerald-200 flex flex-wrap items-center justify-between text-[11px] text-slate-600 gap-2">
+            <span className="flex items-center gap-1.5 text-primary font-bold">
+              <CheckCircle2 className="w-3.5 h-3.5" />
               <span>Cryptographic Audit Trail: <strong>0 unauthorized access attempts</strong></span>
             </span>
-            <span className="font-mono text-emerald-300">Defense Medical Directive MHA/2026/WEL</span>
+            <span className="font-mono text-emerald-800 font-semibold">Defense Medical Directive MHA/2026/WEL</span>
           </div>
         </div>
 
@@ -468,79 +468,79 @@ export const PersonnelDashboard: React.FC = () => {
           </div>
 
           {/* ML 30-Day Risk Forecasting Card for Soldier */}
-          <div className="p-6 rounded-3xl bg-gradient-to-br from-[#0F172A] via-[#162A45] to-[#0A192F] text-white border border-[#D4A017]/40 shadow-xl relative overflow-hidden">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-white/10">
+          <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs relative overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#D4A017]/20 border border-[#D4A017]/50 flex items-center justify-center text-[#D4A017]">
+                <div className="w-8 h-8 rounded-xl bg-accent-50 border border-accent-200 flex items-center justify-center text-accent-700 shadow-2xs">
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-black text-white">Risk Forecasting</h3>
-                    <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#D4A017] text-slate-950 font-black">
+                    <h3 className="text-sm font-black text-slate-900">Risk Forecasting</h3>
+                    <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-accent-100 text-accent-800 border border-accent-200 font-black">
                       30-Day ML Projection
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-300 font-medium">
-                    <strong className="text-[#D4A017]">Purpose:</strong> Predicts future stress levels instead of only reporting current conditions.
+                  <p className="text-[11px] text-slate-600 font-medium">
+                    <strong className="text-secondary">Purpose:</strong> Predicts future stress levels instead of only reporting current conditions.
                   </p>
                 </div>
               </div>
-              <span className="text-[9px] font-mono text-emerald-400 bg-white/10 px-2.5 py-1 rounded-lg border border-white/10 self-start sm:self-auto">
+              <span className="text-[9px] font-mono text-primary font-bold bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 self-start sm:self-auto">
                 Ridge ML Model &bull; 94% Confidence
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-11 gap-3.5 my-4 items-center">
-              <div className="sm:col-span-5 p-4 rounded-2xl bg-white/5 border border-white/10">
-                <div className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Current Risk</div>
-                <div className="text-2xl font-black text-white mt-1">
-                  Moderate <span className="text-sm font-bold text-slate-300 font-mono">(58%)</span>
+              <div className="sm:col-span-5 p-4 rounded-2xl bg-slate-50/70 border border-slate-200">
+                <div className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Current Risk</div>
+                <div className="text-2xl font-black text-slate-900 mt-1">
+                  Moderate <span className="text-sm font-bold text-slate-500 font-mono">(58%)</span>
                 </div>
-                <div className="text-[10px] text-slate-400 mt-1">Real-Time Operational Baseline</div>
+                <div className="text-[10px] text-slate-500 mt-1">Real-Time Operational Baseline</div>
               </div>
 
-              <div className="sm:col-span-1 text-center font-black text-rose-400 flex flex-col items-center">
+              <div className="sm:col-span-1 text-center font-black text-rose-600 flex flex-col items-center">
                 <TrendingUp className="w-5 h-5" />
                 <span className="text-[10px] mt-0.5 font-mono">+16%</span>
               </div>
 
-              <div className="sm:col-span-5 p-4 rounded-2xl bg-orange-950/40 border border-orange-500/50">
-                <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#D4A017]">Predicted in 30 Days</div>
-                <div className="text-2xl font-black text-orange-300 mt-1">
-                  High <span className="text-sm font-bold text-white font-mono">(74%)</span>
+              <div className="sm:col-span-5 p-4 rounded-2xl bg-orange-50/80 border border-orange-200">
+                <div className="text-[10px] font-extrabold uppercase tracking-widest text-orange-800">Predicted in 30 Days</div>
+                <div className="text-2xl font-black text-orange-700 mt-1">
+                  High <span className="text-sm font-bold text-slate-700 font-mono">(74%)</span>
                 </div>
-                <div className="text-[10px] text-slate-300 mt-1">Projected Allostatic Accumulation</div>
+                <div className="text-[10px] text-slate-600 mt-1">Projected Allostatic Accumulation</div>
               </div>
             </div>
 
             {/* Stepper */}
-            <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 mb-3.5">
-              <div className="text-[11px] font-bold text-slate-300 mb-2 flex items-center gap-1.5">
-                <Activity className="w-3.5 h-3.5 text-[#D4A017]" />
+            <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200 mb-3.5">
+              <div className="text-[11px] font-bold text-slate-700 mb-2 flex items-center gap-1.5">
+                <Activity className="w-3.5 h-3.5 text-accent-700" />
                 <span>30-Day Milestone Trajectory Curve</span>
               </div>
               <div className="grid grid-cols-5 gap-1.5 text-center">
                 {[
-                  { day: 'Day 0 (Today)', score: '58%', tier: 'Moderate', color: 'text-amber-400' },
-                  { day: 'Day 7', score: '62%', tier: 'Moderate', color: 'text-amber-400' },
-                  { day: 'Day 14', score: '67%', tier: 'High', color: 'text-orange-400' },
-                  { day: 'Day 21', score: '71%', tier: 'High', color: 'text-orange-400' },
-                  { day: 'Day 30', score: '74%', tier: 'High', color: 'text-orange-300' },
+                  { day: 'Day 0 (Today)', score: '58%', tier: 'Moderate', color: 'text-amber-600' },
+                  { day: 'Day 7', score: '62%', tier: 'Moderate', color: 'text-amber-600' },
+                  { day: 'Day 14', score: '67%', tier: 'High', color: 'text-orange-600' },
+                  { day: 'Day 21', score: '71%', tier: 'High', color: 'text-orange-600' },
+                  { day: 'Day 30', score: '74%', tier: 'High', color: 'text-orange-700' },
                 ].map((m) => (
-                  <div key={m.day} className="p-1.5 rounded-xl bg-white/5 border border-white/10">
+                  <div key={m.day} className="p-1.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
                     <div className="text-[8px] font-bold text-slate-400">{m.day}</div>
-                    <div className="text-xs font-black text-white font-mono mt-0.5">{m.score}</div>
+                    <div className="text-xs font-black text-slate-900 font-mono mt-0.5">{m.score}</div>
                     <div className={`text-[8px] font-bold ${m.color}`}>{m.tier}</div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="p-3 rounded-2xl bg-[#D4A017]/10 border border-[#D4A017]/30 text-xs text-slate-200 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-[#D4A017] shrink-0" />
+            <div className="p-3 rounded-2xl bg-accent-50/60 border border-accent-200 text-xs text-slate-700 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-accent-700 shrink-0" />
               <span>
-                <strong className="text-[#D4A017]">Benefits:</strong> Supports proactive planning and preventive action. Engage in guided rest rotations to avert High risk transition.
+                <strong className="text-accent-900">Benefits:</strong> Supports proactive planning and preventive action. Engage in guided rest rotations to avert High risk transition.
               </span>
             </div>
           </div>

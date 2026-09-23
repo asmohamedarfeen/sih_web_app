@@ -5,6 +5,7 @@ import '../../core/constants/api_constants.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/services/api_service.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/services/localization_service.dart';
 
 class SelfAssessmentScreen extends StatefulWidget {
   const SelfAssessmentScreen({super.key});
@@ -48,6 +49,7 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
 
     final auth = Provider.of<AuthService>(context, listen: false);
     final user = auth.currentUser;
+    final loc = Provider.of<LocalizationService>(context, listen: false);
 
     try {
       final response = await ApiService.post(
@@ -58,6 +60,7 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
           'rank': user?.rank ?? 'Sepoy',
           'unit': user?.unit ?? '10 Para SF',
           'mode': _assessmentMode,
+          'language': loc.currentLanguage,
           'recent_sleep': 5.5,
           'recent_fatigue': 6,
           'consecutive_duty_days': 4,
@@ -225,10 +228,11 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
   }
 
   Future<void> _submitAssessment() async {
+    final loc = Provider.of<LocalizationService>(context, listen: false);
     if (_userResponses.length < _questions.length) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please answer all ${_questions.length} questions before submitting.'),
+          content: Text(loc.assessmentUi('answer_all_warning', 'Please answer all questions before submitting.')),
           backgroundColor: AppColors.amber,
         ),
       );
@@ -327,10 +331,15 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = Provider.of<LocalizationService>(context);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('AI Self-Assessment', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+        title: Text(
+          loc.assessmentUi('assessment_title', 'AI Self-Assessment'),
+          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+        ),
         elevation: 0,
         actions: [
           IconButton(
@@ -341,18 +350,20 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(
+          ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(color: AppColors.accent),
-                  SizedBox(height: 16),
+                  const CircularProgressIndicator(color: AppColors.accent),
+                  const SizedBox(height: 16),
                   Text(
-                    'Synthesizing Questions via Gemini AI...',
-                    style: TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.bold),
+                    loc.currentLanguage == 'en'
+                        ? 'Synthesizing Questions via Gemini AI...'
+                        : '${loc.t('app_title', 'AI')}: प्रश्न लोड हो रहे हैं...',
+                    style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 4),
-                  Text(
+                  const SizedBox(height: 4),
+                  const Text(
                     'Multi-Domain Clinical Behavioral Matrix (18 Domains)',
                     style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
                   ),
@@ -366,6 +377,8 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
   }
 
   Widget _buildAssessmentForm() {
+    final loc = Provider.of<LocalizationService>(context);
+
     if (_questions.isEmpty) {
       return Center(
         child: Column(
@@ -391,7 +404,10 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
     final totalQuestions = _questions.length;
     final progress = (_currentIndex + 1) / totalQuestions;
 
-    final options = currentQ['options'] as List<dynamic>? ?? standardizedOptions;
+    final localizedOptions = loc.getStandardizedOptions();
+    final questionText = loc.translateQuestion(questionId, currentQ['question_text'] ?? '');
+    final domainId = (currentQ['domain_id'] as String?) ?? 'stress';
+    final domainName = loc.translateDomain(domainId, currentQ['domain'] ?? 'Psychological Domain');
 
     return Column(
       children: [
@@ -401,11 +417,11 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
           color: Colors.white,
           child: Row(
             children: [
-              _buildModePill('daily', 'Daily (15 Qs)'),
+              _buildModePill('daily', loc.assessmentUi('daily_mode', 'Daily (15 Qs)')),
               const SizedBox(width: 8),
-              _buildModePill('weekly', 'Weekly (35 Qs)'),
+              _buildModePill('weekly', loc.assessmentUi('weekly_mode', 'Weekly (35 Qs)')),
               const SizedBox(width: 8),
-              _buildModePill('monthly', 'Monthly (70 Qs)'),
+              _buildModePill('monthly', loc.assessmentUi('monthly_mode', 'Monthly (70 Qs)')),
             ],
           ),
         ),
@@ -447,7 +463,7 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '${_currentIndex + 1} / $totalQuestions',
+                      '${loc.assessmentUi('question_counter', 'Question')} ${_currentIndex + 1} ${loc.assessmentUi('of', 'of')} $totalQuestions',
                       style: const TextStyle(
                         color: AppColors.accent,
                         fontWeight: FontWeight.w900,
@@ -486,7 +502,7 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        currentQ['domain'] ?? 'Psychological Domain',
+                        domainName,
                         style: const TextStyle(
                           color: AppColors.accent,
                           fontSize: 11,
@@ -550,7 +566,7 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
                     ],
                   ),
                   child: Text(
-                    currentQ['question_text'] ?? '',
+                    questionText,
                     style: const TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 15,
@@ -561,9 +577,15 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
                 ),
                 const SizedBox(height: 18),
 
-                const Text(
-                  'Select your frequency / level of experience:',
-                  style: TextStyle(
+                Text(
+                  loc.currentLanguage == 'hi'
+                      ? 'अपने अनुभव की आवृत्ति / स्तर चुनें:'
+                      : loc.currentLanguage == 'ta'
+                          ? 'உங்கள் அனுபவத்தின் அளவைத் தேர்ந்தெடுக்கவும்:'
+                          : loc.currentLanguage == 'te'
+                              ? 'మీ అనుభవ స్థాయిని ఎంచుకోండి:'
+                              : 'Select your frequency / level of experience:',
+                  style: const TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -572,10 +594,10 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
                 const SizedBox(height: 10),
 
                 // Likert Option Tiles (Never, Rarely, Sometimes, Often, Almost Always)
-                ...List.generate(options.length, (idx) {
+                ...List.generate(localizedOptions.length, (idx) {
                   final scoreVal = idx + 1;
                   final isSelected = selectedScore == scoreVal;
-                  final label = options[idx].toString();
+                  final label = localizedOptions[idx];
 
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 8),
@@ -661,7 +683,7 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
                     });
                   },
                   icon: const Icon(Icons.arrow_back, size: 16),
-                  label: const Text('Previous'),
+                  label: Text(loc.assessmentUi('previous', 'Previous')),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.textSecondary,
                     side: const BorderSide(color: AppColors.cardBorder),
@@ -680,7 +702,7 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
                         }
                       : null,
                   icon: const Icon(Icons.arrow_forward, size: 16),
-                  label: const Text('Next'),
+                  label: Text(loc.assessmentUi('next', 'Next')),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.accent,
                     foregroundColor: Colors.white,
@@ -698,7 +720,9 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
                           child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                         )
                       : const Icon(Icons.send_rounded, size: 16),
-                  label: Text(_isSubmitting ? 'Evaluating...' : 'Submit Assessment'),
+                  label: Text(_isSubmitting
+                      ? loc.assessmentUi('submitting', 'Evaluating...')
+                      : loc.assessmentUi('submit', 'Submit Assessment')),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.emerald,
                     foregroundColor: Colors.white,
@@ -929,7 +953,7 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
               Navigator.pop(context);
             },
             icon: const Icon(Icons.arrow_back, size: 16),
-            label: const Text('Return to Tactical Dashboard'),
+            label: Text(Provider.of<LocalizationService>(context, listen: false).assessmentUi('done', 'Return to Tactical Dashboard')),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.accent,
               foregroundColor: Colors.white,

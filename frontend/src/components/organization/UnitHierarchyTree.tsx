@@ -282,28 +282,28 @@ export const UnitHierarchyTree: React.FC<UnitHierarchyTreeProps> = ({
   const getTierBadge = (tier: UnitNode['riskTier']) => {
     switch (tier) {
       case 'CRITICAL':
-        return 'bg-rose-500/20 text-rose-300 border-rose-500/40';
+        return 'bg-rose-50 text-rose-700 border-rose-200';
       case 'HIGH':
-        return 'bg-orange-500/20 text-orange-300 border-orange-500/40';
+        return 'bg-orange-50 text-orange-700 border-orange-200';
       case 'MEDIUM':
-        return 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+        return 'bg-amber-50 text-amber-700 border-amber-200';
       case 'LOW':
-        return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
     }
   };
 
   const getLevelColor = (level: UnitNode['level']) => {
     switch (level) {
       case 'CORPS':
-        return 'text-[#D4A017] bg-[#D4A017]/20 border-[#D4A017]/40';
+        return 'text-accent-900 bg-accent-50 border-accent-200';
       case 'DIVISION':
-        return 'text-blue-400 bg-blue-500/20 border-blue-500/40';
+        return 'text-blue-700 bg-blue-50 border-blue-200';
       case 'BRIGADE':
-        return 'text-purple-400 bg-purple-500/20 border-purple-500/40';
+        return 'text-purple-700 bg-purple-50 border-purple-200';
       case 'BATTALION':
-        return 'text-emerald-400 bg-emerald-500/20 border-emerald-500/40';
+        return 'text-emerald-700 bg-emerald-50 border-emerald-200';
       case 'COMPANY':
-        return 'text-teal-300 bg-teal-500/20 border-teal-500/40';
+        return 'text-teal-700 bg-teal-50 border-teal-200';
     }
   };
 
@@ -318,8 +318,8 @@ export const UnitHierarchyTree: React.FC<UnitHierarchyTreeProps> = ({
           onClick={() => handleUnitClick(node)}
           className={`flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition-all border ${
             isSelected
-              ? 'bg-emerald-950/80 border-emerald-500 text-white shadow-md'
-              : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-200'
+              ? 'bg-primary/10 border-primary text-primary font-bold shadow-xs'
+              : 'bg-white hover:bg-slate-50 border-slate-200/80 text-slate-700'
           }`}
           style={{ marginLeft: `${depth * 20}px` }}
         >
@@ -328,12 +328,12 @@ export const UnitHierarchyTree: React.FC<UnitHierarchyTreeProps> = ({
               <button
                 type="button"
                 onClick={(e) => toggleExpand(node.id, e)}
-                className="w-5 h-5 rounded hover:bg-white/20 flex items-center justify-center text-slate-300 transition-colors shrink-0"
+                className="w-5 h-5 rounded hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors shrink-0"
               >
                 {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
               </button>
             ) : (
-              <span className="w-5 h-5 flex items-center justify-center text-slate-500 shrink-0">
+              <span className="w-5 h-5 flex items-center justify-center text-slate-400 shrink-0">
                 &bull;
               </span>
             )}
@@ -351,7 +351,7 @@ export const UnitHierarchyTree: React.FC<UnitHierarchyTreeProps> = ({
             <span className="text-[10px] font-mono text-slate-400 hidden sm:inline">
               {node.headcount.toLocaleString()} Troops
             </span>
-            <span className="text-[10px] font-mono font-bold text-white hidden md:inline">
+            <span className="text-[10px] font-mono font-bold text-slate-900 hidden md:inline">
               {node.readinessPct}% Ready
             </span>
             <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded border ${getTierBadge(node.riskTier)}`}>
@@ -361,7 +361,7 @@ export const UnitHierarchyTree: React.FC<UnitHierarchyTreeProps> = ({
         </div>
 
         {hasChildren && isExpanded && (
-          <div className="space-y-1 pl-2 border-l border-white/10 ml-3">
+          <div className="space-y-1 pl-2 border-l border-slate-200 ml-3">
             {node.children!.map((child) => renderTree(child, depth + 1))}
           </div>
         )}
@@ -370,23 +370,23 @@ export const UnitHierarchyTree: React.FC<UnitHierarchyTreeProps> = ({
   };
 
   return (
-    <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-[#0C1E38] via-[#0E2548] to-[#122F58] border border-slate-700 shadow-2xl text-white space-y-6">
+    <div className="p-6 sm:p-7 rounded-3xl bg-white border border-slate-200/90 shadow-sm text-slate-800 space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-[#D4A017]/20 text-[#D4A017] border border-[#D4A017]/40">
+            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-accent-50 text-accent-800 border border-accent-200">
               Interactive Unit Hierarchy
             </span>
-            <span className="text-xs text-slate-400 font-mono">
+            <span className="text-xs text-slate-500 font-mono">
               Corps &rarr; Division &rarr; Brigade &rarr; Battalion &rarr; Company
             </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-            <GitFork className="w-5 h-5 text-[#D4A017]" />
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+            <GitFork className="w-5 h-5 text-accent-700" />
             <span>Chain of Command &amp; Tactical Force Tree</span>
           </h2>
-          <p className="text-xs text-slate-300 font-medium mt-1">
+          <p className="text-xs text-slate-600 font-medium mt-1">
             Navigate through operational defense echelons to inspect systemic burnout clusters, staffing strength, and company outposts.
           </p>
         </div>
@@ -399,7 +399,7 @@ export const UnitHierarchyTree: React.FC<UnitHierarchyTreeProps> = ({
             placeholder="Search echelon / unit..."
             value={filterQuery}
             onChange={(e) => setFilterQuery(e.target.value)}
-            className="w-full bg-black/40 border border-white/15 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-[#D4A017]"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-primary focus:bg-white transition-colors"
           />
         </div>
       </div>
@@ -412,7 +412,7 @@ export const UnitHierarchyTree: React.FC<UnitHierarchyTreeProps> = ({
         </div>
 
         {/* Right Column: Selected Unit Strategic Breakdown (5 cols) */}
-        <div className="lg:col-span-5 p-5 rounded-2xl bg-black/40 border border-white/15 flex flex-col justify-between space-y-5">
+        <div className="lg:col-span-5 p-5 rounded-2xl bg-slate-50/70 border border-slate-200 flex flex-col justify-between space-y-5">
           <div className="space-y-4">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -424,43 +424,43 @@ export const UnitHierarchyTree: React.FC<UnitHierarchyTreeProps> = ({
                     {activeUnit.riskTier} RISK
                   </span>
                 </div>
-                <h3 className="text-lg font-black text-white mt-1.5 leading-tight">
+                <h3 className="text-lg font-black text-slate-900 mt-1.5 leading-tight">
                   {activeUnit.name}
                 </h3>
-                <p className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mt-1">
+                <p className="text-xs text-slate-500 font-medium flex items-center gap-1.5 mt-1">
                   <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   <span>{activeUnit.location}</span>
                 </p>
               </div>
 
               <div className="text-right">
-                <span className="text-2xl font-black font-mono text-emerald-400 block">
+                <span className="text-2xl font-black font-mono text-primary block">
                   {activeUnit.readinessPct}%
                 </span>
-                <span className="text-[9px] uppercase font-bold text-slate-400">Readiness Index</span>
+                <span className="text-[9px] uppercase font-bold text-slate-500">Readiness Index</span>
               </div>
             </div>
 
             {/* Officer & Personnel Metrics */}
-            <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-2 text-xs">
+            <div className="p-3.5 rounded-xl bg-white border border-slate-200 space-y-2 text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-slate-400 font-medium">Commanding Officer:</span>
-                <span className="font-bold text-white">{activeUnit.commander}</span>
+                <span className="text-slate-500 font-medium">Commanding Officer:</span>
+                <span className="font-bold text-slate-900">{activeUnit.commander}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-slate-400 font-medium">Active Personnel Strength:</span>
-                <span className="font-mono font-bold text-[#D4A017]">{activeUnit.headcount.toLocaleString()} Troops</span>
+                <span className="text-slate-500 font-medium">Active Personnel Strength:</span>
+                <span className="font-mono font-bold text-accent-700">{activeUnit.headcount.toLocaleString()} Troops</span>
               </div>
             </div>
 
             {/* Primary Stress Vector */}
             {activeUnit.primaryIssue && (
-              <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/30 text-xs space-y-1">
-                <div className="text-[10px] font-extrabold uppercase text-rose-300 flex items-center gap-1.5">
-                  <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs space-y-1">
+                <div className="text-[10px] font-extrabold uppercase text-rose-700 flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
                   <span>Primary Stress &amp; Operational Friction Point</span>
                 </div>
-                <p className="text-xs text-slate-200 font-medium leading-relaxed">
+                <p className="text-xs text-slate-700 font-medium leading-relaxed">
                   {activeUnit.primaryIssue}
                 </p>
               </div>
@@ -469,7 +469,7 @@ export const UnitHierarchyTree: React.FC<UnitHierarchyTreeProps> = ({
             {/* Children count summary */}
             {activeUnit.children && activeUnit.children.length > 0 && (
               <div className="space-y-2">
-                <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider">
                   Subordinate Formations ({activeUnit.children.length})
                 </span>
                 <div className="space-y-1.5">
@@ -477,9 +477,9 @@ export const UnitHierarchyTree: React.FC<UnitHierarchyTreeProps> = ({
                     <div
                       key={child.id}
                       onClick={() => handleUnitClick(child)}
-                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-between text-xs cursor-pointer transition-colors"
+                      className="p-2 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-between text-xs cursor-pointer transition-colors"
                     >
-                      <span className="font-semibold text-slate-200">{child.name}</span>
+                      <span className="font-semibold text-slate-800">{child.name}</span>
                       <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded border ${getTierBadge(child.riskTier)}`}>
                         {child.readinessPct}% &bull; {child.riskTier}
                       </span>
@@ -490,12 +490,12 @@ export const UnitHierarchyTree: React.FC<UnitHierarchyTreeProps> = ({
             )}
           </div>
 
-          <div className="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
-            <span className="flex items-center gap-1.5 text-emerald-400 font-bold">
+          <div className="pt-3 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
+            <span className="flex items-center gap-1.5 text-primary font-bold">
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>Synced with Defense Manpower Database</span>
             </span>
-            <span className="font-mono text-[#D4A017]">MHA Echelon Standard</span>
+            <span className="font-mono text-accent-700 font-bold">MHA Echelon Standard</span>
           </div>
         </div>
       </div>

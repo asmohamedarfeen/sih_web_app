@@ -40,7 +40,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ compact = fa
             <div className="px-2.5 py-1.5 border-b border-slate-100 text-[10px] font-black uppercase tracking-wider text-slate-400">
               Select Language / भाषा चुनें
             </div>
-            <div className="py-1 space-y-0.5">
+            <div className="py-1 space-y-0.5 max-h-72 overflow-y-auto">
               {SUPPORTED_LANGUAGES.map((lang) => {
                 const isSelected = lang.code === currentLanguage;
                 return (

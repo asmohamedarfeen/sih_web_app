@@ -13,9 +13,11 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { dashboardService, AdminDashboardData } from '../../services/dashboardService';
+import { useLanguageStore } from '../../localization';
 
 export const AdminDashboard: React.FC = () => {
   const { user } = useAuthStore();
+  const { t } = useLanguageStore();
   const [data, setData] = useState<AdminDashboardData | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -41,23 +43,23 @@ export const AdminDashboard: React.FC = () => {
 
   const systemMetrics = [
     {
-      title: 'Total Personnel in HRMS',
+      title: t('Total Personnel in HRMS'),
       value: (data?.metrics?.total_personnel_records || 1248).toLocaleString(),
-      change: 'Synchronized via HRMS DB',
+      change: t('Synchronized via HRMS DB'),
       icon: Users,
       color: 'text-secondary',
       bg: 'bg-secondary-50 border-secondary-200'
     },
     {
-      title: 'Active Monitoring Nodes',
+      title: t('Active Monitoring Nodes'),
       value: (data?.metrics?.active_monitoring_sessions || 342).toString(),
-      change: 'Online Telemetry Stream',
+      change: t('Online Telemetry Stream'),
       icon: Key,
       color: 'text-primary',
       bg: 'bg-primary-50 border-primary-200'
     },
     {
-      title: 'System Uptime & Latency',
+      title: t('System Uptime & Latency'),
       value: `${data?.metrics?.system_uptime_pct || 99.98}%`,
       change: 'Inference Latency: 18ms',
       icon: Server,
@@ -65,7 +67,7 @@ export const AdminDashboard: React.FC = () => {
       bg: 'bg-secondary-50 border-secondary-200'
     },
     {
-      title: 'Security Audit Integrity',
+      title: t('Security Audit Integrity'),
       value: `${data?.metrics?.critical_security_events || 0} Critical`,
       change: data?.metrics?.hrms_sync_status || 'Real-Time Sync',
       icon: ShieldCheck,
@@ -97,20 +99,20 @@ export const AdminDashboard: React.FC = () => {
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-[0.15em] bg-secondary-50 text-secondary-700 border border-secondary-200 shadow-sm">
-                Strategic System Command Console
+                {t('Strategic System Command Console')}
               </span>
               <span className="text-xs text-slate-500 font-mono font-semibold">
-                &bull; HRMS Unique ID: <span className="text-secondary-700 font-bold">{user?.uid || 'UID-SUP-001'}</span>
+                &bull; {t('HRMS Unique ID')}: <span className="text-secondary-700 font-bold">{user?.uid || 'UID-SUP-001'}</span>
               </span>
               <span className="text-xs text-slate-500 font-mono">
-                &bull; Regimental: <span className="text-gray-900 font-bold">{user?.regimental_number || 'ARMY-2005-9001'}</span>
+                &bull; {t('Regimental')}: <span className="text-gray-900 font-bold">{user?.regimental_number || 'ARMY-2005-9001'}</span>
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
-              Welcome, {user?.full_name}
+              {t('Welcome')}, {user?.full_name}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 mt-1.5 max-w-2xl leading-relaxed font-medium">
-              Synchronized Strategic Defense HRMS Management. Centralized user identity governance, cryptographic audit trails, and multi-service health diagnostics.
+              {t('Synchronized Strategic Defense HRMS Management. Centralized user identity governance, cryptographic audit trails, and multi-service health diagnostics.')}
             </p>
           </div>
 
@@ -121,11 +123,11 @@ export const AdminDashboard: React.FC = () => {
               className="px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200 flex items-center gap-2 transition-all cursor-pointer shadow-sm"
             >
               <RefreshCw className={`w-4 h-4 text-secondary ${isRefreshing ? 'animate-spin' : ''}`} />
-              <span>{isRefreshing ? 'Syncing...' : 'Sync HRMS'}</span>
+              <span>{isRefreshing ? t('Syncing...') : t('Sync HRMS')}</span>
             </button>
             <button className="px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-extrabold shadow-lg shadow-primary/20 flex items-center gap-2 transition-all cursor-pointer">
               <UserPlus className="w-4 h-4 text-accent" />
-              <span>Provision Officer</span>
+              <span>{t('Provision Officer')}</span>
             </button>
           </div>
         </div>
@@ -161,12 +163,12 @@ export const AdminDashboard: React.FC = () => {
             <div>
               <h2 className="text-sm font-extrabold text-gray-900 uppercase tracking-[0.12em] flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-secondary" />
-                <span>HRMS Cryptographic Audit Trail</span>
+                <span>{t('HRMS Cryptographic Audit Trail')}</span>
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5 font-medium">Real-time audit log of access events and role queries.</p>
+              <p className="text-xs text-slate-500 mt-0.5 font-medium">{t('Real-time audit log of access events and role queries.')}</p>
             </div>
             <span className="text-[10px] font-mono text-secondary-700 bg-secondary-50 px-2.5 py-1 rounded-full border border-secondary-200 font-bold">
-              TAMPER-PROOF LOGS
+              {t('TAMPER-PROOF LOGS')}
             </span>
           </div>
 
@@ -181,12 +183,12 @@ export const AdminDashboard: React.FC = () => {
                     </span>
                     <span className="text-[10px] font-mono text-slate-400 font-bold">{l.id}</span>
                   </div>
-                  <p className="text-xs text-gray-700 font-medium">{l.action}</p>
+                  <p className="text-xs text-gray-700 font-medium">{t(l.action)}</p>
                 </div>
                 <div className="text-right shrink-0">
                   <span className="text-[10px] font-mono text-slate-400 font-bold block">{l.time}</span>
                   <span className="text-[10px] font-extrabold text-success bg-success-50 px-2 py-0.5 rounded-full border border-success-200 mt-1 inline-block">
-                    {l.status}
+                    {t(l.status)}
                   </span>
                 </div>
               </div>
@@ -200,9 +202,9 @@ export const AdminDashboard: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-sm font-extrabold text-gray-900 uppercase tracking-[0.12em]">
-                  Platform Infrastructure
+                  {t('Platform Infrastructure')}
                 </h2>
-                <p className="text-xs text-slate-500 mt-0.5 font-medium">Live health status of microservices.</p>
+                <p className="text-xs text-slate-500 mt-0.5 font-medium">{t('Live health status of microservices.')}</p>
               </div>
               <Server className="w-4 h-4 text-secondary" />
             </div>
@@ -212,10 +214,10 @@ export const AdminDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
                     <Server className="w-3.5 h-3.5 text-secondary" />
-                    API Gateway
+                    {t('API Gateway')}
                   </span>
                   <span className="text-[10px] font-bold text-success bg-success-50 px-2 py-0.5 rounded border border-success-200">
-                    Online
+                    {t('Online')}
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-500 font-mono">{systemHealth.api_gateway}</p>
@@ -225,10 +227,10 @@ export const AdminDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
                     <Database className="w-3.5 h-3.5 text-secondary" />
-                    HRMS Database
+                    {t('HRMS Database')}
                   </span>
                   <span className="text-[10px] font-bold text-success bg-success-50 px-2 py-0.5 rounded border border-success-200">
-                    Connected
+                    {t('Connected')}
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-500 font-mono">{systemHealth.database_engine}</p>
@@ -238,10 +240,10 @@ export const AdminDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
                     <Cpu className="w-3.5 h-3.5 text-primary" />
-                    AI Stress Engine
+                    {t('AI Stress Engine')}
                   </span>
                   <span className="text-[10px] font-bold text-success bg-success-50 px-2 py-0.5 rounded border border-success-200">
-                    Active
+                    {t('Active')}
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-500 font-mono">{systemHealth.ai_inference_pipeline}</p>
@@ -252,7 +254,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="mt-5 p-4 rounded-2xl bg-secondary-50 border border-secondary-200 text-xs text-secondary-900 flex items-start gap-3">
             <CheckCircle2 className="w-4 h-4 text-secondary shrink-0 mt-0.5" />
             <p className="text-[11px] leading-relaxed font-medium">
-              HRMS sync engine active. Continuous bi-directional telemetry verification enabled.
+              {t('HRMS sync engine active. Continuous bi-directional telemetry verification enabled.')}
             </p>
           </div>
         </div>

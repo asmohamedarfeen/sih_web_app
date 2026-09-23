@@ -26,11 +26,13 @@ import {
 import { useAuthStore, getRoleDashboardRoute } from '../store/authStore';
 import { authService } from '../services/authService';
 import { LanguageSelector } from '../components/common/LanguageSelector';
+import { useLanguageStore } from '../localization';
 
 export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthStore();
+  const { t } = useLanguageStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState<string>('');
@@ -241,12 +243,12 @@ export const DashboardLayout: React.FC = () => {
                     <h1 className="font-black text-sm tracking-wider text-white uppercase flex items-center gap-2">
                       PSWMS
                       <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-secondary-900 text-accent border border-secondary-700">
-                        DEFENSE COMMAND
+                        {t('DEFENSE COMMAND')}
                       </span>
                     </h1>
                   </div>
                   <p className="text-[10px] text-slate-300 font-medium tracking-wide">
-                    Personnel Stress &amp; Welfare Intelligence Command
+                    {t('Personnel Stress & Welfare Intelligence Command')}
                   </p>
                 </div>
               </>
@@ -266,7 +268,7 @@ export const DashboardLayout: React.FC = () => {
         ) : (
           <div className="hidden lg:flex items-center gap-3 px-3.5 py-1.5 rounded-full bg-secondary-900 border border-secondary-700 text-xs text-slate-200 shadow-sm">
             <Radio className="w-3.5 h-3.5 text-success animate-pulse" />
-            <span className="text-white font-semibold">Gateway Active</span>
+            <span className="text-white font-semibold">{t('Gateway Active')}</span>
             <span className="text-secondary-700">&bull;</span>
             <div className="flex items-center gap-1 font-mono text-[11px] text-slate-300 font-medium">
               <Clock className="w-3 h-3 text-accent" />
@@ -283,7 +285,7 @@ export const DashboardLayout: React.FC = () => {
           {!isCommander && (
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border bg-secondary-900 text-accent border-secondary-700 shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-              <span>{roleTheme.label}</span>
+              <span>{t(roleTheme.label)}</span>
             </div>
           )}
 
@@ -380,7 +382,7 @@ export const DashboardLayout: React.FC = () => {
           <div className="space-y-4">
             <div>
               <p className={`text-[10px] font-black uppercase tracking-[0.15em] ${isCommander ? 'text-emerald-500/80' : 'text-slate-400'} px-3 mb-2`}>
-                {isCommander ? 'Command Modules' : 'Primary Modules'}
+                {t(isCommander ? 'Command Modules' : 'Primary Modules')}
               </p>
               <nav className="space-y-1">
                 {navItems.map((item: any) => {
@@ -406,7 +408,7 @@ export const DashboardLayout: React.FC = () => {
                     >
                       <div className="flex items-center gap-3">
                         <Icon className={`w-4 h-4 ${isActive ? (isCommander ? 'text-emerald-400' : 'text-accent') : (isCommander ? 'text-slate-400' : 'text-slate-400')}`} />
-                        <span>{item.name}</span>
+                        <span>{t(item.name)}</span>
                       </div>
                       {item.badge && (
                         <span className="w-5 h-5 rounded-full bg-rose-600 text-white text-[10px] font-black flex items-center justify-center shadow-xs">
@@ -421,7 +423,7 @@ export const DashboardLayout: React.FC = () => {
 
             <div>
               <p className={`text-[10px] font-black uppercase tracking-[0.15em] ${isCommander ? 'text-emerald-500/80' : 'text-slate-400'} px-3 mb-2`}>
-                Role Dispatch
+                {t('Role Dispatch')}
               </p>
               <div className="space-y-1 px-1">
                 <button
@@ -434,10 +436,10 @@ export const DashboardLayout: React.FC = () => {
                 >
                   <div className="flex items-center gap-2 font-medium">
                     <Compass className="w-3.5 h-3.5 text-slate-400 group-hover:text-primary transition-colors" />
-                    <span>Change Profile</span>
+                    <span>{t('Change Profile')}</span>
                   </div>
                   <span className={`text-[10px] font-mono ${isCommander ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 'bg-primary-50 text-primary border-primary-200'} px-1.5 py-0.5 rounded font-bold border`}>
-                    Switch
+                    {t('Switch')}
                   </span>
                 </button>
               </div>
@@ -478,10 +480,10 @@ export const DashboardLayout: React.FC = () => {
             <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 space-y-2 shadow-sm">
               <div className="flex items-center gap-2 text-gray-900 font-bold">
                 <ShieldCheck className="w-4 h-4 text-primary" />
-                <span>Defense Grade RBAC</span>
+                <span>{t('Defense Grade RBAC')}</span>
               </div>
               <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
-                Active session verified with 256-bit cryptographic tokens.
+                {t('Active session verified with 256-bit cryptographic tokens.')}
               </p>
             </div>
           )}

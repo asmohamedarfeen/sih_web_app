@@ -24,6 +24,7 @@ import {
   Search,
   X,
   Sparkles,
+  LineChart,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import FeatureDetailModal from '../../components/FeatureDetailModal';
@@ -36,6 +37,10 @@ import { WeakSignalBreakdownCard } from '../../components/analytics/WeakSignalBr
 import { RiskEvolutionChart } from '../../components/analytics/RiskEvolutionChart';
 import { SystemTrustMeterCard } from '../../components/trust/SystemTrustMeterCard';
 import { MultiSourceSignalFusionCard } from '../../components/analytics/MultiSourceSignalFusionCard';
+import { WelfarePrecisionRecommendationsCard } from '../../components/welfare/WelfarePrecisionRecommendationsCard';
+import { PersonnelQueryTrackingCard } from '../../components/welfare/PersonnelQueryTrackingCard';
+import { getPersonnelClinicalAnalysis } from '../../utils/personnelClinicalAnalysis';
+import { useLanguageStore } from '../../localization';
 
 export interface PriorityPersonnel {
   id: string;
@@ -647,6 +652,11 @@ export const WelfareDashboard: React.FC = () => {
   const [showFullMatrix, setShowFullMatrix] = useState(false);
   const [selectedFeatureDetail, setSelectedFeatureDetail] = useState<WelfareFeatureDetail | null>(null);
   const [isFeatureModalOpen, setIsFeatureModalOpen] = useState(false);
+  const [isForecastGraphView, setIsForecastGraphView] = useState(false);
+  const [hoveredTrajectoryIndex, setHoveredTrajectoryIndex] = useState<number | null>(null);
+  const [activeDirectiveTab, setActiveDirectiveTab] = useState<number>(0);
+  const [selectedDisasterMilestone, setSelectedDisasterMilestone] = useState<number>(2);
+  const { t } = useLanguageStore();
 
   const handleOpenFeatureDetail = (featureNameOrId: string) => {
     const detail = getWelfareFeatureDetail(featureNameOrId);
@@ -677,6 +687,8 @@ export const WelfareDashboard: React.FC = () => {
   const handleSelectPersonnel = (p: PriorityPersonnel) => {
     setSelectedPersonnel(p);
     setIsSearchDropdownOpen(false);
+    setActiveDirectiveTab(0);
+    setSelectedDisasterMilestone(2);
     setActionAlert(`Switched view to live AI Dossier for: ${p.rank} ${p.name} (${p.jcNumber})`);
     setTimeout(() => setActionAlert(null), 4000);
 
@@ -726,14 +738,14 @@ export const WelfareDashboard: React.FC = () => {
                   भारतीय सेना &bull; INDIAN ARMED FORCES
                 </span>
                 <span className="text-[10px] text-slate-300 font-medium hidden sm:inline">
-                  SERVICE &bull; SECURITY &bull; SELFLESSNESS
+                  {t('SERVICE • SECURITY • SELFLESSNESS')}
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight mt-1">
-                AI Welfare Intelligence Center
+                {t('AI Welfare Intelligence Center')}
               </h1>
               <p className="text-xs sm:text-sm text-slate-200 font-medium mt-0.5">
-                For a Stronger Force, A Healthier Tomorrow
+                {t('For a Stronger Force, A Healthier Tomorrow')}
               </p>
             </div>
           </div>
@@ -742,10 +754,10 @@ export const WelfareDashboard: React.FC = () => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 lg:gap-8">
             <div className="hidden xl:block text-right border-r border-white/20 pr-6">
               <p className="text-sm font-serif italic text-[#FAF5E7] tracking-wide">
-                &ldquo;A Healthy Soldier &bull; A Stronger Nation&rdquo;
+                &ldquo;{t('A Healthy Soldier • A Stronger Nation')}&rdquo;
               </p>
               <p className="text-[10px] font-mono text-[#D4A017] uppercase tracking-wider mt-0.5">
-                Command Welfare Doctrine
+                {t('Command Welfare Doctrine')}
               </p>
             </div>
 
@@ -756,10 +768,10 @@ export const WelfareDashboard: React.FC = () => {
                 </div>
                 <div className="text-left">
                   <div className="text-xs font-black text-white leading-tight">
-                    {user?.full_name || 'Welfare Officer'}
+                    {user?.full_name || t('Welfare Officer')}
                   </div>
                   <div className="text-[10px] text-slate-300 font-semibold leading-tight">
-                    Northern Command
+                    {t('Northern Command')}
                   </div>
                 </div>
               </div>
@@ -796,7 +808,7 @@ export const WelfareDashboard: React.FC = () => {
                   setSearchQuery(e.target.value);
                   setIsSearchDropdownOpen(true);
                 }}
-                placeholder="Search personnel by Name, JC/Regimental No, Rank, Unit or Branch (e.g. 'Rohit', 'JC-2748', 'Gurpreet', '10 Para SF')..."
+                placeholder={t('Search personnel by Name, JC/Regimental No, Rank, Unit or Branch')}
                 className="w-full pl-11 pr-10 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-gray-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all shadow-inner"
               />
               {searchQuery && (
@@ -912,6 +924,7 @@ export const WelfareDashboard: React.FC = () => {
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 shrink-0 text-xs">
             {(['All', 'Critical', 'High', 'Moderate', 'Nominal'] as const).map((tier) => {
               const isSelected = selectedTierFilter === tier;
+              const label = tier === 'All' ? t('All Personnel') : `${t(tier)} ${t('Risk')}`;
               return (
                 <button
                   key={tier}
@@ -922,7 +935,7 @@ export const WelfareDashboard: React.FC = () => {
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
-                  {tier === 'All' ? 'All Personnel' : `${tier} Risk`}
+                  {label}
                 </button>
               );
             })}
@@ -933,7 +946,7 @@ export const WelfareDashboard: React.FC = () => {
         <div className="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-slate-500 font-medium">Currently Selected Profile:</span>
+            <span className="text-slate-500 font-medium">{t('Currently Selected Profile:')}</span>
             <span className="font-extrabold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-lg">
               {selectedPersonnel.rank} {selectedPersonnel.name} ({selectedPersonnel.jcNumber})
             </span>
@@ -942,7 +955,7 @@ export const WelfareDashboard: React.FC = () => {
 
           <div className="text-primary font-bold text-[11px] flex items-center gap-1">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Telemetry &amp; Psychometric Analysis Synchronized</span>
+            <span>{t('Telemetry & Psychometric Analysis Synchronized')}</span>
           </div>
         </div>
       </div>
@@ -958,15 +971,15 @@ export const WelfareDashboard: React.FC = () => {
           </div>
           <div>
             <div className="text-xs font-extrabold uppercase tracking-wider text-slate-600">
-              Operational Readiness
+              {t('Operational Readiness')}
             </div>
             <div className="flex items-baseline gap-2 mt-0.5">
               <span className="text-3xl font-black text-slate-900 tracking-tight">82%</span>
               <span className="text-xs font-extrabold text-emerald-700 flex items-center">
-                &uarr; +4% <span className="text-[10px] text-slate-500 font-normal ml-1">vs last month</span>
+                &uarr; +4% <span className="text-[10px] text-slate-500 font-normal ml-1">{t('vs last month')}</span>
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 mt-1 font-medium">Force readiness on positive trend</p>
+            <p className="text-[11px] text-slate-500 mt-1 font-medium">{t('Force readiness on positive trend')}</p>
           </div>
         </div>
 
@@ -977,15 +990,15 @@ export const WelfareDashboard: React.FC = () => {
           </div>
           <div>
             <div className="text-xs font-extrabold uppercase tracking-wider text-slate-600">
-              Personnel Requiring Support
+              {t('Personnel Requiring Support')}
             </div>
             <div className="flex items-baseline gap-2 mt-0.5">
               <span className="text-3xl font-black text-rose-600 tracking-tight">18</span>
               <span className="text-xs font-extrabold text-rose-600 flex items-center">
-                &uarr; 12% <span className="text-[10px] text-slate-500 font-normal ml-1">High priority cases</span>
+                &uarr; 12% <span className="text-[10px] text-slate-500 font-normal ml-1">{t('High priority cases')}</span>
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 mt-1 font-medium">Need immediate attention</p>
+            <p className="text-[11px] text-slate-500 mt-1 font-medium">{t('Need immediate attention')}</p>
           </div>
         </div>
 
@@ -996,15 +1009,15 @@ export const WelfareDashboard: React.FC = () => {
           </div>
           <div>
             <div className="text-xs font-extrabold uppercase tracking-wider text-slate-600">
-              Pending Welfare Actions
+              {t('Pending Welfare Actions')}
             </div>
             <div className="flex items-baseline gap-2 mt-0.5">
               <span className="text-3xl font-black text-amber-600 tracking-tight">7</span>
               <span className="text-xs font-extrabold text-emerald-700 flex items-center">
-                &darr; 30% <span className="text-[10px] text-slate-500 font-normal ml-1">Awaiting closure</span>
+                &darr; 30% <span className="text-[10px] text-slate-500 font-normal ml-1">{t('Awaiting closure')}</span>
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 mt-1 font-medium">Follow up required</p>
+            <p className="text-[11px] text-slate-500 mt-1 font-medium">{t('Follow up required')}</p>
           </div>
         </div>
 
@@ -1015,15 +1028,15 @@ export const WelfareDashboard: React.FC = () => {
           </div>
           <div>
             <div className="text-xs font-extrabold uppercase tracking-wider text-slate-600">
-              Average Wellness Score
+              {t('Average Wellness Score')}
             </div>
             <div className="flex items-baseline gap-2 mt-0.5">
               <span className="text-3xl font-black text-sky-900 tracking-tight">79%</span>
               <span className="text-xs font-extrabold text-emerald-700 flex items-center">
-                &uarr; 6% <span className="text-[10px] text-slate-500 font-normal ml-1">Across all personnel</span>
+                &uarr; 6% <span className="text-[10px] text-slate-500 font-normal ml-1">{t('Across all personnel')}</span>
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 mt-1 font-medium">Improving trend</p>
+            <p className="text-[11px] text-slate-500 mt-1 font-medium">{t('Improving trend')}</p>
           </div>
         </div>
       </div>
@@ -1041,16 +1054,1201 @@ export const WelfareDashboard: React.FC = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 4. ROW 2: AI HEALTH MODULES (Left) + CRITICAL WELFARE ALERT (Hero Right)   */}
+      {/* 4. ROW 2: ACTIVE PERSONNEL HERO DOSSIER (Left) + WEAK SIGNAL BREAKDOWN (Right)*/}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column (5 cols): AI Health Modules */}
-        <div className="lg:col-span-5 p-6 rounded-3xl bg-white border border-slate-200/90 shadow-sm flex flex-col justify-between">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        {/* Left Column (6 cols): Critical Welfare Alert (Hero Section) */}
+        <div id="critical-welfare-hero" className="lg:col-span-6 p-6 rounded-3xl bg-white border border-rose-200 shadow-sm relative overflow-hidden flex flex-col justify-between">
+          <div>
+            {/* Top Banner Tag */}
+            <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-3 h-3 rounded-full animate-ping ${
+                    selectedPersonnel.riskTier === 'Critical'
+                      ? 'bg-rose-600'
+                      : selectedPersonnel.riskTier === 'High'
+                      ? 'bg-orange-500'
+                      : 'bg-amber-500'
+                  }`}
+                />
+                <div
+                  className={`flex items-center gap-1.5 font-black text-sm tracking-wide ${
+                    selectedPersonnel.riskTier === 'Critical'
+                      ? 'text-rose-700'
+                      : selectedPersonnel.riskTier === 'High'
+                      ? 'text-orange-700'
+                      : 'text-amber-700'
+                  }`}
+                >
+                  <Shield className="w-4 h-4" />
+                  <span>
+                    {selectedPersonnel.riskTier === 'Critical'
+                      ? t('Critical Welfare Alert')
+                      : `${selectedPersonnel.riskTier} ${t('Welfare Priority')}`}
+                  </span>
+                </div>
+              </div>
+              <span
+                className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-white shadow-xs ${
+                  selectedPersonnel.riskTier === 'Critical'
+                    ? 'bg-rose-600'
+                    : selectedPersonnel.riskTier === 'High'
+                    ? 'bg-orange-500'
+                    : selectedPersonnel.riskTier === 'Moderate'
+                    ? 'bg-amber-500'
+                    : 'bg-emerald-600'
+                }`}
+              >
+                {selectedPersonnel.riskTier === 'Critical' ? t('HIGH PRIORITY') : selectedPersonnel.riskTier.toUpperCase()}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+              {/* Personnel Profile Photo & Details (5 cols) */}
+              <div className="md:col-span-5 flex items-center gap-4">
+                <img
+                  src={selectedPersonnel.avatarUrl}
+                  alt={selectedPersonnel.name}
+                  className="w-20 h-20 rounded-2xl object-cover border-2 border-rose-300 shadow-md shrink-0"
+                />
+                <div>
+                  <div className="text-xs font-mono font-bold text-slate-500">{selectedPersonnel.jcNumber}</div>
+                  <h4 className="text-base font-black text-gray-900 leading-snug">{selectedPersonnel.name}</h4>
+                  <div className="text-xs text-slate-600 font-semibold mt-0.5">
+                    {selectedPersonnel.dob} &bull; {selectedPersonnel.age} years
+                  </div>
+                  <div className="text-xs text-slate-700 font-medium mt-1">
+                    {t('Field Unit:')} <span className="font-bold text-gray-900">{selectedPersonnel.unit}</span>
+                  </div>
+                  <div className="text-[11px] text-slate-500 font-medium">{t('Location:')} {selectedPersonnel.location}</div>
+                </div>
+              </div>
+
+              {/* Circular Gauge Meter (4 cols) */}
+              <div className="md:col-span-4 flex flex-col items-center justify-center">
+                <div className="relative w-32 h-32 flex items-center justify-center">
+                  <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r="48"
+                      stroke="#F1F5F9"
+                      strokeWidth="12"
+                      fill="none"
+                    />
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r="48"
+                      stroke={
+                        selectedPersonnel.riskTier === 'Critical'
+                          ? '#DC2626'
+                          : selectedPersonnel.riskTier === 'High'
+                          ? '#EA580C'
+                          : selectedPersonnel.riskTier === 'Moderate'
+                          ? '#F59E0B'
+                          : '#10B981'
+                      }
+                      strokeWidth="12"
+                      strokeDasharray={2 * Math.PI * 48}
+                      strokeDashoffset={2 * Math.PI * 48 * (1 - selectedPersonnel.riskScore / 100)}
+                      strokeLinecap="round"
+                      fill="none"
+                      className="transition-all duration-1000 ease-out"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                    <span className="text-2xl font-black text-slate-900 leading-none">
+                      {selectedPersonnel.riskScore}%
+                    </span>
+                    <span className="text-[9px] font-extrabold uppercase text-slate-500 mt-1 tracking-wider">
+                      {t('Risk Score')}
+                    </span>
+                  </div>
+                </div>
+                <span
+                  className={`mt-1 px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider text-white ${
+                    selectedPersonnel.riskTier === 'Critical'
+                      ? 'bg-rose-600'
+                      : selectedPersonnel.riskTier === 'High'
+                      ? 'bg-orange-500'
+                      : selectedPersonnel.riskTier === 'Moderate'
+                      ? 'bg-amber-500'
+                      : 'bg-emerald-600'
+                  }`}
+                >
+                  {selectedPersonnel.riskTier.toUpperCase()}
+                </span>
+              </div>
+
+              {/* Trend & Meta Stats (3 cols) */}
+              <div className="md:col-span-3 space-y-3 text-xs border-l border-slate-100 pl-4">
+                <div>
+                  <div className="text-[10px] uppercase font-extrabold text-slate-500 tracking-wider">{t('Trend (Last 3 Months)')}</div>
+                  <div
+                    className={`text-base font-black flex items-center gap-1 mt-0.5 ${
+                      selectedPersonnel.trend.startsWith('+') ? 'text-rose-600' : 'text-emerald-600'
+                    }`}
+                  >
+                    <TrendingUp className="w-4 h-4" />
+                    <span>{selectedPersonnel.trend}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-[10px] uppercase font-extrabold text-slate-500 tracking-wider">{t('Prediction Confidence')}</div>
+                  <div className="text-sm font-black text-emerald-700 flex items-center gap-1 mt-0.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <span>{selectedPersonnel.confidence}%</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-[10px] uppercase font-extrabold text-slate-500 tracking-wider">{t('Last Updated')}</div>
+                  <div className="text-xs font-semibold text-slate-700 flex items-center gap-1 mt-0.5">
+                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                    <span>{selectedPersonnel.lastUpdated}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sub-block: Root-Cause Stress Diagnosis & Precision Directive Navigator */}
+            {(() => {
+              const analysis = getPersonnelClinicalAnalysis(selectedPersonnel);
+              const currentRec = analysis.recommendations[activeDirectiveTab] || analysis.recommendations[0];
+
+              return (
+                <div className="mt-4 space-y-3">
+                  {/* Root-Cause Stress Diagnosis */}
+                  <div className="p-3.5 rounded-2xl bg-rose-50/60 border border-rose-200/80 shadow-2xs">
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="w-5 h-5 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                          <Brain className="w-3 h-3" />
+                        </div>
+                        <span className="text-xs font-black text-slate-900 truncate">
+                          {t('Root-Cause Stress Diagnosis')}
+                        </span>
+                        <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 shrink-0">
+                          {analysis.stressCategory}
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-mono font-bold text-rose-700 bg-white px-2 py-0.5 rounded-md border border-rose-200 shrink-0 hidden sm:inline-block">
+                        Velocity: {analysis.riskVelocity}
+                      </span>
+                    </div>
+
+                    <p className="text-xs font-bold text-slate-800">
+                      {analysis.rootCauseTitle}
+                    </p>
+                    <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
+                      {analysis.diagnosisDetails}
+                    </p>
+
+                    {/* Key Triggers Pills */}
+                    <div className="pt-2 mt-2 border-t border-rose-100 flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider">
+                        {t('Triggers:')}
+                      </span>
+                      {analysis.contributingTriggers.map((trig, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2 py-0.5 rounded-md bg-white border border-rose-200/70 text-[10px] font-medium text-slate-700 shadow-2xs"
+                        >
+                          {trig}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Predictive Disaster Horizon & Presenteeism Forecast (10-30 Days Pre-Prediction) */}
+                  <div className="p-3.5 rounded-2xl bg-gradient-to-br from-amber-50/80 via-orange-50/40 to-rose-50/30 border border-amber-200/90 shadow-2xs space-y-3">
+                    {/* Header & Alert Urgency */}
+                    <div className="flex items-start sm:items-center justify-between gap-2 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <div className="w-5 h-5 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                          <Clock className="w-3 h-3" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-xs font-black text-slate-900 tracking-tight">
+                              {t('Predictive Disaster Horizon')}
+                            </span>
+                            <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-rose-600 text-white tracking-wider animate-pulse">
+                              {analysis.disasterHorizon.urgency}
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-slate-500 font-medium">
+                            {t('Early-Warning Pre-Prediction: Stress, Burnout & Presenteeism Timeline')}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Estimated Disaster Day Pill */}
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-100/90 border border-rose-300 text-rose-900 shadow-2xs">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-600"></span>
+                        </span>
+                        <span className="text-[10px] font-mono font-black uppercase tracking-wide">
+                          {t('Projected Disaster:')} <strong className="text-rose-700">Day {analysis.disasterHorizon.projectedBreakdownDay}</strong> ({analysis.disasterHorizon.timeHorizonText})
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Pre-Prediction Diagnosis Card */}
+                    <div className="p-2.5 rounded-xl bg-white/90 border border-amber-200/80 space-y-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                        <div>
+                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-amber-700">
+                            {t('Anticipated Clinical Failure Mode:')}
+                          </span>
+                          <h5 className="text-xs font-black text-slate-800">
+                            {analysis.disasterHorizon.disasterType}
+                          </h5>
+                        </div>
+                        <div className="flex items-center gap-1 text-[10px] font-medium text-slate-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 shrink-0">
+                          <span className="font-bold text-amber-800">{t('Prevention Window:')}</span>
+                          <span>{analysis.disasterHorizon.preventiveActionWindow}</span>
+                        </div>
+                      </div>
+
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                        <strong className="text-slate-800">{t('Cascade Forecast:')} </strong>
+                        {analysis.disasterHorizon.disasterImpact}
+                      </p>
+
+                      <div className="p-2 rounded-lg bg-amber-50/70 border border-amber-200/60 text-[10px] text-amber-900 leading-snug">
+                        <span className="font-bold text-amber-950">{t('Presenteeism Diagnosis:')} </span>
+                        {analysis.disasterHorizon.presenteeismSummary}
+                      </div>
+
+                      {/* Burnout & Presenteeism Risk Indices */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                        <div className="p-2 rounded-lg bg-slate-50 border border-slate-200/80">
+                          <div className="flex items-center justify-between text-[10px] mb-1">
+                            <span className="font-bold text-slate-700">{t('Burnout Collapse Probability')}</span>
+                            <span className="font-mono font-black text-rose-700">
+                              {analysis.disasterHorizon.burnoutProbabilityPct}%
+                            </span>
+                          </div>
+                          <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-amber-500 to-rose-600 rounded-full"
+                              style={{ width: `${analysis.disasterHorizon.burnoutProbabilityPct}%` }}
+                            />
+                          </div>
+                          <span className="text-[9px] text-slate-400 mt-0.5 block">
+                            Exhaustion velocity trending +{Math.round(analysis.disasterHorizon.burnoutProbabilityPct * 0.15)}% / week
+                          </span>
+                        </div>
+
+                        <div className="p-2 rounded-lg bg-slate-50 border border-slate-200/80">
+                          <div className="flex items-center justify-between text-[10px] mb-1">
+                            <span className="font-bold text-slate-700">{t('Presenteeism Index (Hidden Stress)')}</span>
+                            <span className="font-mono font-black text-amber-700">
+                              {analysis.disasterHorizon.presenteeismRiskPct}%
+                            </span>
+                          </div>
+                          <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full"
+                              style={{ width: `${analysis.disasterHorizon.presenteeismRiskPct}%` }}
+                            />
+                          </div>
+                          <span className="text-[9px] text-slate-400 mt-0.5 block">
+                            Physically on sentry; cognitive latency ~40-60% compromised
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Interactive Visual Timeline Slides (Day 0 → Day 30) */}
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="font-bold text-slate-700 flex items-center gap-1">
+                          <span>{t('Progression Trajectory: Day 0 → Day 30')}</span>
+                          <span className="text-[9px] text-slate-400 font-normal">(Click milestone to inspect details)</span>
+                        </span>
+                        <span className="text-[9px] font-mono text-rose-600 font-bold bg-rose-50 px-1.5 py-0.2 rounded border border-rose-200">
+                          ⚠️ Disaster Threshold at Day {analysis.disasterHorizon.projectedBreakdownDay}
+                        </span>
+                      </div>
+
+                      {/* 4-Step Milestone Grid / Slides */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                        {analysis.disasterHorizon.milestones.map((m, idx) => {
+                          const isSelected = selectedDisasterMilestone === idx;
+                          const isThreshold = m.isDisasterThreshold;
+                          return (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => setSelectedDisasterMilestone(idx)}
+                              className={`text-left p-2 rounded-xl border transition-all relative cursor-pointer ${
+                                isSelected
+                                  ? isThreshold
+                                    ? 'bg-rose-50/90 border-rose-400 ring-2 ring-rose-400/40 shadow-xs'
+                                    : 'bg-white border-[#2F4F3E] ring-2 ring-[#2F4F3E]/30 shadow-xs'
+                                  : isThreshold
+                                  ? 'bg-rose-50/50 border-rose-200 hover:border-rose-300'
+                                  : 'bg-white/75 border-slate-200/90 hover:bg-white hover:border-slate-300'
+                              }`}
+                            >
+                              {isThreshold && (
+                                <span className="absolute -top-2 right-1 text-[8px] font-black uppercase tracking-wider bg-rose-600 text-white px-1 py-0.2 rounded shadow-2xs">
+                                  Disaster Point
+                                </span>
+                              )}
+
+                              <div className="flex items-center justify-between">
+                                <span className="text-[10px] font-mono font-bold text-slate-500">
+                                  {m.label}
+                                </span>
+                                <span
+                                  className={`text-[8px] font-bold uppercase px-1 py-0.2 rounded ${
+                                    m.severity === 'nominal'
+                                      ? 'bg-emerald-100 text-emerald-700'
+                                      : m.severity === 'warning'
+                                      ? 'bg-amber-100 text-amber-700'
+                                      : m.severity === 'danger'
+                                      ? 'bg-orange-100 text-orange-700'
+                                      : 'bg-rose-100 text-rose-700'
+                                  }`}
+                                >
+                                  {m.riskScore}%
+                                </span>
+                              </div>
+
+                              <p className="text-[10px] font-black text-slate-800 mt-1 truncate">
+                                {m.status}
+                              </p>
+
+                              <div className="flex items-center gap-1 mt-1">
+                                <span
+                                  className={`text-[8px] font-extrabold uppercase px-1 rounded ${
+                                    isThreshold
+                                      ? 'bg-rose-100 text-rose-700'
+                                      : m.severity === 'critical'
+                                      ? 'bg-purple-100 text-purple-700'
+                                      : 'bg-slate-100 text-slate-600'
+                                  }`}
+                                >
+                                  {m.severity}
+                                </span>
+                                <span className="text-[8px] text-slate-400 capitalize truncate">
+                                  {m.day === 0 ? 'Current' : `+${m.day}d`}
+                                </span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Selected Milestone Deep-Dive Slide Banner */}
+                      {(() => {
+                        const activeMilestone =
+                          analysis.disasterHorizon.milestones[selectedDisasterMilestone] ||
+                          analysis.disasterHorizon.milestones[2];
+                        return (
+                          <div className="p-2.5 rounded-xl bg-white border border-slate-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-2xs">
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5 mb-0.5">
+                                <span className="text-[10px] font-black text-slate-900">
+                                  {activeMilestone.label}: {activeMilestone.status}
+                                </span>
+                                <span className="text-[9px] font-mono text-slate-500">
+                                  ({activeMilestone.riskScore}% projected strain)
+                                </span>
+                                {activeMilestone.isDisasterThreshold && (
+                                  <span className="text-[8px] font-bold bg-rose-100 text-rose-700 px-1 rounded">
+                                    ⚠️ Projected Breakdown Point
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[10px] text-slate-600 leading-snug">
+                                {activeMilestone.impactDescription}
+                              </p>
+                            </div>
+
+                            <div className="sm:text-right shrink-0 bg-emerald-50/80 px-2 py-1 rounded-lg border border-emerald-200">
+                              <span className="text-[8px] uppercase tracking-wider font-extrabold text-emerald-800 block">
+                                Action Window:
+                              </span>
+                              <span className="text-[10px] font-bold text-emerald-950">
+                                {analysis.disasterHorizon.preventiveActionWindow}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/90 shadow-2xs space-y-2.5">
+                    {/* Directive Header & Tab Stepper */}
+                    <div className="flex items-center justify-between gap-2 pb-1 border-b border-slate-200">
+                      <div className="flex items-center gap-1.5">
+                        <Shield className="w-3.5 h-3.5 text-[#2F4F3E]" />
+                        <span className="text-xs font-black text-slate-900 uppercase tracking-wide">
+                          {t('Tailored Action Protocol')}
+                        </span>
+                        <span className="text-[10px] font-bold text-slate-500">
+                          ({analysis.recommendations.length} {t('Actions')})
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-mono text-slate-500">
+                        {t('Step')} {activeDirectiveTab + 1} {t('of')} {analysis.recommendations.length}
+                      </span>
+                    </div>
+
+                    {/* Segmented Directive Tabs */}
+                    <div className="grid grid-cols-4 gap-1 p-1 bg-slate-200/70 rounded-xl">
+                      {analysis.recommendations.map((rec, idx) => {
+                        const isActive = activeDirectiveTab === idx;
+                        return (
+                          <button
+                            key={rec.id}
+                            type="button"
+                            onClick={() => setActiveDirectiveTab(idx)}
+                            className={`py-1.5 px-1 rounded-lg text-center transition-all cursor-pointer truncate ${
+                              isActive
+                                ? 'bg-white text-slate-950 font-black shadow-2xs ring-1 ring-slate-300'
+                                : 'text-slate-600 hover:text-slate-900 font-bold hover:bg-white/50'
+                            }`}
+                          >
+                            <span className="text-[9px] font-mono mr-1 opacity-70">#{idx + 1}</span>
+                            <span className="text-[10px]">{rec.category.split('&')[0].trim()}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Active Directive Focus Card */}
+                    <div className="p-3.5 rounded-xl bg-white border border-slate-200/90 shadow-2xs space-y-2">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <div className="flex items-center gap-1.5">
+                          <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md border ${currentRec.priorityBadgeClass}`}>
+                            {currentRec.priority}
+                          </span>
+                          <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-md border ${currentRec.categoryBadge}`}>
+                            {currentRec.category}
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                          ⚡ {currentRec.expectedBenefit}
+                        </span>
+                      </div>
+
+                      <div>
+                        <h6 className="text-xs font-black text-slate-900">{currentRec.title}</h6>
+                        <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">{currentRec.description}</p>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2 border-t border-slate-100 gap-2">
+                        <div className="flex items-center gap-1 text-[10px] font-semibold text-slate-400">
+                          <span>Target: {selectedPersonnel.rank} {selectedPersonnel.name}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleInitiateAction(currentRec.actionPayload)}
+                          className="px-3 py-1.5 rounded-xl bg-[#D4A017] hover:bg-[#b88a14] text-slate-950 text-xs font-black shadow-2xs transition-all cursor-pointer active:scale-95 flex items-center gap-1.5"
+                        >
+                          <Send className="w-3 h-3 text-slate-950" />
+                          <span>{t('Initiate Directive')} #{activeDirectiveTab + 1}</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Master Protocol Dispatch Row */}
+                    <div className="flex items-center justify-between pt-1 text-[11px] gap-2">
+                      <span className="text-slate-500 font-medium text-[10px]">
+                        Logged in Regimental EMR &bull; Routed to Command
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleInitiateAction(
+                            `Comprehensive Welfare Protocol (${analysis.recommendations.length} Actions) for ${selectedPersonnel.name}`
+                          )
+                        }
+                        className="px-3.5 py-1.5 rounded-xl bg-[#2F4F3E] hover:bg-[#233d30] text-white text-[11px] font-black shadow-2xs flex items-center gap-1.5 cursor-pointer active:scale-95"
+                      >
+                        <Send className="w-3 h-3 text-[#D4A017]" />
+                        <span>{t('Dispatch All Directives')} ({analysis.recommendations.length})</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+
+        {/* Right Column (6 cols): Weak Signal Breakdown (Explainable AI / XAI) */}
+        <div className="lg:col-span-6 flex flex-col">
+          <WeakSignalBreakdownCard
+            personnelName={selectedPersonnel.name}
+            riskScore={selectedPersonnel.riskScore}
+            confidence={selectedPersonnel.confidence}
+          />
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 4.2. BEHAVIORAL ANOMALY DETECTION & ML RISK FORECASTING                   */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        {/* Column 1 (6 cols): Behavioral Change Detection Panel */}
+        <div className="lg:col-span-6 flex flex-col">
+          {(() => {
+            const bc = getPersonnelBehavioralChange(selectedPersonnel);
+            const isSevere = bc.behavior_change_score >= 75;
+            const isModerate = bc.behavior_change_score >= 50;
+
+            return (
+              <div id="welfare-behavioral-change-card" className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs relative overflow-hidden flex flex-col justify-between h-full">
+                <div>
+                  {/* Header with Title, Badge, and AI Process */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100 relative z-10">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-secondary/10 border border-secondary/20 flex items-center justify-center text-secondary shadow-2xs">
+                        <Sliders className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="text-sm font-black tracking-wide text-slate-900 flex items-center gap-1.5">
+                            Behavioral Change Detection
+                          </h4>
+                          <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-secondary/15 text-secondary-900 font-black border border-secondary/25">
+                            AI Routine Anomaly
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-600 font-medium">
+                          <strong className="text-secondary">Purpose:</strong> Detects unusual changes in a person&apos;s behavior over time.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-[10px] font-mono text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 self-start sm:self-auto">
+                      AI Process: <strong className="text-secondary">Compare: Current behavior VS Historical behavior</strong>
+                    </div>
+                  </div>
+
+                  {/* Output Section: Behavior Change Score Banner & Comparison Matrix */}
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-3.5 my-4 items-stretch relative z-10">
+                    {/* Left: Behavior Change Score Box */}
+                    <div className="sm:col-span-4 p-4 rounded-2xl bg-slate-50/70 border border-slate-200 flex flex-col justify-between">
+                      <div>
+                        <div className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">
+                          Output Metric
+                        </div>
+                        <div className="text-xs font-bold text-secondary uppercase tracking-wider mt-0.5">
+                          Behavior Change Score
+                        </div>
+                        <div className="flex items-baseline gap-2.5 mt-2">
+                          <span className={`text-4xl sm:text-5xl font-black font-mono tracking-tight ${
+                            isSevere ? 'text-rose-600' : isModerate ? 'text-amber-600' : 'text-emerald-600'
+                          }`}>
+                            {bc.behavior_change_score}
+                          </span>
+                          <span className="text-sm font-mono text-slate-500 font-semibold">/ 100</span>
+                        </div>
+                        <div className="mt-2">
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-black uppercase border ${
+                            isSevere
+                              ? 'bg-rose-50 text-rose-700 border-rose-200'
+                              : isModerate
+                              ? 'bg-amber-50 text-amber-700 border-amber-200'
+                              : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          }`}>
+                            {bc.severity_tier}
+                          </span>
+                        </div>
+                        <div className="w-full bg-slate-200 rounded-full h-2 mt-3 overflow-hidden">
+                          <div
+                            className={`h-2 rounded-full ${
+                              isSevere
+                                ? 'bg-rose-600'
+                                : isModerate
+                                ? 'bg-amber-500'
+                                : 'bg-emerald-500'
+                            }`}
+                            style={{ width: `${bc.behavior_change_score}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="mt-4 pt-3 border-t border-slate-200 text-[11px] text-slate-600 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-500">Confidence:</span>
+                          <span className="font-mono text-secondary font-bold">{bc.confidence_pct}%</span>
+                        </div>
+                        <div className="text-[10px] text-slate-500 leading-tight">
+                          <strong>Primary Anomaly:</strong> {bc.primary_driver}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right: 5 Examples Comparison Table (Current behavior VS Historical behavior) */}
+                    <div className="sm:col-span-8 p-3.5 rounded-2xl bg-slate-50/70 border border-slate-200 flex flex-col justify-between">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">
+                          AI Comparison: Current Behavior VS Historical Behavior
+                        </span>
+                        <span className="text-[10px] font-mono text-secondary font-bold">
+                          5 Evaluated Examples
+                        </span>
+                      </div>
+
+                      {/* Table of the 5 Examples */}
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead>
+                            <tr className="border-b border-slate-200 text-[10px] font-extrabold uppercase text-slate-500 tracking-wider">
+                              <th className="pb-1.5">Example / Behavior</th>
+                              <th className="pb-1.5 text-center">Historical</th>
+                              <th className="pb-1.5 text-center">Current</th>
+                              <th className="pb-1.5 text-center">Shift</th>
+                              <th className="pb-1.5 text-right">Detection Flag</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100">
+                            {bc.factors.map((f) => {
+                              const isHighShift = f.anomaly_score >= 60;
+                              return (
+                                <tr key={f.key} className="hover:bg-white/80 transition-colors">
+                                  <td className="py-2 pr-2">
+                                    <div className="font-bold text-slate-900 leading-snug">{f.example_label}</div>
+                                    <div className="text-[10px] text-slate-500">{f.domain}</div>
+                                  </td>
+                                  <td className="py-2 text-center font-mono text-slate-600 text-[11px] whitespace-nowrap">
+                                    {f.historical_behavior}
+                                  </td>
+                                  <td className="py-2 text-center font-mono font-bold text-slate-900 text-[11px] whitespace-nowrap">
+                                    {f.current_behavior}
+                                  </td>
+                                  <td className="py-2 text-center whitespace-nowrap">
+                                    <span className={`font-mono font-bold text-[11px] ${
+                                      f.change_pct > 0 ? 'text-rose-600' : 'text-amber-600'
+                                    }`}>
+                                      {f.change_pct > 0 ? `+${f.change_pct}%` : `${f.change_pct}%`}
+                                    </span>
+                                  </td>
+                                  <td className="py-2 text-right whitespace-nowrap">
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                      isHighShift
+                                        ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                                        : 'bg-slate-100 text-slate-700 border border-slate-200'
+                                    }`}>
+                                      {f.flag}
+                                    </span>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recommendation Footer */}
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-2 text-[11px] text-slate-600 mt-auto">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                  <span><strong>Clinical Directive:</strong> {bc.recommendation}</span>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+
+        {/* Column 2 (6 cols): ML Risk Forecasting Panel */}
+        <div className="lg:col-span-6 flex flex-col">
+          {(() => {
+            const forecast = getPersonnelForecast(selectedPersonnel);
+            const isEscalating = forecast.trend_direction === 'ESCALATING';
+
+            return (
+              <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs relative overflow-hidden flex flex-col justify-between h-full">
+                <div>
+                  {/* Header with Title & ML Badge */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100 relative z-10">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-accent-50 border border-accent-200 flex items-center justify-center text-accent-700 shadow-2xs">
+                        <Sparkles className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-black tracking-wide text-slate-900 flex items-center gap-1.5">
+                            {t('Risk Forecasting')}
+                          </h4>
+                          <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-accent-100 text-accent-800 border border-accent-200">
+                            {t('ML Predictive Engine')}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-600 font-medium">
+                          <strong className="text-secondary">Purpose:</strong> Predicts future stress levels instead of only reporting current conditions.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-[10px] font-mono text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 self-start sm:self-auto">
+                      Algorithm: <span className="text-primary font-bold">Ridge Time-Series ML</span> &bull; {forecast.confidence}% Confidence
+                    </div>
+                  </div>
+
+                  {/* Core Comparison: Current Risk vs Predicted in 30 Days */}
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-3.5 my-4 items-stretch relative z-10">
+                    {/* Current Risk Box */}
+                    <div className="sm:col-span-5 p-4 rounded-2xl bg-slate-50/70 border border-slate-200 flex flex-col justify-between">
+                      <div>
+                        <div className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">
+                          {t('Current Risk')}
+                        </div>
+                        <div className="flex items-baseline gap-2 mt-1">
+                          <span className={`text-2xl font-black ${
+                            forecast.current_risk_tier === 'Critical'
+                              ? 'text-rose-600'
+                              : forecast.current_risk_tier === 'High'
+                              ? 'text-orange-600'
+                              : forecast.current_risk_tier === 'Moderate'
+                              ? 'text-amber-600'
+                              : 'text-emerald-600'
+                          }`}>
+                            {forecast.current_risk_tier}
+                          </span>
+                          <span className="text-sm font-bold text-slate-500 font-mono">
+                            ({forecast.current_risk_score}%)
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-[10px] text-slate-500 mt-2 font-medium">
+                        {t('Live Telemetry Baseline Assessment')}
+                      </div>
+                    </div>
+
+                    {/* Transition Vector Arrow */}
+                    <div className="sm:col-span-2 flex flex-col items-center justify-center py-2 sm:py-0">
+                      <div className={`flex items-center gap-1 font-black text-xs px-2.5 py-1 rounded-full border ${
+                        isEscalating
+                          ? 'bg-rose-50 text-rose-700 border-rose-200'
+                          : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      }`}>
+                        <TrendingUp className="w-3.5 h-3.5" />
+                        <span>{isEscalating ? `+${forecast.delta_score}%` : `${forecast.delta_score}%`}</span>
+                      </div>
+                      <span className="text-[9px] uppercase tracking-wider text-slate-400 mt-1 font-semibold text-center">
+                        {t('30-Day Shift')}
+                      </span>
+                    </div>
+
+                    {/* Predicted in 30 Days Box */}
+                    <div className={`sm:col-span-5 p-4 rounded-2xl border flex flex-col justify-between ${
+                      forecast.predicted_30d_risk_tier === 'Critical'
+                        ? 'bg-rose-50/80 border-rose-200'
+                        : forecast.predicted_30d_risk_tier === 'High'
+                        ? 'bg-orange-50/80 border-orange-200'
+                        : 'bg-amber-50/80 border-amber-200'
+                    }`}>
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-700">
+                            {t('Predicted in 30 Days')}
+                          </span>
+                          <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+                        </div>
+                        <div className="flex items-baseline gap-2 mt-1">
+                          <span className={`text-2xl font-black ${
+                            forecast.predicted_30d_risk_tier === 'Critical'
+                              ? 'text-rose-700'
+                              : forecast.predicted_30d_risk_tier === 'High'
+                              ? 'text-orange-700'
+                              : forecast.predicted_30d_risk_tier === 'Moderate'
+                              ? 'text-amber-700'
+                              : 'text-emerald-700'
+                          }`}>
+                            {forecast.predicted_30d_risk_tier}
+                          </span>
+                          <span className="text-sm font-bold text-slate-700 font-mono">
+                            ({forecast.predicted_30d_score}%)
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-[10px] text-slate-500 mt-2 font-medium">
+                        {t('ML Projected Cognitive & Physiological Load')}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 30-Day Milestone Trajectory & Visualization Section */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200 relative z-10 mb-3.5">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-600 mb-2.5 gap-2">
+                      <span className="flex items-center gap-1.5 text-xs text-slate-800 font-black">
+                        <Activity className="w-3.5 h-3.5 text-accent-700" />
+                        <span>{t('30-Day Longitudinal Stress Trajectory')}</span>
+                      </span>
+
+                      {/* Forecasting Visualization Button replacing "Step Milestones: Day 0 -> Day 30" */}
+                      <button
+                        type="button"
+                        onClick={() => setIsForecastGraphView(!isForecastGraphView)}
+                        className={`px-3 py-1 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 border ${
+                          isForecastGraphView
+                            ? 'bg-[#2F4F3E] hover:bg-[#233d30] text-white border-[#2F4F3E] shadow-2xs'
+                            : 'bg-[#D4A017] hover:bg-[#b88a14] text-slate-950 border-[#D4A017] shadow-xs'
+                        }`}
+                        title={isForecastGraphView ? "Switch back to milestone cards" : "Visualize 30-day forecasting trajectory as an interactive graph"}
+                      >
+                        {isForecastGraphView ? (
+                          <>
+                            <Sliders className="w-3.5 h-3.5 text-[#D4A017]" />
+                            <span>{t('Milestones')}</span>
+                          </>
+                        ) : (
+                          <>
+                            <LineChart className="w-3.5 h-3.5 text-slate-950" />
+                            <span>{t('Visualization')}</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {!isForecastGraphView ? (
+                      /* Milestones Stepper Cards */
+                      <div className="grid grid-cols-5 gap-2 relative">
+                        {forecast.trajectory.map((point, idx) => {
+                          const isEnd = idx === forecast.trajectory.length - 1;
+                          return (
+                            <div
+                              key={point.day}
+                              className={`p-2 rounded-xl text-center border transition-all ${
+                                isEnd
+                                  ? 'bg-rose-50 border-rose-300 ring-1 ring-rose-200'
+                                  : idx === 0
+                                  ? 'bg-white border-slate-300 shadow-2xs'
+                                  : 'bg-white border-slate-200/80'
+                              }`}
+                            >
+                              <div className="text-[9px] font-extrabold uppercase text-slate-400">{point.label}</div>
+                              <div className="text-xs font-black text-slate-900 font-mono mt-0.5">{point.score}%</div>
+                              <div className={`text-[8px] font-extrabold uppercase mt-0.5 ${
+                                point.risk_tier === 'Critical'
+                                  ? 'text-rose-600'
+                                  : point.risk_tier === 'High'
+                                  ? 'text-orange-600'
+                                  : point.risk_tier === 'Moderate'
+                                  ? 'text-amber-600'
+                                  : 'text-emerald-600'
+                              }`}>
+                                {point.risk_tier}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      /* Interactive Graphical Trajectory Visualization */
+                      <div className="relative bg-white rounded-xl border border-slate-200/90 p-2.5 shadow-2xs overflow-hidden">
+                        {/* Top Info Bar: Legend & Current Hover Tooltip */}
+                        <div className="flex items-center justify-between text-[10px] pb-1.5 mb-1 border-b border-slate-100">
+                          <div className="flex items-center gap-2 font-mono">
+                            <span className="flex items-center gap-1 text-slate-500">
+                              <span className="w-2 h-0.5 bg-rose-500 inline-block"></span>
+                              <span className="text-[9px]">Critical (&gt;80%)</span>
+                            </span>
+                            <span className="flex items-center gap-1 text-slate-500">
+                              <span className="w-2 h-0.5 bg-amber-500 inline-block"></span>
+                              <span className="text-[9px]">High (&gt;65%)</span>
+                            </span>
+                          </div>
+                          <div className="text-[10px] font-bold text-slate-600 flex items-center gap-1">
+                            <span>Trajectory Shift:</span>
+                            <span className={`font-mono font-black ${
+                              forecast.trend_direction === 'ESCALATING' ? 'text-rose-600' : 'text-emerald-600'
+                            }`}>
+                              {forecast.delta_score > 0 ? `+${forecast.delta_score}%` : `${forecast.delta_score}%`}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* SVG Canvas */}
+                        {(() => {
+                          const chartWidth = 480;
+                          const chartHeight = 120;
+                          const padL = 36;
+                          const padR = 24;
+                          const padT = 18;
+                          const padB = 26;
+                          const plotW = chartWidth - padL - padR;
+                          const plotH = chartHeight - padT - padB;
+
+                          const pts = forecast.trajectory.map((p, i) => {
+                            const x = padL + (i / (forecast.trajectory.length - 1)) * plotW;
+                            const score = Math.max(0, Math.min(100, p.score));
+                            const y = padT + (1 - score / 100) * plotH;
+                            return { ...p, x, y };
+                          });
+
+                          // Bézier curve smoothing
+                          let pathD = `M ${pts[0].x} ${pts[0].y}`;
+                          for (let i = 0; i < pts.length - 1; i++) {
+                            const p0 = pts[i === 0 ? 0 : i - 1];
+                            const p1 = pts[i];
+                            const p2 = pts[i + 1];
+                            const p3 = pts[i + 2] || p2;
+                            const cp1x = p1.x + (p2.x - p0.x) / 6;
+                            const cp1y = p1.y + (p2.y - p0.y) / 6;
+                            const cp2x = p2.x - (p3.x - p1.x) / 6;
+                            const cp2y = p2.y - (p3.y - p1.y) / 6;
+                            pathD += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+                          }
+
+                          const baselineY = padT + plotH;
+                          const areaD = `${pathD} L ${pts[pts.length - 1].x} ${baselineY} L ${pts[0].x} ${baselineY} Z`;
+
+                          // 80% Critical Threshold Y & 65% High Threshold Y
+                          const criticalY = padT + (1 - 0.8) * plotH;
+                          const highY = padT + (1 - 0.65) * plotH;
+
+                          return (
+                            <div className="relative">
+                              <svg
+                                viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+                                className="w-full h-32 overflow-visible"
+                              >
+                                <defs>
+                                  <linearGradient id="trajAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor="#f43f5e" stopOpacity="0.32" />
+                                    <stop offset="60%" stopColor="#f59e0b" stopOpacity="0.15" />
+                                    <stop offset="100%" stopColor="#10b981" stopOpacity="0.02" />
+                                  </linearGradient>
+                                  <linearGradient id="trajStrokeGrad" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stopColor="#d97706" />
+                                    <stop offset="50%" stopColor="#ea580c" />
+                                    <stop offset="100%" stopColor="#e11d48" />
+                                  </linearGradient>
+                                </defs>
+
+                                {/* Background reference lines */}
+                                <line
+                                  x1={padL}
+                                  y1={criticalY}
+                                  x2={chartWidth - padR}
+                                  y2={criticalY}
+                                  stroke="#f43f5e"
+                                  strokeDasharray="3 3"
+                                  strokeWidth="1"
+                                  strokeOpacity="0.6"
+                                />
+                                <text
+                                  x={padL - 4}
+                                  y={criticalY + 3}
+                                  textAnchor="end"
+                                  fontSize="7.5"
+                                  fill="#f43f5e"
+                                  fontWeight="bold"
+                                >
+                                  80%
+                                </text>
+
+                                <line
+                                  x1={padL}
+                                  y1={highY}
+                                  x2={chartWidth - padR}
+                                  y2={highY}
+                                  stroke="#f59e0b"
+                                  strokeDasharray="2 2"
+                                  strokeWidth="0.8"
+                                  strokeOpacity="0.4"
+                                />
+                                <text
+                                  x={padL - 4}
+                                  y={highY + 3}
+                                  textAnchor="end"
+                                  fontSize="7.5"
+                                  fill="#f59e0b"
+                                >
+                                  65%
+                                </text>
+
+                                <line
+                                  x1={padL}
+                                  y1={baselineY}
+                                  x2={chartWidth - padR}
+                                  y2={baselineY}
+                                  stroke="#cbd5e1"
+                                  strokeWidth="1"
+                                />
+
+                                {/* Area fill */}
+                                <path d={areaD} fill="url(#trajAreaGrad)" />
+
+                                {/* Trajectory Curve */}
+                                <path
+                                  d={pathD}
+                                  fill="none"
+                                  stroke="url(#trajStrokeGrad)"
+                                  strokeWidth="2.5"
+                                  strokeLinecap="round"
+                                />
+
+                                {/* Trajectory Points */}
+                                {pts.map((pt, i) => {
+                                  const isEnd = i === pts.length - 1;
+                                  const isHovered = hoveredTrajectoryIndex === i;
+                                  const ptColor =
+                                    pt.risk_tier === 'Critical'
+                                      ? '#e11d48'
+                                      : pt.risk_tier === 'High'
+                                      ? '#ea580c'
+                                      : pt.risk_tier === 'Moderate'
+                                      ? '#d97706'
+                                      : '#059669';
+
+                                  return (
+                                    <g
+                                      key={pt.day}
+                                      className="cursor-pointer"
+                                      onMouseEnter={() => setHoveredTrajectoryIndex(i)}
+                                      onMouseLeave={() => setHoveredTrajectoryIndex(null)}
+                                    >
+                                      {/* Pulse ring for endpoint or hovered */}
+                                      {(isEnd || isHovered) && (
+                                        <circle
+                                          cx={pt.x}
+                                          cy={pt.y}
+                                          r={isHovered ? 9 : 7}
+                                          fill={ptColor}
+                                          fillOpacity={isHovered ? 0.35 : 0.2}
+                                        />
+                                      )}
+
+                                      {/* Outer border & solid point */}
+                                      <circle
+                                        cx={pt.x}
+                                        cy={pt.y}
+                                        r={isHovered ? 5.5 : 4}
+                                        fill="#ffffff"
+                                        stroke={ptColor}
+                                        strokeWidth={isHovered ? "2.5" : "2"}
+                                      />
+
+                                      {/* Score text on top */}
+                                      <text
+                                        x={pt.x}
+                                        y={pt.y - 7}
+                                        textAnchor="middle"
+                                        fontSize={isHovered ? "9.5" : "8.5"}
+                                        fontWeight="bold"
+                                        fontFamily="monospace"
+                                        fill={ptColor}
+                                      >
+                                        {pt.score}%
+                                      </text>
+
+                                      {/* X-axis label below */}
+                                      <text
+                                        x={pt.x}
+                                        y={baselineY + 14}
+                                        textAnchor="middle"
+                                        fontSize="8"
+                                        fontWeight={isEnd || i === 0 ? "700" : "500"}
+                                        fill={isHovered ? "#0f172a" : "#64748b"}
+                                      >
+                                        {i === 0 ? 'Today' : isEnd ? 'Day 30' : `D${pt.day}`}
+                                      </text>
+                                    </g>
+                                  );
+                                })}
+                              </svg>
+
+                              {/* Live Hover Tooltip Card */}
+                              {hoveredTrajectoryIndex !== null && pts[hoveredTrajectoryIndex] && (
+                                <div
+                                  className="absolute -top-1 px-2 py-1 rounded-lg bg-slate-900 text-white text-[10px] shadow-lg pointer-events-none flex items-center gap-1.5 transition-all z-20"
+                                  style={{
+                                    left: `${Math.max(10, Math.min(75, (pts[hoveredTrajectoryIndex].x / chartWidth) * 100))}%`,
+                                  }}
+                                >
+                                  <span className="font-bold">{pts[hoveredTrajectoryIndex].label}:</span>
+                                  <span className="font-mono font-black text-amber-300">
+                                    {pts[hoveredTrajectoryIndex].score}%
+                                  </span>
+                                  <span className={`text-[8px] font-black uppercase px-1 rounded ${
+                                    pts[hoveredTrajectoryIndex].risk_tier === 'Critical'
+                                      ? 'bg-rose-600'
+                                      : pts[hoveredTrajectoryIndex].risk_tier === 'High'
+                                      ? 'bg-orange-500'
+                                      : 'bg-amber-500'
+                                  }`}>
+                                    {pts[hoveredTrajectoryIndex].risk_tier}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Benefits & Proactive Planning Footer */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50/90 to-slate-50/80 border border-amber-200/90 flex flex-col gap-3 relative z-10 mt-auto shadow-2xs">
+                  <div className="flex items-start gap-3">
+                    <div className="w-7 h-7 rounded-lg bg-amber-100/90 border border-amber-200 flex items-center justify-center text-amber-800 shrink-0 mt-0.5">
+                      <CheckCircle2 className="w-4 h-4 text-amber-700" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs font-black text-amber-950 tracking-wide flex items-center gap-2 flex-wrap">
+                        <span>Benefits &amp; Proactive Directive</span>
+                        <span className="text-[10px] font-bold text-amber-800 bg-amber-200/60 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                          Preventive Action
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-700 mt-1 font-medium leading-relaxed">
+                        Early welfare intervention now stabilizes stress trajectory and stops projected transition to{' '}
+                        <strong className="text-rose-700 font-black">{forecast.predicted_30d_risk_tier}</strong> risk.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Proactive Action Buttons Row */}
+                  <div className="flex items-center justify-end gap-2.5 pt-2.5 border-t border-amber-200/60 flex-wrap sm:flex-nowrap">
+                    <button
+                      onClick={() => handleInitiateAction(`Preventive Furlough Grant (Flatten 30-Day Curve) for ${selectedPersonnel.name}`)}
+                      className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-[#D4A017] hover:bg-[#b88a14] text-slate-950 font-black text-xs shadow-xs transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-1.5"
+                    >
+                      <span>Approve Preventive Furlough</span>
+                    </button>
+                    <button
+                      onClick={() => handleInitiateAction(`Roster Night Watch Rotation for ${selectedPersonnel.name}`)}
+                      className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs border border-slate-300 shadow-xs transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-1.5"
+                    >
+                      <span>Rotate Watch Roster</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 4.1. ROW 3: AI HEALTH MODULES (Left) + EMOTIONAL STABILITY INDEX (Right)    */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        {/* Column 1 (6 cols): AI Health Modules */}
+        <div className="lg:col-span-6 p-6 rounded-3xl bg-white border border-slate-200/90 shadow-sm flex flex-col justify-between h-full">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Brain className="w-5 h-5 text-primary" />
-                <h3 className="text-base font-black text-gray-900">AI Health Modules</h3>
+                <h3 className="text-base font-black text-gray-900">{t('AI Health Modules')}</h3>
               </div>
               <button
                 onClick={() => handleOpenFeatureDetail('Burnout Risk')}
@@ -1090,7 +2288,7 @@ export const WelfareDashboard: React.FC = () => {
                     <div className="w-6 h-6 rounded-lg bg-slate-100 group-hover:bg-[#163A5F] group-hover:text-white flex items-center justify-center text-slate-600 shrink-0 transition-colors">
                       <ModIcon className="w-3.5 h-3.5" />
                     </div>
-                    <div className="w-36 font-semibold text-slate-800 group-hover:text-primary group-hover:font-black truncate transition-colors flex items-center gap-1">
+                    <div className="w-40 font-semibold text-slate-800 group-hover:text-primary group-hover:font-black truncate transition-colors flex items-center gap-1">
                       <span>{mod.name}</span>
                     </div>
                     <div className="flex-1 bg-slate-100 rounded-full h-3 overflow-hidden">
@@ -1116,698 +2314,142 @@ export const WelfareDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column (7 cols): Critical Welfare Alert (Hero Section) */}
-        <div id="critical-welfare-hero" className="lg:col-span-7 p-6 rounded-3xl bg-white border border-rose-200 shadow-sm relative overflow-hidden">
-          {/* Top Banner Tag */}
-          <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-100">
-            <div className="flex items-center gap-2">
-              <div
-                className={`w-3 h-3 rounded-full animate-ping ${
-                  selectedPersonnel.riskTier === 'Critical'
-                    ? 'bg-rose-600'
-                    : selectedPersonnel.riskTier === 'High'
-                    ? 'bg-orange-500'
-                    : 'bg-amber-500'
-                }`}
-              />
-              <div
-                className={`flex items-center gap-1.5 font-black text-sm tracking-wide ${
-                  selectedPersonnel.riskTier === 'Critical'
-                    ? 'text-rose-700'
-                    : selectedPersonnel.riskTier === 'High'
-                    ? 'text-orange-700'
-                    : 'text-amber-700'
-                }`}
-              >
-                <Shield className="w-4 h-4" />
-                <span>
-                  {selectedPersonnel.riskTier === 'Critical'
-                    ? 'Critical Welfare Alert'
-                    : `${selectedPersonnel.riskTier} Welfare Priority`}
-                </span>
-              </div>
-            </div>
-            <span
-              className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-white shadow-xs ${
-                selectedPersonnel.riskTier === 'Critical'
-                  ? 'bg-rose-600'
-                  : selectedPersonnel.riskTier === 'High'
-                  ? 'bg-orange-500'
-                  : selectedPersonnel.riskTier === 'Moderate'
-                  ? 'bg-amber-500'
-                  : 'bg-emerald-600'
-              }`}
-            >
-              {selectedPersonnel.riskTier === 'Critical' ? 'HIGH PRIORITY' : selectedPersonnel.riskTier.toUpperCase()}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-            {/* Personnel Profile Photo & Details (5 cols) */}
-            <div className="md:col-span-5 flex items-center gap-4">
-              <img
-                src={selectedPersonnel.avatarUrl}
-                alt={selectedPersonnel.name}
-                className="w-20 h-20 rounded-2xl object-cover border-2 border-rose-300 shadow-md shrink-0"
-              />
-              <div>
-                <div className="text-xs font-mono font-bold text-slate-500">{selectedPersonnel.jcNumber}</div>
-                <h4 className="text-base font-black text-gray-900 leading-snug">{selectedPersonnel.name}</h4>
-                <div className="text-xs text-slate-600 font-semibold mt-0.5">
-                  {selectedPersonnel.dob} &bull; {selectedPersonnel.age} years
-                </div>
-                <div className="text-xs text-slate-700 font-medium mt-1">
-                  Field Unit: <span className="font-bold text-gray-900">{selectedPersonnel.unit}</span>
-                </div>
-                <div className="text-[11px] text-slate-500 font-medium">Location: {selectedPersonnel.location}</div>
-              </div>
-            </div>
-
-            {/* Circular Gauge Meter (4 cols) */}
-            <div className="md:col-span-4 flex flex-col items-center justify-center">
-              <div className="relative w-32 h-32 flex items-center justify-center">
-                <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r="48"
-                    stroke="#F1F5F9"
-                    strokeWidth="12"
-                    fill="none"
-                  />
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r="48"
-                    stroke={
-                      selectedPersonnel.riskTier === 'Critical'
-                        ? '#DC2626'
-                        : selectedPersonnel.riskTier === 'High'
-                        ? '#EA580C'
-                        : selectedPersonnel.riskTier === 'Moderate'
-                        ? '#F59E0B'
-                        : '#10B981'
-                    }
-                    strokeWidth="12"
-                    strokeDasharray={2 * Math.PI * 48}
-                    strokeDashoffset={2 * Math.PI * 48 * (1 - selectedPersonnel.riskScore / 100)}
-                    strokeLinecap="round"
-                    fill="none"
-                    className="transition-all duration-1000 ease-out"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                  <span className="text-2xl font-black text-slate-900 leading-none">
-                    {selectedPersonnel.riskScore}%
-                  </span>
-                  <span className="text-[9px] font-extrabold uppercase text-slate-500 mt-1 tracking-wider">
-                    Risk Score
-                  </span>
-                </div>
-              </div>
-              <span
-                className={`mt-1 px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider text-white ${
-                  selectedPersonnel.riskTier === 'Critical'
-                    ? 'bg-rose-600'
-                    : selectedPersonnel.riskTier === 'High'
-                    ? 'bg-orange-500'
-                    : selectedPersonnel.riskTier === 'Moderate'
-                    ? 'bg-amber-500'
-                    : 'bg-emerald-600'
-                }`}
-              >
-                {selectedPersonnel.riskTier.toUpperCase()}
-              </span>
-            </div>
-
-            {/* Trend & Meta Stats (3 cols) */}
-            <div className="md:col-span-3 space-y-3 text-xs border-l border-slate-100 pl-4">
-              <div>
-                <div className="text-[10px] uppercase font-extrabold text-slate-500 tracking-wider">Trend (Last 3 Months)</div>
-                <div
-                  className={`text-base font-black flex items-center gap-1 mt-0.5 ${
-                    selectedPersonnel.trend.startsWith('+') ? 'text-rose-600' : 'text-emerald-600'
-                  }`}
-                >
-                  <TrendingUp className="w-4 h-4" />
-                  <span>{selectedPersonnel.trend}</span>
-                </div>
-              </div>
-
-              <div>
-                <div className="text-[10px] uppercase font-extrabold text-slate-500 tracking-wider">Prediction Confidence</div>
-                <div className="text-sm font-black text-emerald-700 flex items-center gap-1 mt-0.5">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span>{selectedPersonnel.confidence}%</span>
-                </div>
-              </div>
-
-              <div>
-                <div className="text-[10px] uppercase font-extrabold text-slate-500 tracking-wider">Last Updated</div>
-                <div className="text-xs font-semibold text-slate-700 flex items-center gap-1 mt-0.5">
-                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                  <span>{selectedPersonnel.lastUpdated}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Sub-block: AI Welfare Summary */}
-          <div className="mt-5 p-4 rounded-2xl bg-rose-50/70 border border-rose-100">
-            <div className="flex items-center gap-2 mb-1.5">
-              <Brain className="w-4 h-4 text-rose-600" />
-              <span className="text-xs font-black text-rose-900 uppercase tracking-wide">AI Welfare Summary</span>
-            </div>
-            <p className="text-xs text-slate-700 leading-relaxed font-medium">
-              {selectedPersonnel.summary}
-            </p>
-          </div>
-
-          {/* ========================================================================= */}
-          {/* ML RISK FORECASTING PANEL: Current Risk vs Predicted in 30 Days            */}
-          {/* ========================================================================= */}
-          {(() => {
-            const forecast = getPersonnelForecast(selectedPersonnel);
-            const isEscalating = forecast.trend_direction === 'ESCALATING';
-
-            return (
-              <div className="mt-5 p-5 rounded-2xl bg-gradient-to-br from-[#0F172A] via-[#162A45] to-[#0A192F] text-white border-2 border-[#D4A017]/40 shadow-xl relative overflow-hidden">
-                {/* Background Pattern */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-[#D4A017]/5 rounded-full blur-2xl pointer-events-none" />
-
-                {/* Header with Title & ML Badge */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-white/10 relative z-10">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-[#D4A017]/20 border border-[#D4A017]/50 flex items-center justify-center text-[#D4A017] shadow-inner">
-                      <Sparkles className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-black tracking-wide text-white flex items-center gap-1.5">
-                          Risk Forecasting
-                        </h4>
-                        <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#D4A017] text-slate-950 font-black">
-                          ML Predictive Engine
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-300 font-medium">
-                        <strong className="text-[#D4A017]">Purpose:</strong> Predicts future stress levels instead of only reporting current conditions.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="text-[10px] font-mono text-slate-300 bg-black/40 px-2.5 py-1 rounded-lg border border-white/10 self-start sm:self-auto">
-                    Algorithm: <span className="text-emerald-400 font-bold">Ridge Time-Series ML</span> &bull; {forecast.confidence}% Confidence
-                  </div>
-                </div>
-
-                {/* Core Comparison: Current Risk vs Predicted in 30 Days */}
-                <div className="grid grid-cols-1 sm:grid-cols-12 gap-3.5 my-4 items-stretch relative z-10">
-                  {/* Current Risk Box */}
-                  <div className="sm:col-span-5 p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
-                    <div>
-                      <div className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
-                        Current Risk
-                      </div>
-                      <div className="flex items-baseline gap-2 mt-1">
-                        <span className={`text-2xl font-black ${
-                          forecast.current_risk_tier === 'Critical'
-                            ? 'text-rose-400'
-                            : forecast.current_risk_tier === 'High'
-                            ? 'text-orange-400'
-                            : forecast.current_risk_tier === 'Moderate'
-                            ? 'text-amber-400'
-                            : 'text-emerald-400'
-                        }`}>
-                          {forecast.current_risk_tier}
-                        </span>
-                        <span className="text-sm font-bold text-slate-300 font-mono">
-                          ({forecast.current_risk_score}%)
-                        </span>
-                      </div>
-                    </div>
-                    <div className="text-[10px] text-slate-400 mt-2 font-medium">
-                      Live Telemetry Baseline Assessment
-                    </div>
-                  </div>
-
-                  {/* Transition Vector Arrow */}
-                  <div className="sm:col-span-2 flex flex-col items-center justify-center py-2 sm:py-0">
-                    <div className={`flex items-center gap-1 font-black text-xs px-2.5 py-1 rounded-full border ${
-                      isEscalating
-                        ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                        : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                    }`}>
-                      <TrendingUp className="w-3.5 h-3.5" />
-                      <span>{isEscalating ? `+${forecast.delta_score}%` : `${forecast.delta_score}%`}</span>
-                    </div>
-                    <span className="text-[9px] uppercase tracking-wider text-slate-400 mt-1 font-semibold text-center">
-                      30-Day Shift
-                    </span>
-                  </div>
-
-                  {/* Predicted in 30 Days Box */}
-                  <div className={`sm:col-span-5 p-4 rounded-xl border flex flex-col justify-between ${
-                    forecast.predicted_30d_risk_tier === 'Critical'
-                      ? 'bg-rose-950/40 border-rose-500/50 shadow-lg shadow-rose-950/50'
-                      : forecast.predicted_30d_risk_tier === 'High'
-                      ? 'bg-orange-950/40 border-orange-500/50 shadow-lg shadow-orange-950/50'
-                      : 'bg-amber-950/40 border-amber-500/50 shadow-lg shadow-amber-950/50'
-                  }`}>
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#D4A017]">
-                          Predicted in 30 Days
-                        </span>
-                        <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-                      </div>
-                      <div className="flex items-baseline gap-2 mt-1">
-                        <span className={`text-2xl font-black ${
-                          forecast.predicted_30d_risk_tier === 'Critical'
-                            ? 'text-rose-300'
-                            : forecast.predicted_30d_risk_tier === 'High'
-                            ? 'text-orange-300'
-                            : forecast.predicted_30d_risk_tier === 'Moderate'
-                            ? 'text-amber-300'
-                            : 'text-emerald-300'
-                        }`}>
-                          {forecast.predicted_30d_risk_tier}
-                        </span>
-                        <span className="text-sm font-bold text-white font-mono">
-                          ({forecast.predicted_30d_score}%)
-                        </span>
-                      </div>
-                    </div>
-                    <div className="text-[10px] text-slate-300 mt-2 font-medium">
-                      ML Projected Cognitive & Physiological Load
-                    </div>
-                  </div>
-                </div>
-
-                {/* 30-Day Milestone Trajectory Curve */}
-                <div className="p-3.5 rounded-xl bg-black/30 border border-white/10 relative z-10 mb-3.5">
-                  <div className="flex items-center justify-between text-[11px] font-bold text-slate-300 mb-2">
-                    <span className="flex items-center gap-1.5 text-xs text-white">
-                      <Activity className="w-3.5 h-3.5 text-[#D4A017]" />
-                      <span>30-Day Longitudinal Stress Trajectory</span>
-                    </span>
-                    <span className="text-[10px] font-mono text-slate-400">
-                      Step Milestones: Day 0 &rarr; Day 30
-                    </span>
-                  </div>
-
-                  {/* Milestones Stepper */}
-                  <div className="grid grid-cols-5 gap-2 relative">
-                    {forecast.trajectory.map((point, idx) => {
-                      const isEnd = idx === forecast.trajectory.length - 1;
-                      return (
-                        <div
-                          key={point.day}
-                          className={`p-2 rounded-lg text-center border transition-all ${
-                            isEnd
-                              ? 'bg-rose-500/20 border-rose-500/60 ring-1 ring-rose-500/30'
-                              : idx === 0
-                              ? 'bg-white/10 border-white/20'
-                              : 'bg-white/5 border-white/10'
-                          }`}
-                        >
-                          <div className="text-[9px] font-extrabold uppercase text-slate-400">{point.label}</div>
-                          <div className="text-xs font-black text-white font-mono mt-0.5">{point.score}%</div>
-                          <div className={`text-[8px] font-extrabold uppercase mt-0.5 ${
-                            point.risk_tier === 'Critical'
-                              ? 'text-rose-400'
-                              : point.risk_tier === 'High'
-                              ? 'text-orange-400'
-                              : point.risk_tier === 'Moderate'
-                              ? 'text-amber-400'
-                              : 'text-emerald-400'
-                          }`}>
-                            {point.risk_tier}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Benefits & Proactive Planning Footer */}
-                <div className="p-3.5 rounded-xl bg-[#D4A017]/10 border border-[#D4A017]/30 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs relative z-10">
-                  <div className="space-y-0.5">
-                    <div className="text-[11px] font-black text-[#D4A017] uppercase tracking-wider flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Benefits: Supports proactive planning and preventive action.</span>
-                    </div>
-                    <p className="text-[11px] text-slate-200 font-medium">
-                      Early welfare intervention now stops the projected transition to{' '}
-                      <strong className="text-rose-300 font-bold">{forecast.predicted_30d_risk_tier}</strong> risk.
-                    </p>
-                  </div>
-
-                  {/* Proactive Action Buttons */}
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      onClick={() => handleInitiateAction(`Preventive Furlough Grant (Flatten 30-Day Curve) for ${selectedPersonnel.name}`)}
-                      className="px-3 py-1.5 rounded-lg bg-[#D4A017] hover:bg-[#b88a14] text-slate-950 font-black text-[11px] shadow-sm transition-all cursor-pointer"
-                    >
-                      Approve Preventive Furlough
-                    </button>
-                    <button
-                      onClick={() => handleInitiateAction(`Roster Night Watch Rotation for ${selectedPersonnel.name}`)}
-                      className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-[11px] border border-white/20 transition-all cursor-pointer"
-                    >
-                      Rotate Watch Roster
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
-
-          {/* ========================================================================= */}
-          {/* EMOTIONAL STABILITY INDEX PANEL: Measures emotional consistency over time */}
-          {/* ========================================================================= */}
+        {/* Column 2 (6 cols): Emotional Stability Index (ESI) */}
+        <div className="lg:col-span-6 flex flex-col">
           {(() => {
             const esi = getPersonnelEmotionalStability(selectedPersonnel);
 
             return (
-              <div id="welfare-emotional-stability-card" className="mt-5 p-5 rounded-2xl bg-gradient-to-br from-[#0B1E2E] via-[#122A40] to-[#0A1A28] text-white border-2 border-teal-400/40 shadow-xl relative overflow-hidden">
-                {/* Background Pattern */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-2xl pointer-events-none" />
-
-                {/* Header with Title, Badge, and Algorithm */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-white/10 relative z-10">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-teal-500/20 border border-teal-400/50 flex items-center justify-center text-teal-300 shadow-inner">
-                      <HeartPulse className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-black tracking-wide text-white flex items-center gap-1.5">
-                          Emotional Stability Index
-                        </h4>
-                        <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-teal-400 text-slate-950 font-black">
-                          Longitudinal ESI
-                        </span>
+              <div id="welfare-emotional-stability-card" className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs relative overflow-hidden flex flex-col justify-between h-full">
+                <div>
+                  {/* Header with Title, Badge, and Algorithm */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100 relative z-10">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-2xs">
+                        <HeartPulse className="w-4 h-4" />
                       </div>
-                      <p className="text-[11px] text-slate-300 font-medium">
-                        <strong className="text-teal-400">Purpose:</strong> Measures emotional consistency over time.
-                      </p>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-black tracking-wide text-slate-900 flex items-center gap-1.5">
+                            Emotional Stability Index
+                          </h4>
+                          <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-primary/15 text-primary-900 font-black border border-primary/25">
+                            Longitudinal ESI
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-600 font-medium">
+                          <strong className="text-primary">Purpose:</strong> Measures emotional consistency over time.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-[10px] font-mono text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 self-start sm:self-auto">
+                      Algorithm: <span className="text-primary font-bold">Weighted moving average or LSTM</span> &bull; {esi.confidence}% Confidence
                     </div>
                   </div>
 
-                  <div className="text-[10px] font-mono text-slate-300 bg-black/40 px-2.5 py-1 rounded-lg border border-white/10 self-start sm:self-auto">
-                    Algorithm: <span className="text-teal-300 font-bold">Weighted moving average or LSTM</span> &bull; {esi.confidence}% Confidence
-                  </div>
-                </div>
+                  {/* Core Output Banner: 78% Stable */}
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-3.5 my-4 items-stretch relative z-10">
+                    {/* ESI Score Display */}
+                    <div className="sm:col-span-5 p-4 rounded-2xl bg-slate-50/70 border border-slate-200 flex flex-col justify-between">
+                      <div>
+                        <div className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">
+                          Emotional Stability Score
+                        </div>
+                        <div className="flex items-baseline gap-2.5 mt-2">
+                          <span className="text-4xl sm:text-5xl font-black font-mono tracking-tight text-slate-900">
+                            {esi.score}%
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>{esi.status}</span>
+                          </span>
+                        </div>
+                        <div className="w-full bg-slate-200 rounded-full h-2 mt-3 overflow-hidden">
+                          <div
+                            className="bg-emerald-600 h-2 rounded-full transition-all duration-700"
+                            style={{ width: `${esi.score}%` }}
+                          />
+                        </div>
+                      </div>
 
-                {/* Core Output Banner: 78% Stable */}
-                <div className="grid grid-cols-1 sm:grid-cols-12 gap-3.5 my-4 items-stretch relative z-10">
-                  {/* Score & Status Box */}
-                  <div className="sm:col-span-5 p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
-                    <div>
-                      <div className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
-                        Emotional Stability
-                      </div>
-                      <div className="flex items-baseline gap-2.5 mt-1.5">
-                        <span className="text-3xl sm:text-4xl font-black text-teal-300 font-mono">
-                          {esi.score}%
-                        </span>
-                        <span className="px-2.5 py-0.5 rounded-full bg-teal-500/20 text-teal-300 text-xs font-black uppercase border border-teal-500/40">
-                          {esi.status}
-                        </span>
-                      </div>
-                      <div className="w-full bg-white/10 rounded-full h-2 mt-2.5 overflow-hidden">
-                        <div className="bg-gradient-to-r from-teal-500 to-emerald-400 h-2 rounded-full" style={{ width: `${esi.score}%` }} />
+                      <div className="mt-3 text-[11px] text-slate-500 font-medium">
+                        Consistency Rating &bull; Calibrated for {selectedPersonnel.name}
                       </div>
                     </div>
-                    <div className="text-[10px] text-slate-300 mt-2 font-medium">
-                      Affective consistency across 7-day longitudinal window
-                    </div>
-                  </div>
 
-                  {/* 6 Input Factors Grid */}
-                  <div className="sm:col-span-7 p-3.5 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
-                    <div className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-2 flex items-center justify-between">
-                      <span>Inputs (6 Key Factors)</span>
-                      <span className="font-mono text-teal-400 text-[10px]">WMA Recency Calibration</span>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2">
+                    {/* 6 Sub-Factors Mini-Grid */}
+                    <div className="sm:col-span-7 grid grid-cols-3 gap-2">
                       {esi.factors.map((f) => (
-                        <div key={f.name} className="p-2 rounded-lg bg-black/25 border border-white/5 text-center">
-                          <span className="text-[10px] font-bold text-slate-300 block truncate">{f.name}</span>
-                          <span className="text-xs font-black text-white font-mono mt-0.5 block">{f.score}%</span>
-                          <span className="text-[9px] text-teal-300 font-semibold block">{f.status}</span>
+                        <div key={f.name} className="p-2 rounded-xl bg-white border border-slate-200/80 text-center shadow-2xs">
+                          <span className="text-[10px] font-bold text-slate-600 block truncate">{f.name}</span>
+                          <span className="text-xs font-black text-slate-900 font-mono mt-0.5 block">{f.score}%</span>
+                          <span className="text-[9px] text-primary font-semibold block">{f.status}</span>
                         </div>
                       ))}
                     </div>
                   </div>
-                </div>
 
-                {/* 7-Day Trajectory Mini-Track */}
-                <div className="p-3 rounded-xl bg-black/30 border border-white/10 relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <Activity className="w-3.5 h-3.5 text-teal-400 shrink-0" />
-                    <span className="text-[11px] font-bold text-slate-200">Consistency Trajectory:</span>
-                    <div className="flex items-center gap-1 font-mono text-[10px] flex-wrap">
-                      {esi.trajectory.map((t, idx) => (
-                        <span key={idx} className="px-1.5 py-0.5 rounded bg-white/10 text-teal-200">
-                          {t.day_label}: {t.score}%
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <span className="text-[10px] font-mono text-slate-300 shrink-0">
-                    &sigma; Volatility: <strong className="text-teal-300">{esi.volatility_variance}</strong>
-                  </span>
-                </div>
-              </div>
-            );
-          })()}
-
-          {/* ========================================================================= */}
-          {/* BEHAVIORAL CHANGE DETECTION PANEL: Compare Current VS Historical Behavior   */}
-          {/* ========================================================================= */}
-          {(() => {
-            const bc = getPersonnelBehavioralChange(selectedPersonnel);
-            const isSevere = bc.behavior_change_score >= 75;
-            const isModerate = bc.behavior_change_score >= 50;
-
-            return (
-              <div id="welfare-behavioral-change-card" className="mt-5 p-5 rounded-2xl bg-gradient-to-br from-[#10192A] via-[#162238] to-[#0D1524] text-white border-2 border-indigo-400/40 shadow-xl relative overflow-hidden">
-                {/* Background Pattern */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
-
-                {/* Header with Title, Badge, and AI Process */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-white/10 relative z-10">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-indigo-500/20 border border-indigo-400/50 flex items-center justify-center text-indigo-300 shadow-inner">
-                      <Sliders className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h4 className="text-sm font-black tracking-wide text-white flex items-center gap-1.5">
-                          Behavioral Change Detection
-                        </h4>
-                        <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-indigo-400 text-slate-950 font-black">
-                          AI Routine Anomaly
-                        </span>
+                  {/* 7-Day Trajectory Mini-Track */}
+                  <div className="p-3 rounded-2xl bg-slate-50/80 border border-slate-200 relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs mb-3">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <Activity className="w-3.5 h-3.5 text-primary shrink-0" />
+                      <span className="text-[11px] font-bold text-slate-700">Consistency Trajectory:</span>
+                      <div className="flex items-center gap-1 font-mono text-[10px] flex-wrap">
+                        {esi.trajectory.map((t, idx) => (
+                          <span key={idx} className="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-slate-800 shadow-2xs font-semibold">
+                            {t.day_label}: {t.score}%
+                          </span>
+                        ))}
                       </div>
-                      <p className="text-[11px] text-slate-300 font-medium">
-                        <strong className="text-indigo-400">Purpose:</strong> Detects unusual changes in a person&apos;s behavior over time.
-                      </p>
                     </div>
-                  </div>
-
-                  <div className="text-[10px] font-mono text-slate-300 bg-black/40 px-2.5 py-1 rounded-lg border border-white/10 self-start sm:self-auto">
-                    AI Process: <strong className="text-indigo-300">Compare: Current behavior VS Historical behavior</strong>
+                    <span className="text-[10px] font-mono text-slate-500 shrink-0">
+                      &sigma; Volatility: <strong className="text-secondary font-bold">{esi.volatility_variance}</strong>
+                    </span>
                   </div>
                 </div>
 
-                {/* Output Section: Behavior Change Score Banner & Comparison Matrix */}
-                <div className="grid grid-cols-1 sm:grid-cols-12 gap-3.5 my-4 items-stretch relative z-10">
-                  {/* Left: Behavior Change Score Box */}
-                  <div className="sm:col-span-4 p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
-                    <div>
-                      <div className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
-                        Output Metric
-                      </div>
-                      <div className="text-xs font-bold text-indigo-300 uppercase tracking-wider mt-0.5">
-                        Behavior Change Score
-                      </div>
-                      <div className="flex items-baseline gap-2.5 mt-2">
-                        <span className={`text-4xl sm:text-5xl font-black font-mono tracking-tight ${
-                          isSevere ? 'text-rose-400' : isModerate ? 'text-amber-400' : 'text-emerald-400'
-                        }`}>
-                          {bc.behavior_change_score}
-                        </span>
-                        <span className="text-sm font-mono text-slate-400 font-semibold">/ 100</span>
-                      </div>
-                      <div className="mt-2">
-                        <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-black uppercase border ${
-                          isSevere
-                            ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                            : isModerate
-                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                            : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                        }`}>
-                          {bc.severity_tier}
-                        </span>
-                      </div>
-                      <div className="w-full bg-white/10 rounded-full h-2 mt-3 overflow-hidden">
-                        <div
-                          className={`h-2 rounded-full ${
-                            isSevere
-                              ? 'bg-gradient-to-r from-amber-500 to-rose-500'
-                              : isModerate
-                              ? 'bg-gradient-to-r from-indigo-500 to-amber-400'
-                              : 'bg-gradient-to-r from-teal-500 to-emerald-400'
-                          }`}
-                          style={{ width: `${bc.behavior_change_score}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-white/10 text-[11px] text-slate-300 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-400">Confidence:</span>
-                        <span className="font-mono text-indigo-300 font-bold">{bc.confidence_pct}%</span>
-                      </div>
-                      <div className="text-[10px] text-slate-400 leading-tight">
-                        <strong>Primary Anomaly:</strong> {bc.primary_driver}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right: 5 Examples Comparison Table (Current behavior VS Historical behavior) */}
-                  <div className="sm:col-span-8 p-3.5 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
-                        AI Comparison: Current Behavior VS Historical Behavior
-                      </span>
-                      <span className="text-[10px] font-mono text-indigo-300">
-                        5 Evaluated Examples
-                      </span>
-                    </div>
-
-                    {/* Table of the 5 Examples */}
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs">
-                        <thead>
-                          <tr className="border-b border-white/10 text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">
-                            <th className="pb-1.5">Example / Behavior</th>
-                            <th className="pb-1.5 text-center">Historical</th>
-                            <th className="pb-1.5 text-center">Current</th>
-                            <th className="pb-1.5 text-center">Shift</th>
-                            <th className="pb-1.5 text-right">Detection Flag</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5">
-                          {bc.factors.map((f) => {
-                            const isHighShift = f.anomaly_score >= 60;
-                            return (
-                              <tr key={f.key} className="hover:bg-white/5 transition-colors">
-                                <td className="py-2 pr-2">
-                                  <div className="font-bold text-white leading-snug">{f.example_label}</div>
-                                  <div className="text-[10px] text-slate-400">{f.domain}</div>
-                                </td>
-                                <td className="py-2 text-center font-mono text-slate-300 text-[11px] whitespace-nowrap">
-                                  {f.historical_behavior}
-                                </td>
-                                <td className="py-2 text-center font-mono font-bold text-white text-[11px] whitespace-nowrap">
-                                  {f.current_behavior}
-                                </td>
-                                <td className="py-2 text-center whitespace-nowrap">
-                                  <span className={`font-mono font-bold text-[11px] ${
-                                    f.change_pct > 0 ? 'text-rose-300' : 'text-amber-300'
-                                  }`}>
-                                    {f.change_pct > 0 ? `+${f.change_pct}%` : `${f.change_pct}%`}
-                                  </span>
-                                </td>
-                                <td className="py-2 text-right whitespace-nowrap">
-                                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                    isHighShift
-                                      ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                                      : 'bg-white/10 text-slate-300 border border-white/10'
-                                  }`}>
-                                    {f.flag}
-                                  </span>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* Recommendation Footer */}
-                    <div className="mt-3 pt-2.5 border-t border-white/10 text-[11px] text-slate-300 flex items-start gap-2">
-                      <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
-                      <span><strong>Clinical Directive:</strong> {bc.recommendation}</span>
-                    </div>
-                  </div>
+                {/* Recommendation Footer */}
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-2 text-[11px] text-slate-600 mt-auto">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span><strong>Clinical Directive:</strong> {esi.recommendation}</span>
                 </div>
               </div>
             );
           })()}
-
-          {/* Weak Signal Breakdown (Explainable AI / XAI) */}
-          <div className="mt-4">
-            <WeakSignalBreakdownCard
-              personnelName={selectedPersonnel.name}
-              riskScore={selectedPersonnel.riskScore}
-              confidence={selectedPersonnel.confidence}
-            />
-          </div>
-
-          {/* Longitudinal Risk Evolution & Operational Milestone Timeline */}
-          <div className="mt-4">
-            <RiskEvolutionChart
-              personnelName={selectedPersonnel.name}
-              windowDays={60}
-            />
-          </div>
-
-          {/* Closed-Loop Post-Intervention Recovery Monitoring */}
-          <div className="mt-4">
-            <ClosedLoopRecoveryTracker personnelUid={selectedPersonnel.id || selectedPersonnel.jcNumber} />
-          </div>
-
-          {/* Sub-block: Recommended Actions & Initiate Action Button */}
-          <div className="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="space-y-1 text-xs">
-              <div className="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider mb-1 flex items-center justify-between">
-                <span>Recommended Actions for {selectedPersonnel.name}</span>
-                <span className="text-[10px] font-bold text-primary cursor-pointer">View All &rarr;</span>
-              </div>
-              <div className="flex items-center gap-2 text-slate-700 font-medium">
-                <span className="w-2 h-2 rounded-full bg-rose-600 shrink-0" />
-                <span>Schedule counselling session</span>
-              </div>
-              <div className="flex items-center gap-2 text-slate-700 font-medium">
-                <span className="w-2 h-2 rounded-full bg-orange-500 shrink-0" />
-                <span>Review and adjust workload</span>
-              </div>
-              <div className="flex items-center gap-2 text-slate-700 font-medium">
-                <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
-                <span>Medical evaluation (if required)</span>
-              </div>
-              <div className="flex items-center gap-2 text-slate-700 font-medium">
-                <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0" />
-                <span>Plan wellness follow-up in 2 weeks</span>
-              </div>
-            </div>
-
-            <button
-              onClick={() => handleInitiateAction(`Priority Welfare Clinical Action for ${selectedPersonnel.name}`)}
-              className="px-5 py-3 rounded-xl bg-[#2F4F3E] hover:bg-[#233d30] text-white text-xs font-extrabold shadow-md shadow-[#2F4F3E]/20 flex items-center justify-center gap-2 cursor-pointer shrink-0 transition-all active:scale-95"
-            >
-              <Send className="w-4 h-4 text-[#D4A017]" />
-              <span>Initiate Action</span>
-            </button>
-          </div>
         </div>
       </div>
+
+      {/* ========================================================================= */}
+      {/* 4.3. LONGITUDINAL RISK EVOLUTION & CLOSED-LOOP RECOVERY MONITORING        */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        {/* Column 1 (6 cols): Longitudinal Risk Evolution & Operational Milestone Timeline */}
+        <div className="lg:col-span-6 flex flex-col">
+          <RiskEvolutionChart
+            personnelName={selectedPersonnel.name}
+            windowDays={60}
+          />
+        </div>
+
+        {/* Column 2 (6 cols): Closed-Loop Post-Intervention Recovery Monitoring */}
+        <div className="lg:col-span-6 flex flex-col">
+          <ClosedLoopRecoveryTracker personnelUid={selectedPersonnel.id || selectedPersonnel.jcNumber} />
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 4.4. WELFARE OFFICER PRECISION RECOMMENDATIONS (AI Precision CDSS Engine) */}
+      {/* ========================================================================= */}
+      <WelfarePrecisionRecommendationsCard
+        personnel={selectedPersonnel}
+        onInitiateDirective={(directiveName) => handleInitiateAction(directiveName)}
+      />
+
+      {/* ========================================================================= */}
+      {/* 4.5. FRONTLINE PERSONNEL QUERY & GRIEVANCE TRACKING SYSTEM               */}
+      {/* ========================================================================= */}
+      <PersonnelQueryTrackingCard />
 
       {/* ========================================================================= */}
       {/* 5. ROW 3: EXPLAINABLE AI (SHAP) + RISK TREND (6M) + POPULATION DONUT     */}
@@ -1819,7 +2461,7 @@ export const WelfareDashboard: React.FC = () => {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Brain className="w-5 h-5 text-primary" />
-                <h3 className="text-sm font-black text-gray-900">Top Contributing Factors (Explainable AI)</h3>
+                <h3 className="text-sm font-black text-gray-900">{t('Top Contributing Factors (Explainable AI)')}</h3>
               </div>
               <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase bg-sky-50 text-sky-700 border border-sky-200">
                 SHAP Analysis
@@ -1899,7 +2541,7 @@ export const WelfareDashboard: React.FC = () => {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-primary" />
-                <h3 className="text-sm font-black text-gray-900">Risk Trend (Last 6 Months)</h3>
+                <h3 className="text-sm font-black text-gray-900">{t('Risk Trend (Last 6 Months)')}</h3>
               </div>
               <span className="text-xs font-bold text-slate-500">Jan &ndash; Jun 2025</span>
             </div>
@@ -1977,7 +2619,7 @@ export const WelfareDashboard: React.FC = () => {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-primary" />
-                <h3 className="text-sm font-black text-gray-900">Personnel Risk Distribution</h3>
+                <h3 className="text-sm font-black text-gray-900">{t('Personnel Risk Distribution')}</h3>
               </div>
               <span className="text-xs font-bold text-primary cursor-pointer">Export</span>
             </div>
@@ -2088,7 +2730,7 @@ export const WelfareDashboard: React.FC = () => {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-primary" />
-                <h3 className="text-sm font-black text-gray-900">Priority Personnel Queue</h3>
+                <h3 className="text-sm font-black text-gray-900">{t('Priority Personnel Queue')}</h3>
               </div>
               <span className="text-xs font-bold text-primary hover:text-primary-700 cursor-pointer">
                 View All &rarr;
@@ -2225,7 +2867,7 @@ export const WelfareDashboard: React.FC = () => {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-primary" />
-                <h3 className="text-sm font-black text-gray-900">Recent Welfare Interventions</h3>
+                <h3 className="text-sm font-black text-gray-900">{t('Recent Welfare Interventions')}</h3>
               </div>
               <span className="text-xs font-bold text-primary hover:text-primary-700 cursor-pointer">
                 View All &rarr;
@@ -2303,7 +2945,7 @@ export const WelfareDashboard: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Lock className="w-5 h-5 text-emerald-700" />
-              <h3 className="text-sm font-black text-gray-900">Privacy & Ethical Use</h3>
+              <h3 className="text-sm font-black text-gray-900">{t('Privacy & Ethical Use')}</h3>
             </div>
             <p className="text-xs text-slate-600 font-medium mb-4">
               Statutory Defense Welfare Safeguards
@@ -2340,12 +2982,6 @@ export const WelfareDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* ========================================================================= */}
-      {/* 6.5. TOP 1% CLOSED-LOOP RECOVERY TRACKING (14/30/60-Day Trajectory Curve)  */}
-      {/* ========================================================================= */}
-      <div className="pt-2">
-        <ClosedLoopRecoveryTracker personnelUid={selectedPersonnel.jcNumber} />
-      </div>
 
       {/* ========================================================================= */}
       {/* 7. EXPANDABLE 13-FACTOR PSYCHOMETRIC MATRIX (Full Developer Transparency) */}

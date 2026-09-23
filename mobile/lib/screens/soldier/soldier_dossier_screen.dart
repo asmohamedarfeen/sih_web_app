@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/services/localization_service.dart';
 import '../../core/theme/app_theme.dart';
 
 class SoldierDossierScreen extends StatelessWidget {
@@ -9,12 +10,13 @@ class SoldierDossierScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<AuthService>(context).currentUser;
+    final loc = Provider.of<LocalizationService>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Personnel Service Dossier',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+        title: Text(
+          loc.t('dossier', 'Personnel Service Dossier'),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
         ),
       ),
       body: SingleChildScrollView(

@@ -200,19 +200,21 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
   }
 
   void _triggerSos() {
+    final loc = Provider.of<LocalizationService>(context, listen: false);
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.emergency_outlined, color: AppColors.rose, size: 28),
-            SizedBox(width: 10),
+            const Icon(Icons.emergency_outlined, color: AppColors.rose, size: 28),
+            const SizedBox(width: 10),
             Expanded(
               child: Text(
-                'EMERGENCY WELFARE SUPPORT',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AppColors.rose),
+                loc.t('emergency_support_heading', 'EMERGENCY WELFARE SUPPORT'),
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AppColors.rose),
               ),
             ),
           ],
@@ -221,9 +223,9 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Immediate 24/7 confidential assistance for Armed Forces personnel.',
-              style: TextStyle(fontSize: 12, color: AppColors.textPrimary, height: 1.4),
+            Text(
+              loc.t('emergency_support_sub', 'Immediate 24/7 confidential assistance for Armed Forces personnel.'),
+              style: const TextStyle(fontSize: 12, color: AppColors.textPrimary, height: 1.4),
             ),
             const SizedBox(height: 14),
             Container(
@@ -233,23 +235,23 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.rose.withValues(alpha: 0.3)),
               ),
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.phone_in_talk, color: AppColors.rose, size: 16),
-                      SizedBox(width: 6),
+                      const Icon(Icons.phone_in_talk, color: AppColors.rose, size: 16),
+                      const SizedBox(width: 6),
                       Text(
-                        'Defense Crisis Helpline: 1800-11-0023',
-                        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: AppColors.rose),
+                        loc.t('defense_helpline', 'Defense Crisis Helpline: 1800-11-0023'),
+                        style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: AppColors.rose),
                       ),
                     ],
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    'Tele-MANAS Armed Forces Cell (Toll-Free • 24x7)',
-                    style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                    loc.t('tele_manas_cell', 'Tele-MANAS Armed Forces Cell (Toll-Free • 24x7)'),
+                    style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
                   ),
                 ],
               ),
@@ -264,7 +266,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
+            child: Text(loc.t('cancel', 'Cancel'), style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
           ),
           ElevatedButton.icon(
             onPressed: () {
@@ -289,7 +291,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
               );
             },
             icon: const Icon(Icons.send_rounded, size: 16),
-            label: const Text('CALL WELFARE HELPLINE', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 11)),
+            label: Text(loc.t('call_helpline', 'CALL WELFARE HELPLINE'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 11)),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.rose,
               foregroundColor: Colors.white,
@@ -549,6 +551,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context);
     final sync = Provider.of<SyncService>(context);
+    final loc = Provider.of<LocalizationService>(context);
     final user = auth.currentUser;
 
     // Soldier Name fallback per plan.md
@@ -562,9 +565,9 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
         foregroundColor: Colors.white,
         elevation: 6,
         icon: const Icon(Icons.health_and_safety_outlined, color: AppColors.accent, size: 18),
-        label: const Text(
-          'Welfare Support',
-          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.3),
+        label: Text(
+          loc.t('welfare_support', 'Welfare Support'),
+          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.3),
         ),
       ),
       body: SafeArea(
@@ -742,6 +745,11 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
   // Helper: Section Title Header with Clean Badge
   // ---------------------------------------------------------------------------
   Widget _buildSectionTitleBadge(String secNum, String title, String subtitle) {
+    final loc = Provider.of<LocalizationService>(context, listen: false);
+    final secPrefix = loc.t('sec_badge_prefix', 'SECTION');
+    final localizedTitle = loc.t(title);
+    final localizedSubtitle = loc.t(subtitle);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 10, top: 4),
       child: Column(
@@ -756,7 +764,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  'SECTION $secNum',
+                  '$secPrefix $secNum',
                   style: const TextStyle(
                     color: AppColors.accent,
                     fontSize: 9,
@@ -768,7 +776,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  title,
+                  localizedTitle,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w900,
@@ -783,7 +791,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
           Padding(
             padding: const EdgeInsets.only(left: 2),
             child: Text(
-              subtitle,
+              localizedSubtitle,
               style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
             ),
           ),
@@ -796,19 +804,21 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
   // Quick Jump Navigation Pill Row
   // ---------------------------------------------------------------------------
   Widget _buildQuickNavHeader() {
+    final loc = Provider.of<LocalizationService>(context, listen: false);
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _buildNavPill(0, 'Overview', Icons.home_filled, () => _scrollToKey(_overviewKey, 0)),
+          _buildNavPill(0, loc.t('overview', 'Overview'), Icons.home_filled, () => _scrollToKey(_overviewKey, 0)),
           const SizedBox(width: 6),
-          _buildNavPill(1, 'AI Coach', Icons.psychology, () => _scrollToKey(_aiCoachKey, 1)),
+          _buildNavPill(1, loc.t('ai_coach', 'AI Coach'), Icons.psychology, () => _scrollToKey(_aiCoachKey, 1)),
           const SizedBox(width: 6),
-          _buildNavPill(2, 'Readiness & Risk', Icons.shield_outlined, () => _scrollToKey(_readinessKey, 2)),
+          _buildNavPill(2, loc.t('readiness_risk', 'Readiness & Risk'), Icons.shield_outlined, () => _scrollToKey(_readinessKey, 2)),
           const SizedBox(width: 6),
-          _buildNavPill(3, 'Sleep & Recovery', Icons.bedtime_outlined, () => _scrollToKey(_healthKey, 3)),
+          _buildNavPill(3, loc.t('health_sleep', 'Sleep & Recovery'), Icons.bedtime_outlined, () => _scrollToKey(_healthKey, 3)),
           const SizedBox(width: 6),
-          _buildNavPill(4, 'Support & SOS', Icons.health_and_safety_outlined, () => _scrollToKey(_supportKey, 4)),
+          _buildNavPill(4, loc.t('support', 'Support & SOS'), Icons.health_and_safety_outlined, () => _scrollToKey(_supportKey, 4)),
         ],
       ),
     );
@@ -863,6 +873,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
   // SECTION 1: PERSONALIZED HOME SCREEN CARD
   // ---------------------------------------------------------------------------
   Widget _buildPersonalizedHeaderCard(String soldierName, SyncService sync) {
+    final loc = Provider.of<LocalizationService>(context, listen: false);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -900,10 +911,10 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
-                        'VOLUNTARY & PRIVACY PRESERVED',
-                        style: TextStyle(
+                        loc.t('voluntary_privacy', 'VOLUNTARY & PRIVACY PRESERVED'),
+                        style: const TextStyle(
                           color: Color(0xFF34D399),
                           fontSize: 9.5,
                           fontWeight: FontWeight.w900,
@@ -911,8 +922,8 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                         ),
                       ),
                       Text(
-                        'Protected by Defense Medical Firewalls • Zero Career Stigma',
-                        style: TextStyle(color: Colors.white70, fontSize: 8.5, fontWeight: FontWeight.w500),
+                        loc.t('medical_firewalls', 'Protected by Defense Medical Firewalls • Zero Career Stigma'),
+                        style: const TextStyle(color: Colors.white70, fontSize: 8.5, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
@@ -923,7 +934,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                     color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: const Text('AIRGAP', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w900)),
+                  child: Text(loc.t('airgap', 'AIRGAP'), style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w900)),
                 ),
               ],
             ),
@@ -937,9 +948,9 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Good Morning,',
-                      style: TextStyle(color: Color(0xFFCBD5E1), fontSize: 13, fontWeight: FontWeight.w500),
+                    Text(
+                      loc.t('good_morning', 'Good Morning,'),
+                      style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 13, fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -979,13 +990,13 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                         border: Border.all(color: Colors.white24),
                       ),
                       child: Consumer<LocalizationService>(
-                        builder: (ctx, loc, _) => Row(
+                        builder: (ctx, l, _) => Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(loc.currentLanguageModel.flag, style: const TextStyle(fontSize: 13)),
+                            Text(l.currentLanguageModel.flag, style: const TextStyle(fontSize: 13)),
                             const SizedBox(width: 4),
                             Text(
-                              loc.currentLanguageModel.code.toUpperCase(),
+                              l.currentLanguageModel.code.toUpperCase(),
                               style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900),
                             ),
                             const Icon(Icons.keyboard_arrow_down, color: Colors.white70, size: 14),
@@ -996,7 +1007,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                   ),
                   const SizedBox(width: 6),
                   IconButton(
-                    tooltip: 'View Full Dossier',
+                    tooltip: loc.t('dossier', 'View Full Dossier'),
                     padding: const EdgeInsets.all(4),
                     constraints: const BoxConstraints(),
                     onPressed: () {
@@ -1069,30 +1080,32 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      runSpacing: 4,
                       children: [
-                        const Text(
-                          'AI Wellness Score',
-                          style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w700),
+                        Text(
+                          loc.t('ai_wellness_score', 'AI Wellness Score'),
+                          style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w700),
                         ),
-                        const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
                           decoration: BoxDecoration(
                             color: AppColors.emerald,
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: const Text(
-                            'LOW RISK',
-                            style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900),
+                          child: Text(
+                            loc.t('low_risk', 'LOW RISK'),
+                            style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 6),
-                    const Text(
-                      'You\'re doing well today.\nKeep maintaining your sleep and hydration.',
-                      style: TextStyle(
+                    Text(
+                      loc.t('doing_well_msg', 'You\'re doing well today.\nKeep maintaining your sleep and hydration.'),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -1117,10 +1130,10 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
               children: [
                 const Icon(Icons.verified_user_outlined, color: AppColors.accent, size: 14),
                 const SizedBox(width: 6),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Your Personal AI Welfare Companion for the Indian Armed Forces',
-                    style: TextStyle(color: Color(0xFFCBD5E1), fontSize: 9.5, fontWeight: FontWeight.w600),
+                    loc.t('welfare_companion_sub', 'Your Personal AI Welfare Companion for the Indian Armed Forces'),
+                    style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 9.5, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
@@ -1135,6 +1148,8 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
   // SECTION 2: TODAY'S AI SUMMARY
   // ---------------------------------------------------------------------------
   Widget _buildAiDailySummaryCard() {
+    final loc = Provider.of<LocalizationService>(context, listen: false);
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -1148,16 +1163,19 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Row(
             children: [
-              Text(
-                'TODAY\'S AI SUMMARY',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.secondary, letterSpacing: 0.4),
+              Expanded(
+                child: Text(
+                  loc.t("TODAY'S AI SUMMARY", "TODAY'S AI SUMMARY"),
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.secondary, letterSpacing: 0.4),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
+              const SizedBox(width: 6),
               Text(
-                'Updated 15m ago',
-                style: TextStyle(fontSize: 10, color: AppColors.textMuted, fontWeight: FontWeight.w600),
+                loc.t('Updated 15m ago', 'Updated 15m ago'),
+                style: const TextStyle(fontSize: 10, color: AppColors.textMuted, fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -1175,6 +1193,8 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
   }
 
   Widget _buildSummaryBullet(IconData icon, String text, Color color) {
+    final loc = Provider.of<LocalizationService>(context, listen: false);
+
     return Row(
       children: [
         Container(
@@ -1188,7 +1208,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
         const SizedBox(width: 10),
         Expanded(
           child: Text(
-            text,
+            loc.t(text),
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
           ),
         ),
@@ -1433,6 +1453,8 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
   // INTERACTIVE BOX BREATHING CARD (4-4-4-4)
   // ---------------------------------------------------------------------------
   Widget _buildInteractiveBoxBreathingCard() {
+    final loc = Provider.of<LocalizationService>(context, listen: false);
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -1445,12 +1467,12 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'TACTICAL BOX BREATHING (4-4-4-4)',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.secondary, letterSpacing: 0.5),
+              Text(
+                loc.t('tactical_breathing', 'TACTICAL BOX BREATHING (4-4-4-4)'),
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.secondary, letterSpacing: 0.5),
               ),
               Text(
-                'Cycles: $_completedBreathingCycles',
+                '${loc.t('cycles_completed', 'Cycles')}: $_completedBreathingCycles',
                 style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.primary),
               ),
             ],
@@ -1481,7 +1503,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                       ),
                     ),
                     Text(
-                      _isBreathingActive ? _breathingPhaseLabels[_breathingPhaseIndex] : 'PRANAYAMA',
+                      _isBreathingActive ? loc.t(_breathingPhaseLabels[_breathingPhaseIndex]) : 'PRANAYAMA',
                       style: TextStyle(
                         fontSize: 8.5,
                         fontWeight: FontWeight.w800,
@@ -1500,7 +1522,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
             onPressed: _toggleBreathing,
             icon: Icon(_isBreathingActive ? Icons.pause : Icons.play_arrow, size: 16),
             label: Text(
-              _isBreathingActive ? 'PAUSE BREATHING' : 'START 4-MIN BOX BREATHING',
+              _isBreathingActive ? loc.t('stop_breathing', 'PAUSE BREATHING') : loc.t('start_breathing', 'START 4-MIN BOX BREATHING'),
               style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900),
             ),
             style: ElevatedButton.styleFrom(
@@ -3352,16 +3374,22 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
-                children: [
-                  Icon(Icons.timeline, color: Colors.amberAccent, size: 16),
-                  SizedBox(width: 8),
-                  Text(
-                    'RISK EVOLUTION & MILESTONE TIMELINE',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 0.5),
-                  ),
-                ],
+              const Expanded(
+                child: Row(
+                  children: [
+                    Icon(Icons.timeline, color: Colors.amberAccent, size: 16),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'RISK EVOLUTION & MILESTONE TIMELINE',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 0.5),
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(

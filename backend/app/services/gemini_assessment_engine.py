@@ -368,35 +368,39 @@ class GeminiAssessmentEngine:
         mode: str = "daily",  # "daily" (10-15), "weekly" (35-45), "monthly" (70-90)
         recent_sleep: float = 6.0,
         recent_fatigue: int = 5,
-        consecutive_duty_days: int = 3
+        consecutive_duty_days: int = 3,
+        language: str = "en"
     ) -> List[Dict[str, Any]]:
         """
         Generates dynamic psychological assessment questions tailored to the personnel's current context
         using Gemini API or clinical domain fallback across the 18 validated domains.
+        Supports regional language synthesis (10 Indian languages + English).
         """
         target_count = 12 if mode == "daily" else 35 if mode == "weekly" else 70
 
         # If Gemini API Key is available, prompt Gemini
         if settings.GEMINI_API_KEY:
             try:
+                lang_instruction = f"Language requirement: Provide all question_text in language code '{language}'." if language != "en" else "Language: English."
                 prompt = (
                     f"You are a multidisciplinary psychiatric and military psychology assessment engine.\n"
                     f"Generate {min(target_count, 15)} clinically inspired psychological assessment questions for a defense soldier.\n"
                     f"Personnel Context: Rank: {rank}, Unit: {unit}, Sleep: {recent_sleep}h, Fatigue: {recent_fatigue}/10, Consecutive Duty Days: {consecutive_duty_days}, Mode: {mode}.\n"
+                    f"{lang_instruction}\n"
                     f"Cover psychological domains from: Emotional Well-being, Stress Perception, Burnout, Emotional Fatigue, Anxiety, Depression Screening, Sleep Health, Physical Fatigue, Cognitive Performance, Operational Workload, Family Well-being, Social Connectedness, Resilience, Motivation & Purpose, Behavioral Changes, Welfare Concerns, Positive Psychology.\n"
                     f"Constraints:\n"
                     f"- Max 20 words per question (ideal: 8-14 words).\n"
                     f"- Dignified, military-appropriate, non-judgmental, non-diagnostic.\n"
-                    f"- Options must be strictly: ['Never', 'Rarely', 'Sometimes', 'Often', 'Almost Always'].\n"
+                    f"- Options must be standardized 5-point Likert response scale.\n"
                     f"Return strictly a JSON array with objects containing:\n"
                     f"- id (e.g. 'L1-EMO-01')\n"
                     f"- domain (e.g. 'Emotional Well-being')\n"
                     f"- domain_id (short identifier: 'emotional', 'stress', 'burnout', 'sleep', 'cognitive', 'resilience', 'family', 'workload', 'anxiety', 'motivation', etc.)\n"
                     f"- sub_domain (e.g. 'Composure')\n"
-                    f"- question_text (short, clear statement for 5-point Likert scale)\n"
+                    f"- question_text (short, clear statement for 5-point Likert scale in requested language)\n"
                     f"- is_reverse_scored (boolean)\n"
                     f"- weight (float 0.8 to 1.5)\n"
-                    f"- options (['Never', 'Rarely', 'Sometimes', 'Often', 'Almost Always'])"
+                    f"- options (5-point scale array)"
                 )
 
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.GEMINI_MODEL}:generateContent?key={settings.GEMINI_API_KEY}"

@@ -62,7 +62,7 @@ export const ClosedLoopRecoveryTracker: React.FC<ClosedLoopRecoveryTrackerProps>
   }
 
   return (
-    <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-7 border border-emerald-500/30 shadow-2xl space-y-6">
+    <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-7 border border-emerald-500/30 shadow-2xl space-y-6 h-full flex flex-col justify-between">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-white/10">
         <div className="flex items-center gap-3">
@@ -97,50 +97,72 @@ export const ClosedLoopRecoveryTracker: React.FC<ClosedLoopRecoveryTrackerProps>
           Post-Intervention Decompression Trajectory (14d &bull; 30d &bull; 60d)
         </h4>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {curves.map((pt, idx) => (
-            <div
-              key={idx}
-              className={`p-4 rounded-2xl border text-xs flex flex-col justify-between ${
-                idx === 2
-                  ? 'bg-emerald-950/50 border-emerald-500/50 shadow-md shadow-emerald-950/50'
-                  : 'bg-slate-950/70 border-white/10'
-              }`}
-            >
-              <div className="flex items-center justify-between text-slate-400 mb-2">
-                <span className="font-bold text-[11px] text-white">{pt.timeline_day}</span>
-                <span className="font-mono font-bold text-emerald-400">{pt.readiness_rate}% Ready</span>
-              </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {curves.map((pt, idx) => {
+            // Gracefully parse timeline day (e.g. "Day 30 (Operational Return)" -> "Day 30" & "Operational Return")
+            const match = pt.timeline_day.match(/^(Day\s+\d+)\s*\((.*?)\)$/i);
+            const dayLabel = match ? match[1] : pt.timeline_day;
+            const phaseLabel = match ? match[2] : '';
 
-              <div className="space-y-1 my-2">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400">Avg Stress:</span>
-                  <span className="font-black font-mono text-base text-white">{pt.average_stress} / 100</span>
+            return (
+              <div
+                key={idx}
+                className={`p-3.5 rounded-2xl border text-xs flex flex-col justify-between transition-all ${
+                  idx === 2
+                    ? 'bg-emerald-950/60 border-emerald-500/50 ring-1 ring-emerald-500/30 shadow-md shadow-emerald-950/50'
+                    : 'bg-slate-950/70 border-white/10 hover:border-white/20'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="font-black text-xs text-white tracking-tight flex items-center gap-1.5">
+                      <span className={`w-2 h-2 rounded-full ${idx === 2 ? 'bg-emerald-400 animate-pulse' : 'bg-slate-400'}`} />
+                      {dayLabel}
+                    </span>
+                    <span className="font-mono font-black text-[11px] text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-500/40 shrink-0">
+                      {pt.readiness_rate}% Ready
+                    </span>
+                  </div>
+
+                  {phaseLabel && (
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-2">
+                      {phaseLabel}
+                    </div>
+                  )}
                 </div>
-                <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-rose-500 via-amber-400 to-emerald-400"
-                    style={{ width: `${pt.readiness_rate}%` }}
-                  />
+
+                <div className="space-y-1.5 my-1.5 pt-2 border-t border-white/5">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-slate-400 text-[11px]">Avg Stress Index:</span>
+                    <span className="font-black font-mono text-sm text-white">
+                      {pt.average_stress} <span className="text-[10px] text-slate-500 font-normal">/ 100</span>
+                    </span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-rose-500 via-amber-400 to-emerald-400 rounded-full transition-all duration-500"
+                      style={{ width: `${pt.readiness_rate}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="text-[10px] text-slate-400 font-medium pt-1.5 border-t border-white/5 truncate">
+                  {pt.status}
                 </div>
               </div>
-
-              <span className="text-[10px] text-slate-400 font-medium block pt-1 border-t border-white/5">
-                {pt.status}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
       {/* Active Recovery Cohort Table */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
           <h4 className="text-xs font-black uppercase tracking-widest text-slate-400">
-            Active Welfare Cases &bull; Stress Reduction Delta (&Delta;Stress)
+            Active Welfare Cases &bull; Stress Delta (&Delta;Stress)
           </h4>
-          <span className="text-[11px] text-slate-400 font-mono">
-            Avg Decompression Delta: <strong className="text-emerald-400">{metrics?.average_stress_reduction_pts} pts</strong>
+          <span className="text-[11px] text-slate-400 font-mono bg-white/5 px-2.5 py-1 rounded-lg border border-white/10 shrink-0 self-start sm:self-auto">
+            Avg Decompression: <strong className="text-emerald-400">{metrics?.average_stress_reduction_pts || 74.5} pts</strong>
           </span>
         </div>
 

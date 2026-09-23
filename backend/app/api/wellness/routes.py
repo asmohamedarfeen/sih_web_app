@@ -742,6 +742,7 @@ class AssessmentQuestionGenRequest(BaseModel):
     rank: Optional[str] = None
     unit: Optional[str] = None
     mode: Optional[str] = "daily"
+    language: Optional[str] = "en"
     recent_sleep: Optional[float] = 6.0
     recent_fatigue: Optional[int] = 5
     consecutive_duty_days: Optional[int] = 3
@@ -769,6 +770,7 @@ async def generate_assessment_questions(
     """
     Generates dynamic, AI-powered contextual psychological self-assessment questions
     using Gemini API with structured clinical domain fallback.
+    Supports 10 Indian scheduled languages + English.
     """
     personnel = next((p for p in hrms_service.PERSONNEL_DATABASE if p["uid"] == req.personnel_uid), None)
     name = req.personnel_name or (personnel["name"] if personnel else (current_user.full_name if current_user else "Sepoy Amit Kumar"))
@@ -783,7 +785,8 @@ async def generate_assessment_questions(
         mode=req.mode or "daily",
         recent_sleep=req.recent_sleep or 6.0,
         recent_fatigue=req.recent_fatigue or 5,
-        consecutive_duty_days=req.consecutive_duty_days or 3
+        consecutive_duty_days=req.consecutive_duty_days or 3,
+        language=req.language or "en"
     )
 
     return {

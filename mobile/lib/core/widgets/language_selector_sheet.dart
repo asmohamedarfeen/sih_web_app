@@ -9,6 +9,7 @@ class LanguageSelectorSheet extends StatelessWidget {
   static void show(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => const LanguageSelectorSheet(),
     );
@@ -19,11 +20,14 @@ class LanguageSelectorSheet extends StatelessWidget {
     final loc = Provider.of<LocalizationService>(context);
 
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.85,
+      ),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,7 +66,7 @@ class LanguageSelectorSheet extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Frontline regional multilingual support',
+                    '10 Indian Languages + English Supported',
                     style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                   ),
                 ],
@@ -70,65 +74,69 @@ class LanguageSelectorSheet extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          ...LocalizationService.supportedLanguages.map((lang) {
-            final isSelected = lang.code == loc.currentLanguage;
+          Expanded(
+            child: ListView.separated(
+              itemCount: LocalizationService.supportedLanguages.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                final lang = LocalizationService.supportedLanguages[index];
+                final isSelected = lang.code == loc.currentLanguage;
 
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Material(
-                color: isSelected
-                    ? AppColors.primary.withValues(alpha: 0.08)
-                    : Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(14),
-                child: InkWell(
+                return Material(
+                  color: isSelected
+                      ? AppColors.primary.withValues(alpha: 0.08)
+                      : Colors.grey.shade50,
                   borderRadius: BorderRadius.circular(14),
-                  onTap: () {
-                    loc.setLanguage(lang.code);
-                    Navigator.of(context).pop();
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: isSelected
-                            ? AppColors.primary
-                            : Colors.grey.shade200,
-                        width: isSelected ? 1.5 : 1,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(14),
+                    onTap: () {
+                      loc.setLanguage(lang.code);
+                      Navigator.of(context).pop();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: isSelected
+                              ? AppColors.primary
+                              : Colors.grey.shade200,
+                          width: isSelected ? 1.5 : 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(lang.flag, style: const TextStyle(fontSize: 20)),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  lang.nativeName,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+                                    color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                                  ),
+                                ),
+                                Text(
+                                  lang.name,
+                                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (isSelected)
+                            const Icon(Icons.check_circle, color: AppColors.primary, size: 20),
+                        ],
                       ),
                     ),
-                    child: Row(
-                      children: [
-                        Text(lang.flag, style: const TextStyle(fontSize: 20)),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                lang.nativeName,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
-                                  color: isSelected ? AppColors.primary : AppColors.textPrimary,
-                                ),
-                              ),
-                              Text(
-                                lang.name,
-                                style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (isSelected)
-                          const Icon(Icons.check_circle, color: AppColors.primary, size: 20),
-                      ],
-                    ),
                   ),
-                ),
-              ),
-            );
-          }),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );

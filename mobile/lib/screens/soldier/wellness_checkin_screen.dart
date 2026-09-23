@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/sync_service.dart';
+import '../../core/services/localization_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/wellness_model.dart';
 
@@ -59,43 +60,34 @@ class _WellnessCheckinScreenState extends State<WellnessCheckinScreen> {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          title: Row(
-            children: [
-              Icon(
-                res['offline'] == true ? Icons.cloud_off : Icons.check_circle,
-                color: res['offline'] == true ? AppColors.amber : AppColors.emerald,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                res['offline'] == true ? 'Queued Offline' : 'Logged & Evaluated',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
-              ),
-            ],
-          ),
+          title: const Text('Check-in Logged'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                res['message'] ?? '',
-                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                res['offline'] == true
+                    ? 'Saved to Local Queue (Offline). Will auto-sync when connected.'
+                    : 'Transmitted securely to the Defense Server.',
+                style: const TextStyle(fontSize: 13),
               ),
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.cardBorder),
+                  color: _estimatedStress() > 70 ? AppColors.roseLight : AppColors.emeraldLight,
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Calculated Stress Index:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                    Icon(
+                      _estimatedStress() > 70 ? Icons.warning : Icons.check_circle,
+                      color: _estimatedStress() > 70 ? AppColors.rose : AppColors.emerald,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
                     Text(
-                      '${_estimatedStress().toStringAsFixed(1)} / 100',
+                      'Stress Index: ${_estimatedStress().toStringAsFixed(0)}%',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w900,
@@ -123,13 +115,14 @@ class _WellnessCheckinScreenState extends State<WellnessCheckinScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = Provider.of<LocalizationService>(context);
     final estimated = _estimatedStress();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Daily Telemetry Check-in',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+        title: Text(
+          loc.t('checkin', 'Daily Telemetry Check-in'),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
         ),
         actions: [
           Container(

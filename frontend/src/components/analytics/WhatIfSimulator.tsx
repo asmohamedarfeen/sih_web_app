@@ -89,21 +89,21 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
   };
 
   return (
-    <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-xl space-y-6">
+    <div className="p-6 rounded-3xl bg-white border border-slate-200/90 text-slate-800 shadow-sm space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-primary-500/20 border border-primary-500/30 text-primary-400">
+          <div className="p-2.5 rounded-2xl bg-secondary/10 border border-secondary/20 text-secondary">
             <Sliders className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-black text-white">"What-If" Counterfactual Intervention Simulator</h3>
-              <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <h3 className="text-base font-black text-slate-900">"What-If" Counterfactual Intervention Simulator</h3>
+              <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
                 Decision Support
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Simulate command reallocations (leave, night shift reduction, restorative sleep) on 30-day risk trajectory.
             </p>
           </div>
@@ -111,7 +111,7 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
 
         <button
           onClick={handleReset}
-          className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+          className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           <span>Reset Dials</span>
@@ -119,22 +119,22 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
       </div>
 
       {/* Quick Tactical Preset: 14-Day Deployment Extension Impact Simulator */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-start gap-3">
-          <div className="p-2 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 shrink-0 mt-0.5">
+          <div className="p-2 rounded-xl bg-amber-100 border border-amber-300 text-amber-800 shrink-0 mt-0.5">
             <Compass className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-wider text-amber-400">
+              <span className="text-[10px] font-black uppercase tracking-wider text-amber-800">
                 Command Impact Scenario
               </span>
-              <span className="text-[10px] font-mono text-slate-400">&bull; Tactical Counterfactual</span>
+              <span className="text-[10px] font-mono text-slate-500">&bull; Tactical Counterfactual</span>
             </div>
-            <p className="text-xs font-bold text-white mt-0.5">
+            <p className="text-xs font-bold text-slate-900 mt-0.5">
               "Simulate Impact: What happens to unit fatigue if deployment is extended by 14 days?"
             </p>
-            <p className="text-[11px] text-slate-300 mt-0.5">
+            <p className="text-[11px] text-slate-600 mt-0.5">
               Proactive planning: Test operational shift adjustments and rest rotations before signing movement orders.
             </p>
           </div>
@@ -149,7 +149,7 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
               setStationReassignment('CURRENT');
               setCounselingHeld(false);
             }}
-            className="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-xs font-black transition-all cursor-pointer"
+            className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs font-black transition-all cursor-pointer"
           >
             Simulate +14d Overload
           </button>
@@ -161,7 +161,7 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
               setStationReassignment('PEACE_STATION');
               setCounselingHeld(true);
             }}
-            className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black transition-all cursor-pointer shadow-md"
+            className="px-3 py-1.5 rounded-xl bg-primary hover:bg-primary-600 text-white text-xs font-black transition-all cursor-pointer shadow-sm"
           >
             Apply Mitigation
           </button>
@@ -169,8 +169,8 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
       </div>
 
       {appliedNotice && (
-        <div className="p-3.5 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-2 animate-fade-in">
-          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+        <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-fade-in">
+          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
           <span>{appliedNotice}</span>
         </div>
       )}
@@ -179,19 +179,19 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left: Tactical Command Dials (7 cols) */}
         <div className="lg:col-span-7 space-y-4">
-          <h4 className="text-xs font-black tracking-wider uppercase text-slate-400 flex items-center gap-1.5">
-            <Compass className="w-3.5 h-3.5 text-primary-400" />
+          <h4 className="text-xs font-black tracking-wider uppercase text-slate-600 flex items-center gap-1.5">
+            <Compass className="w-3.5 h-3.5 text-primary" />
             <span>Tactical Command Adjustment Dials</span>
           </h4>
 
           {/* Slider 1: Extra Sleep */}
-          <div className="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-2">
+          <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="flex items-center gap-1.5 font-bold text-slate-200">
-                <Moon className="w-3.5 h-3.5 text-blue-400" />
+              <span className="flex items-center gap-1.5 font-bold text-slate-800">
+                <Moon className="w-3.5 h-3.5 text-secondary" />
                 Prescribed Restorative Sleep Recovery
               </span>
-              <span className="font-mono font-black text-blue-400">+{extraSleep.toFixed(1)} hrs/night</span>
+              <span className="font-mono font-black text-secondary">+{extraSleep.toFixed(1)} hrs/night</span>
             </div>
             <input
               type="range"
@@ -200,7 +200,7 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
               step="0.5"
               value={extraSleep}
               onChange={(e) => setExtraSleep(parseFloat(e.target.value))}
-              className="w-full accent-blue-500 cursor-pointer"
+              className="w-full accent-secondary cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-slate-500 font-mono">
               <span>+0h (No Change)</span>
@@ -210,13 +210,13 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
           </div>
 
           {/* Slider 2: Night Shifts Reduction */}
-          <div className="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-2">
+          <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="flex items-center gap-1.5 font-bold text-slate-200">
-                <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
+              <span className="flex items-center gap-1.5 font-bold text-slate-800">
+                <ShieldAlert className="w-3.5 h-3.5 text-amber-600" />
                 Relieve Consecutive Night Sentry Shifts
               </span>
-              <span className="font-mono font-black text-amber-400">-{reduceNightShifts} shifts</span>
+              <span className="font-mono font-black text-amber-700">-{reduceNightShifts} shifts</span>
             </div>
             <input
               type="range"
@@ -225,7 +225,7 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
               step="1"
               value={reduceNightShifts}
               onChange={(e) => setReduceNightShifts(parseInt(e.target.value))}
-              className="w-full accent-amber-500 cursor-pointer"
+              className="w-full accent-amber-600 cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-slate-500 font-mono">
               <span>0 (Continuous Watch)</span>
@@ -235,13 +235,13 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
           </div>
 
           {/* Slider 3: Grant Compassionate Leave */}
-          <div className="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-2">
+          <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="flex items-center gap-1.5 font-bold text-slate-200">
-                <Calendar className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="flex items-center gap-1.5 font-bold text-slate-800">
+                <Calendar className="w-3.5 h-3.5 text-primary" />
                 Grant Expedited Compassionate Furlough
               </span>
-              <span className="font-mono font-black text-emerald-400">{grantLeaveDays} days leave</span>
+              <span className="font-mono font-black text-primary">{grantLeaveDays} days leave</span>
             </div>
             <input
               type="range"
@@ -250,7 +250,7 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
               step="1"
               value={grantLeaveDays}
               onChange={(e) => setGrantLeaveDays(parseInt(e.target.value))}
-              className="w-full accent-emerald-500 cursor-pointer"
+              className="w-full accent-primary cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-slate-500 font-mono">
               <span>0 (No Leave)</span>
@@ -261,12 +261,12 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
 
           {/* Toggles: Station & Counseling */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="p-3 rounded-2xl bg-slate-800/60 border border-slate-700/60 text-xs space-y-1.5">
-              <label className="block text-slate-300 font-bold">Duty Station Reassignment</label>
+            <div className="p-3 rounded-2xl bg-slate-50/80 border border-slate-200 text-xs space-y-1.5">
+              <label className="block text-slate-700 font-bold">Duty Station Reassignment</label>
               <select
                 value={stationReassignment}
                 onChange={(e) => setStationReassignment(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white text-xs font-semibold focus:outline-none"
+                className="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 text-slate-900 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
               >
                 <option value="CURRENT">Maintain Current High-Altitude Post</option>
                 <option value="PEACE_STATION">Reassign to Peace Station Base</option>
@@ -274,10 +274,10 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
               </select>
             </div>
 
-            <div className="p-3 rounded-2xl bg-slate-800/60 border border-slate-700/60 text-xs flex items-center justify-between">
+            <div className="p-3 rounded-2xl bg-slate-50/80 border border-slate-200 text-xs flex items-center justify-between">
               <div>
-                <span className="font-bold text-slate-200 block">Welfare Counseling Debrief</span>
-                <span className="text-[10px] text-slate-400">1-on-1 sessions with psychologist</span>
+                <span className="font-bold text-slate-800 block">Welfare Counseling Debrief</span>
+                <span className="text-[10px] text-slate-500">1-on-1 sessions with psychologist</span>
               </div>
               <input
                 type="checkbox"
@@ -290,17 +290,17 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
         </div>
 
         {/* Right: Projected Risk Impact (5 cols) */}
-        <div className="lg:col-span-5 flex flex-col justify-between p-5 rounded-3xl bg-slate-950 border border-slate-800 space-y-4">
+        <div className="lg:col-span-5 flex flex-col justify-between p-5 rounded-3xl bg-slate-50/90 border border-slate-200/90 space-y-4">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-black uppercase tracking-wider text-slate-400">
+              <span className="text-xs font-black uppercase tracking-wider text-slate-600">
                 Projected 30-Day Risk Delta
               </span>
               {simulation && (
                 <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border uppercase tracking-wider ${
                   simulation.command_feasibility_verdict === 'HIGHLY RECOMMENDED'
-                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                    : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                    : 'bg-secondary/10 text-secondary border-secondary/20'
                 }`}>
                   {simulation.command_feasibility_verdict}
                 </span>
@@ -310,26 +310,26 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
             {/* Before vs After Scores */}
             <div className="grid grid-cols-2 gap-3 pt-1">
               {/* Baseline */}
-              <div className="p-3.5 rounded-2xl bg-slate-900/80 border border-rose-500/30 text-center space-y-1">
-                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Current Baseline</div>
-                <div className="text-2xl font-black text-rose-400 font-mono">
+              <div className="p-3.5 rounded-2xl bg-white border border-rose-200 text-center space-y-1 shadow-xs">
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Current Baseline</div>
+                <div className="text-2xl font-black text-rose-600 font-mono">
                   {simulation ? simulation.baseline.stress_score : initialStress}
                 </div>
-                <div className="text-[10px] font-black text-rose-300">
+                <div className="text-[10px] font-black text-rose-600">
                   {simulation ? simulation.baseline.risk_level : 'CRITICAL'} RISK
                 </div>
               </div>
 
               {/* Simulated */}
-              <div className="p-3.5 rounded-2xl bg-slate-900/80 border border-emerald-500/40 text-center space-y-1 shadow-lg shadow-emerald-950/30">
-                <div className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider flex items-center justify-center gap-1">
-                  <Sparkles className="w-3 h-3 text-emerald-400" />
+              <div className="p-3.5 rounded-2xl bg-white border border-emerald-200 text-center space-y-1 shadow-xs">
+                <div className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider flex items-center justify-center gap-1">
+                  <Sparkles className="w-3 h-3 text-emerald-600" />
                   <span>Simulated</span>
                 </div>
-                <div className="text-2xl font-black text-emerald-400 font-mono">
+                <div className="text-2xl font-black text-emerald-700 font-mono">
                   {simulation ? simulation.simulated.stress_score : 18.0}
                 </div>
-                <div className="text-[10px] font-black text-emerald-300">
+                <div className="text-[10px] font-black text-emerald-700">
                   {simulation ? simulation.simulated.risk_level : 'LOW'} RISK
                 </div>
               </div>
@@ -337,20 +337,20 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
 
             {/* Net Delta Badge */}
             {simulation && (
-              <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between text-xs font-bold text-emerald-300">
+              <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs font-bold text-emerald-900">
                 <span className="flex items-center gap-1.5">
-                  <TrendingDown className="w-4 h-4 text-emerald-400" />
+                  <TrendingDown className="w-4 h-4 text-emerald-600" />
                   <span>Projected Stress Drop:</span>
                 </span>
-                <span className="font-mono text-sm font-black text-emerald-400">
+                <span className="font-mono text-sm font-black text-emerald-700">
                   -{simulation.delta_points} pts (-{simulation.percentage_risk_reduction}%)
                 </span>
               </div>
             )}
 
             {/* Trajectory description */}
-            <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 text-[11px] text-slate-300 leading-relaxed">
-              <span className="font-bold text-slate-200 block mb-0.5">30-Day Tactical Forecast:</span>
+            <div className="p-3 rounded-2xl bg-white border border-slate-200 text-[11px] text-slate-700 leading-relaxed">
+              <span className="font-bold text-slate-900 block mb-0.5">30-Day Tactical Forecast:</span>
               {simulation ? simulation.projected_30_day_trajectory : 'Calculating counterfactual trajectory...'}
             </div>
           </div>
@@ -359,7 +359,7 @@ export const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
           <button
             onClick={handleApply}
             disabled={loading}
-            className="w-full py-3 rounded-2xl bg-primary hover:bg-primary-600 text-white font-black text-xs transition-all shadow-lg shadow-primary/25 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            className="w-full py-3 rounded-2xl bg-primary hover:bg-primary-600 text-white font-black text-xs transition-all shadow-md shadow-primary/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             <span>Adopt Simulated Recommendation</span>
             <ArrowRight className="w-4 h-4" />

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/services/localization_service.dart';
 import '../../core/theme/app_theme.dart';
 
 class DutyReadinessScreen extends StatefulWidget {
@@ -56,6 +57,7 @@ class _DutyReadinessScreenState extends State<DutyReadinessScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context);
+    final loc = Provider.of<LocalizationService>(context);
     final user = auth.currentUser;
 
     return Scaffold(
@@ -88,7 +90,11 @@ class _DutyReadinessScreenState extends State<DutyReadinessScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      runSpacing: 6,
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -97,14 +103,14 @@ class _DutyReadinessScreenState extends State<DutyReadinessScreen> {
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.security, color: AppColors.accent, size: 14),
-                              SizedBox(width: 4),
+                              const Icon(Icons.security, color: AppColors.accent, size: 14),
+                              const SizedBox(width: 4),
                               Text(
-                                'OPERATIONAL READINESS & DUTY HUB',
-                                style: TextStyle(
+                                loc.t('OPERATIONAL READINESS & DUTY HUB', 'OPERATIONAL READINESS & DUTY HUB'),
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 10,
                                   fontWeight: FontWeight.w900,
@@ -114,7 +120,6 @@ class _DutyReadinessScreenState extends State<DutyReadinessScreen> {
                             ],
                           ),
                         ),
-                        const Spacer(),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
@@ -122,9 +127,9 @@ class _DutyReadinessScreenState extends State<DutyReadinessScreen> {
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: Colors.green.withValues(alpha: 0.4)),
                           ),
-                          child: const Text(
-                            'VOLUNTARY & CONFIDENTIAL',
-                            style: TextStyle(
+                          child: Text(
+                            loc.t('voluntary_privacy', 'VOLUNTARY & CONFIDENTIAL'),
+                            style: const TextStyle(
                               color: Color(0xFF4ADE80),
                               fontSize: 9,
                               fontWeight: FontWeight.w900,
@@ -176,13 +181,13 @@ class _DutyReadinessScreenState extends State<DutyReadinessScreen> {
               const SizedBox(height: 16),
 
               // Duty Schedule Transparency Section
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.schedule, color: AppColors.secondary, size: 18),
-                  SizedBox(width: 8),
+                  const Icon(Icons.schedule, color: AppColors.secondary, size: 18),
+                  const SizedBox(width: 8),
                   Text(
-                    'Duty Schedule & Shift Transparency',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AppColors.secondary),
+                    loc.t('upcoming_duties', 'Duty Schedule & Shift Transparency'),
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AppColors.secondary),
                   ),
                 ],
               ),
@@ -212,13 +217,13 @@ class _DutyReadinessScreenState extends State<DutyReadinessScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       children: [
-                        Icon(Icons.beach_access_outlined, color: AppColors.primary, size: 18),
-                        SizedBox(width: 8),
+                        const Icon(Icons.beach_access_outlined, color: AppColors.primary, size: 18),
+                        const SizedBox(width: 8),
                         Text(
-                          'Leave Entitlements & Furlough Rights',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.secondary),
+                          loc.t('leave_accrued', 'Leave Entitlements & Furlough Rights'),
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.secondary),
                         ),
                       ],
                     ),

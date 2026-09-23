@@ -61,10 +61,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               user?.role == 'SOLDIER'
                   ? loc.t('app_title', 'SOLDIER PULSE')
                   : user?.role == 'WELFARE_OFFICER'
-                      ? 'WELFARE HUB'
+                      ? loc.t('welfare_hub', 'WELFARE HUB')
                       : user?.role == 'COMMANDER'
-                          ? 'COMMAND RADAR'
-                          : 'HR FORCE DIRECTORY',
+                          ? loc.t('command_radar', 'COMMAND RADAR')
+                          : loc.t('hr_force_directory', 'HR FORCE DIRECTORY'),
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 0.5, color: Colors.white),
             ),
           ],
@@ -84,7 +84,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             onPressed: () => LanguageSelectorSheet.show(context),
           ),
           IconButton(
-            tooltip: 'Logout',
+            tooltip: loc.t('logout', 'Logout'),
             icon: const Icon(Icons.logout, size: 20),
             onPressed: () async {
               final nav = Navigator.of(context);

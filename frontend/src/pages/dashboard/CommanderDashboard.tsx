@@ -7,12 +7,9 @@ import {
   Activity,
   CheckCircle2,
   Clock,
-  Sparkles,
   Lock,
   ArrowUp,
-  ArrowDown,
   FileText,
-  UserCheck,
   Truck,
   HeartPulse,
   Brain,
@@ -25,6 +22,10 @@ import {
   Moon,
   Zap,
   RefreshCw,
+  Radio,
+  ShieldAlert,
+  Terminal,
+  ChevronRight,
 } from 'lucide-react';
 import { personnelService } from '../../services/personnelService';
 import { WhatIfSimulator } from '../../components/analytics/WhatIfSimulator';
@@ -32,7 +33,7 @@ import { Form16WelfareDossier } from '../../components/reports/Form16WelfareDoss
 import { UnitHierarchyTree } from '../../components/organization/UnitHierarchyTree';
 import { RiskMomentumBadge, RiskMomentumData } from '../../components/analytics/RiskMomentumBadge';
 import { MultiSourceSignalFusionCard } from '../../components/analytics/MultiSourceSignalFusionCard';
-
+import { useLanguageStore } from '../../localization';
 
 // ============================================================================
 // DATA DEFINITIONS & MOCK VALUES FROM PLAN.MD
@@ -429,6 +430,7 @@ const BATTALION_DATABASE: Record<string, BattalionData> = {
 };
 
 export const CommanderDashboard: React.FC = () => {
+  const { t } = useLanguageStore();
   // Interactive States
   const [selectedBattalion, setSelectedBattalion] = useState<BattalionData | null>(null);
   const [isDrillDownOpen, setIsDrillDownOpen] = useState(false);
@@ -440,6 +442,56 @@ export const CommanderDashboard: React.FC = () => {
   const [swappedRosters, setSwappedRosters] = useState<Record<string, boolean>>({});
   const [isSwapping, setIsSwapping] = useState<string | null>(null);
   const [activeDossierUid, setActiveDossierUid] = useState<string | null>(null);
+  const [liveEventFilter, setLiveEventFilter] = useState<'all' | 'critical' | 'roster' | 'intel'>('all');
+  const [triageTab, setTriageTab] = useState<'units' | 'warnings'>('units');
+
+  const liveEvents = [
+    {
+      id: 'EVT-904',
+      time: '14s ago',
+      category: 'roster',
+      level: 'ACTION',
+      title: 'Stand-Down Protocol Initialized',
+      details: 'Hav. Ramesh Chand night sentry post transfer pre-authorized for Sepoy Amit Kumar (SHAPE-1 Standby).',
+      badge: 'bg-emerald-50 text-emerald-800 border-emerald-300 font-mono',
+    },
+    {
+      id: 'EVT-903',
+      time: '3m ago',
+      category: 'critical',
+      level: 'CRITICAL',
+      title: 'Acute Velocity Exceedance Detected',
+      details: 'Naik Rohit Sharma (Bravo Bn, C Coy) d(Stress)/dt reached +4.8 pts/day. Intercept window: 48h.',
+      badge: 'bg-rose-50 text-rose-800 border-rose-300 font-mono',
+    },
+    {
+      id: 'EVT-902',
+      time: '9m ago',
+      category: 'intel',
+      level: 'TELEMETRY',
+      title: '14-Day Baseline Telemetry Synced',
+      details: 'Behavioral shift delta engine processed 520 personnel across 25 forward companies with 95.8% CI.',
+      badge: 'bg-sky-50 text-sky-800 border-sky-300 font-mono',
+    },
+    {
+      id: 'EVT-901',
+      time: '21m ago',
+      category: 'roster',
+      level: 'ACTION',
+      title: 'Fast-Track Compassionate Leave Queued',
+      details: 'Sub. Gurpreet Singh 14-day domestic emergency leave routed to Chief Welfare Officer for endorsement.',
+      badge: 'bg-amber-50 text-amber-800 border-amber-300 font-mono',
+    },
+    {
+      id: 'EVT-900',
+      time: '44m ago',
+      category: 'intel',
+      level: 'ROUTINE',
+      title: 'Guard Shift Handover Confirmed',
+      details: 'Observation Post Siachen B-4 watch cycle shift completed without operational incident.',
+      badge: 'bg-slate-100 text-slate-700 border-slate-300 font-mono',
+    },
+  ];
 
   const handleExecuteRosterSwap = async (
     sourceUid: string,
@@ -492,66 +544,7 @@ export const CommanderDashboard: React.FC = () => {
     showToast(`Command Directive Dispatched: "${actionTitle}" transmitted to Battalion HQ.`);
   };
 
-  // --------------------------------------------------------------------------
-  // ROW 1: 5 EXECUTIVE COMMAND CENTER KPI CARDS
-  // --------------------------------------------------------------------------
-  const kpiCards = [
-    {
-      title: 'Operational Readiness',
-      value: '92%',
-      trend: '+3%',
-      trendLabel: 'vs last month',
-      subtext: 'Force remains mission ready',
-      icon: ShieldCheck,
-      iconBg: 'bg-emerald-500/10 text-emerald-600',
-      badgeBg: 'bg-emerald-50 text-emerald-700',
-      arrow: 'up',
-    },
-    {
-      title: 'Force Wellness',
-      value: '84%',
-      trend: '+5%',
-      trendLabel: 'vs last month',
-      subtext: 'Improving trend',
-      icon: Users,
-      iconBg: 'bg-blue-500/10 text-blue-600',
-      badgeBg: 'bg-blue-50 text-blue-700',
-      arrow: 'up',
-    },
-    {
-      title: 'Critical Units',
-      value: '5',
-      trend: '+2',
-      trendLabel: 'vs last month',
-      subtext: 'Require immediate attention',
-      icon: AlertTriangle,
-      iconBg: 'bg-rose-500/10 text-rose-600',
-      badgeBg: 'bg-rose-50 text-rose-700',
-      arrow: 'up',
-    },
-    {
-      title: 'Pending Welfare Actions',
-      value: '12',
-      trend: '-4',
-      trendLabel: 'vs last week',
-      subtext: 'Follow up required',
-      icon: FileText,
-      iconBg: 'bg-amber-500/10 text-amber-600',
-      badgeBg: 'bg-amber-50 text-amber-700',
-      arrow: 'down',
-    },
-    {
-      title: 'High Risk Personnel',
-      value: '31',
-      trend: '-8',
-      trendLabel: 'vs last month',
-      subtext: 'Under monitoring',
-      icon: Users,
-      iconBg: 'bg-indigo-500/10 text-indigo-600',
-      badgeBg: 'bg-indigo-50 text-indigo-700',
-      arrow: 'down',
-    },
-  ];
+
 
   // --------------------------------------------------------------------------
   // ROW 2 DATA: TREND, RADAR, BATTALIONS, DONUT
@@ -656,17 +649,8 @@ export const CommanderDashboard: React.FC = () => {
     { id: 5, indicator: 'Behavioral Anomaly', unit: 'Delta Bn', risk: 'Medium', badge: 'bg-amber-400 text-slate-900 font-bold' },
   ];
 
-  // AI Command Recommendations
-  const aiRecommendations = [
-    { id: 'rec-1', text: 'Reduce workload for Bravo Battalion', priority: 'High Priority', color: 'bg-rose-600 text-white', dot: 'bg-rose-500' },
-    { id: 'rec-2', text: 'Approve additional counselling sessions', priority: 'High Priority', color: 'bg-rose-600 text-white', dot: 'bg-rose-500' },
-    { id: 'rec-3', text: 'Increase leave allocation for high-risk units', priority: 'Medium', color: 'bg-amber-500 text-white', dot: 'bg-amber-400' },
-    { id: 'rec-4', text: 'Plan welfare visit to Echo Battalion', priority: 'Medium', color: 'bg-amber-500 text-white', dot: 'bg-amber-400' },
-    { id: 'rec-5', text: 'Monitor Charlie Battalion closely', priority: 'Low', color: 'bg-emerald-600 text-white', dot: 'bg-emerald-400' },
-  ];
-
   return (
-    <div className="space-y-4 pb-12 font-sans text-slate-800">
+    <div className="space-y-5 pb-12 font-sans text-slate-800">
       {/* Toast Notification Banner */}
       {toastMessage && (
         <div className="fixed top-20 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-900 text-white shadow-2xl border border-emerald-500/50 animate-in slide-in-from-top-2 duration-200">
@@ -683,790 +667,740 @@ export const CommanderDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Strict RBAC Command Confidentiality Safeguard Banner */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 border-2 border-emerald-500/40 text-white flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 shrink-0">
-            <ShieldCheck className="w-5 h-5" />
+      {/* ===================================================================== */}
+      {/* 0. DEFENSE COMMAND CENTER OPERATIONAL HEADER & TELEMETRY RIBBON       */}
+      {/* ===================================================================== */}
+      <div className="rounded-2xl bg-[#0B1712] border border-emerald-950/80 shadow-md text-white overflow-hidden">
+        {/* Top Telemetry & Clearance Strip */}
+        <div className="px-4 py-2 bg-[#08110D] border-b border-emerald-900/40 flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono">
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1.5 text-emerald-400 font-bold tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              RESTRICTED // REL TO COMMAND
+            </span>
+            <span className="text-slate-500">|</span>
+            <span className="text-slate-300">
+              {t('HQ Northern Command • XV Corps Formation')}
+            </span>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/40">
-                Command Echelon Access Scope &bull; Aggregated Readiness Only
-              </span>
-              <span className="text-[10px] font-mono text-slate-400">Strict RBAC Boundary</span>
-            </div>
-            <p className="text-xs text-slate-200 mt-1 font-medium">
-              <strong>Confidentiality Safeguard:</strong> This view displays operational readiness, watch fatigue, and roster rebalancing directives only. Individual psychological check-ins, psychiatric assessments, and counseling logs are strictly restricted to the <strong>Welfare &amp; Medical Officer Hub</strong>.
-            </p>
+
+          <div className="flex items-center gap-3 text-slate-400">
+            <span className="flex items-center gap-1">
+              <Radio className="w-3.5 h-3.5 text-emerald-400" />
+              <span>SECURE MIL-NET // AES-256</span>
+            </span>
+            <span className="text-slate-600">&bull;</span>
+            <span>LATENCY: <strong className="text-emerald-300">14ms</strong></span>
+            <span className="text-slate-600">&bull;</span>
+            <span>SYNC: <strong className="text-slate-200">14s AGO</strong></span>
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="px-3 py-1 rounded-xl bg-white/10 text-emerald-300 font-mono text-[11px] font-bold border border-white/15">
-            Medical Airgap Enforced
-          </span>
+
+        {/* Operational Context Bar */}
+        <div className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-xl bg-emerald-950/80 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 shadow-inner">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-lg sm:text-xl font-black text-white tracking-tight">
+                  {t('Formation Command Operations Center')}
+                </h2>
+                <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-mono font-black uppercase">
+                  DEFCON READINESS TIER 2
+                </span>
+                <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-bold">
+                  HIGH TEMPO
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 mt-0.5">
+                Aggregated operational readiness, acute fatigue vectors, and tactical roster stand-downs. Individual clinical check-ins remain airgapped in Welfare/Medical hub.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0 self-start md:self-auto">
+            <button
+              onClick={() => setActiveDecisionModal(true)}
+              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#D4A017] to-amber-600 hover:from-[#c39213] hover:to-amber-700 text-slate-950 font-black text-xs transition-all shadow-md cursor-pointer flex items-center gap-1.5"
+            >
+              <Terminal className="w-4 h-4" />
+              <span>{t('Command Decision Center')}</span>
+            </button>
+            <button
+              onClick={() => setActiveDossierUid('UID-EMP-012')}
+              className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 border border-white/10 font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5"
+              title="Print Form 16 Executive Welfare Dossier"
+            >
+              <FileText className="w-3.5 h-3.5 text-emerald-400" />
+              <span>{t('Form 16 Dossier')}</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* ===================================================================== */}
-      {/* ROW 1: 5 LARGE EXECUTIVE COMMAND CENTER KPI CARDS                     */}
+      {/* 1. VISUAL HIERARCHY: 4 ASYMMETRIC OPERATIONAL COMMAND METRIC BLOCKS    */}
+      {/* Contextual Military Data (Readiness, High Risk, Directives, Coverage) */}
       {/* ===================================================================== */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
-        {kpiCards.map((kpi, idx) => {
-          const Icon = kpi.icon;
-          return (
-            <div
-              key={idx}
-              className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between"
-            >
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
-                  <span className="text-xs font-semibold text-slate-500 tracking-tight">
-                    {kpi.title}
-                  </span>
-                  <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">
-                      {kpi.value}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        {/* Block 1: Operational Combat Readiness (Dominant) */}
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between hover:border-emerald-500/40 transition-all">
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-500">
+              <span className="font-mono text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                {t('Force Posture')}
+              </span>
+              <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono text-[10px] font-bold">
+                +1.8% vs 30d baseline
+              </span>
+            </div>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-3xl font-black text-slate-900 font-mono tracking-tight">
+                92.4%
+              </span>
+              <span className="text-xs font-bold text-emerald-600 uppercase">
+                {t('Mission Ready')}
+              </span>
+            </div>
+            {/* Bullet Graph: Benchmark target 85% vs Current 92.4% */}
+            <div className="mt-2.5">
+              <div className="relative w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div
+                  className="h-full bg-emerald-500 rounded-full"
+                  style={{ width: '92.4%' }}
+                />
+                {/* Target marker at 85% */}
+                <div
+                  className="absolute top-0 bottom-0 w-0.5 bg-slate-800 z-10"
+                  style={{ left: '85%' }}
+                  title="Target Benchmark: 85%"
+                />
+              </div>
+              <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono mt-1">
+                <span>Threshold: 75%</span>
+                <span className="font-bold text-slate-600">Target: 85%</span>
+                <span className="text-emerald-600 font-bold">Current: 92.4%</span>
+              </div>
+            </div>
+          </div>
+          <div className="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-600 flex items-center justify-between">
+            <span>4 of 5 Battalions Combat Ready</span>
+            <span className="text-slate-400 font-mono">2,520 Troops</span>
+          </div>
+        </div>
+
+        {/* Block 2: Acute Risk & High-Strain Personnel (Critical Focus) */}
+        <div className="p-4 rounded-2xl bg-white border border-rose-200/80 shadow-xs flex flex-col justify-between hover:border-rose-400 transition-all">
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-500">
+              <span className="font-mono text-[10px] uppercase font-bold tracking-wider text-rose-600 flex items-center gap-1">
+                <ShieldAlert className="w-3.5 h-3.5" />
+                {t('Personnel Under Watch')}
+              </span>
+              <span className="px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 font-mono text-[10px] font-bold">
+                -8 (-20.5% vs Q2)
+              </span>
+            </div>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-3xl font-black text-rose-600 font-mono tracking-tight">
+                31
+              </span>
+              <span className="text-xs font-bold text-slate-700">
+                {t('High Strain Jawans')}
+              </span>
+            </div>
+            {/* Sparkline trend over 7 days */}
+            <div className="mt-2 flex items-center justify-between">
+              <div className="space-y-0.5">
+                <span className="text-[10px] text-slate-400 block font-mono">Surge Velocity:</span>
+                <span className="text-xs font-bold text-rose-700 font-mono">4 Acute (V &ge; +2.5/d)</span>
+              </div>
+              {/* Mini Sparkline SVG (36 -> 34 -> 35 -> 33 -> 32 -> 31) */}
+              <div className="w-20 h-6">
+                <svg viewBox="0 0 60 20" className="w-full h-full">
+                  <polyline
+                    fill="none"
+                    stroke="#EF4444"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    points="0,4 12,8 24,6 36,12 48,15 60,18"
+                  />
+                  <circle cx="60" cy="18" r="2.5" fill="#EF4444" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div className="mt-3 pt-2 border-t border-rose-100 text-[11px] text-rose-700 font-medium flex items-center justify-between">
+            <span>2 Immediate Stand-Downs Required</span>
+            <span className="font-bold cursor-pointer hover:underline" onClick={() => setActiveDecisionModal(true)}>Triage &rarr;</span>
+          </div>
+        </div>
+
+        {/* Block 3: Pending Command Directives & Stand-Down Actions */}
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between hover:border-amber-400 transition-all">
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-500">
+              <span className="font-mono text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                {t('Command Directives')}
+              </span>
+              <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-mono text-[10px] font-bold">
+                -4 Backlog vs Last Wk
+              </span>
+            </div>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-3xl font-black text-slate-900 font-mono tracking-tight">
+                12
+              </span>
+              <span className="text-xs font-bold text-amber-700">
+                {t('Pending Sign-off')}
+              </span>
+            </div>
+            {/* Completion ratio */}
+            <div className="mt-2.5 space-y-1">
+              <div className="flex items-center justify-between text-[10px] font-mono text-slate-500">
+                <span>Directive Adherence:</span>
+                <span className="font-bold text-slate-800">81.4% Standard</span>
+              </div>
+              <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                <div className="h-full bg-amber-500 rounded-full" style={{ width: '81.4%' }} />
+              </div>
+            </div>
+          </div>
+          <div className="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-600 flex items-center justify-between">
+            <span>2 Swaps &bull; 5 Decompressions &bull; 5 Leave</span>
+            <span className="text-slate-400 font-mono">HQ Standard</span>
+          </div>
+        </div>
+
+        {/* Block 4: Formation Coverage & Logistical Airgap */}
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between hover:border-blue-400 transition-all">
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-500">
+              <span className="font-mono text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                {t('Formation Coverage')}
+              </span>
+              <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-mono text-[10px] font-bold">
+                5 Bns &bull; 25 Coys
+              </span>
+            </div>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-3xl font-black text-slate-900 font-mono tracking-tight">
+                18
+              </span>
+              <span className="text-xs font-bold text-slate-700">
+                {t('Forward Observation Posts')}
+              </span>
+            </div>
+            {/* Asset availability chips */}
+            <div className="mt-2.5 flex items-center gap-1.5 flex-wrap text-[10px] font-mono">
+              <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                MOs: <strong>5/6</strong>
+              </span>
+              <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                Clinics: <strong>3/4</strong>
+              </span>
+              <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                Counsellors: <strong>12/15</strong>
+              </span>
+            </div>
+          </div>
+          <div className="mt-3 pt-2 border-t border-slate-100 text-[11px] text-emerald-700 font-medium flex items-center justify-between">
+            <span className="flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              Medical Airgap Enforced
+            </span>
+            <span className="text-slate-400 font-mono">ISO 27001</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ===================================================================== */}
+      {/* 2. VISUAL HIERARCHY: CRITICAL ALERTS & IMMEDIATE TACTICAL STAND-DOWN   */}
+      {/* (PRIMARY FOCUS: High Risk Personnel, Stand-Down Queue, Live Stream)    */}
+      {/* ===================================================================== */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        {/* Left Column (8 cols): Tactical Stand-Down Queue & Acute Momentum */}
+        <div className="lg:col-span-8 space-y-4">
+          {/* Tactical Stand-Down Queue Card */}
+          <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/90 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-700 shrink-0">
+                  <Zap className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm sm:text-base font-black text-slate-900 tracking-tight">
+                      {t('Tactical Command Roster Actions & Immediate Stand-Down Queue')}
+                    </h3>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-black bg-rose-50 text-rose-700 border border-rose-200 animate-pulse">
+                      {t('2 Critical Fatigue Triggers')}
                     </span>
-                    <span
-                      className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[11px] font-bold ${kpi.badgeBg}`}
-                    >
-                      {kpi.arrow === 'up' ? (
-                        <ArrowUp className="w-3 h-3 stroke-[3]" />
-                      ) : (
-                        <ArrowDown className="w-3 h-3 stroke-[3]" />
-                      )}
-                      <span>{kpi.trend}</span>
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    Actionable Command Decision Support: Relieve exhausted frontline jawans with verified SHAPE-1 standby personnel.
+                  </p>
+                </div>
+              </div>
+              <span className="text-[10px] font-mono text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200 self-start sm:self-auto font-bold">
+                HQ RoP Standard 14-A Active
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              {/* Action Card 1: Havildar Ramesh Chand */}
+              <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200 hover:border-emerald-500/40 transition-all flex flex-col justify-between">
+                <div>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-black text-slate-900">Havildar Ramesh Chand</span>
+                        <span className="text-[9px] font-mono text-slate-600 bg-white border border-slate-200 px-1.5 py-0.5 rounded">UID-EMP-012</span>
+                      </div>
+                      <div className="text-[10px] text-slate-500 mt-0.5 font-medium">
+                        High Altitude Guard &bull; Observation Post Siachen B-4
+                      </div>
+                    </div>
+                    <span className="px-2 py-0.5 rounded font-mono font-black text-[10px] bg-rose-50 text-rose-700 border border-rose-200 shrink-0">
+                      8 Night Shifts
                     </span>
+                  </div>
+
+                  <div className="mt-2.5 p-2.5 rounded-lg bg-white border border-slate-200 text-[11px] space-y-1 shadow-2xs">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-slate-500 font-semibold">{t('Critical Trigger:')}</span>
+                      <span className="text-rose-700 font-bold">Hypoxia Strain + 3.8h Rest Debt</span>
+                    </div>
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-slate-500 font-semibold">{t('Tactical Replacement:')}</span>
+                      <span className="text-emerald-700 font-bold">Sepoy Amit Kumar (10 Para SF &bull; SHAPE-1 Standby)</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className={`w-10 h-10 rounded-xl ${kpi.iconBg} flex items-center justify-center shrink-0`}>
-                  <Icon className="w-5 h-5" />
+                <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-slate-500">
+                      Post: Night Sentry (00:00 - 06:00)
+                    </span>
+                    <button
+                      onClick={() => setActiveDossierUid('UID-EMP-012')}
+                      className="text-[10px] text-emerald-700 hover:text-emerald-800 underline font-bold cursor-pointer"
+                    >
+                      Form 16 🖨️
+                    </button>
+                  </div>
+                  {swappedRosters['UID-EMP-012'] ? (
+                    <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>{t('Stood Down • Sepoy Amit Deployed')}</span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() =>
+                        handleExecuteRosterSwap(
+                          'UID-EMP-012',
+                          'Havildar Ramesh Chand',
+                          'UID-SLD-015',
+                          'Sepoy Amit Kumar',
+                          'Observation Post Siachen B-4'
+                        )
+                      }
+                      disabled={isSwapping === 'UID-EMP-012'}
+                      className="px-3 py-1.5 rounded-lg bg-emerald-900 hover:bg-emerald-800 text-white font-bold text-[11px] cursor-pointer shadow-xs transition-all flex items-center gap-1.5"
+                    >
+                      <RefreshCw className={`w-3 h-3 ${isSwapping === 'UID-EMP-012' ? 'animate-spin' : ''}`} />
+                      <span>{isSwapping === 'UID-EMP-012' ? t('Executing Swap...') : t('Approve Stand-down Swap')}</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
-              <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
-                <span>{kpi.subtext}</span>
-                <span className="text-[10px] text-slate-400">{kpi.trendLabel}</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+              {/* Action Card 2: Subedar Gurpreet Singh */}
+              <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200 hover:border-amber-500/40 transition-all flex flex-col justify-between">
+                <div>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-black text-slate-900">Subedar Gurpreet Singh</span>
+                        <span className="text-[9px] font-mono text-slate-600 bg-white border border-slate-200 px-1.5 py-0.5 rounded">UID-EMP-013</span>
+                      </div>
+                      <div className="text-[10px] text-slate-500 mt-0.5 font-medium">
+                        Field Artillery 3rd Bn &bull; Sector Artillery Battery 2
+                      </div>
+                    </div>
+                    <span className="px-2 py-0.5 rounded font-mono font-black text-[10px] bg-amber-50 text-amber-700 border border-amber-200 shrink-0">
+                      5 Shifts + Family Emergency
+                    </span>
+                  </div>
 
-      {/* ===================================================================== */}
-      {/* EMOTIONAL STABILITY INDEX (ESI) - EXECUTIVE COMMAND SURVEILLANCE       */}
-      {/* ===================================================================== */}
-      <div id="commander-emotional-stability-panel" className="p-5 rounded-2xl bg-gradient-to-br from-[#0C1929] via-[#132840] to-[#0A1624] text-white border-2 border-emerald-500/40 shadow-xl relative overflow-hidden">
-        {/* Ambient Glow */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+                  <div className="mt-2.5 p-2.5 rounded-lg bg-white border border-slate-200 text-[11px] space-y-1 shadow-2xs">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-slate-500 font-semibold">{t('Critical Trigger:')}</span>
+                      <span className="text-amber-700 font-bold">Mother Hospitalized + Acute Vigil Stress</span>
+                    </div>
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-slate-500 font-semibold">{t('Tactical Replacement:')}</span>
+                      <span className="text-emerald-700 font-bold">Captain Sarah Connor (Security Wing &bull; SHAPE-1 Available)</span>
+                    </div>
+                  </div>
+                </div>
 
-        {/* Top Header & Metadata */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-4 border-b border-white/10 relative z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-emerald-400 shadow-inner">
-              <Activity className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2.5 flex-wrap">
-                <h3 className="text-base sm:text-lg font-black tracking-wide text-white flex items-center gap-2">
-                  Emotional Stability Index
-                </h3>
-                <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-400 text-slate-950">
-                  Command Intelligence
-                </span>
-                <span className="text-[10px] font-mono text-slate-300 bg-white/10 px-2.5 py-0.5 rounded-full border border-white/15">
-                  Algorithm: <strong className="text-emerald-300">Weighted Moving Average or LSTM</strong>
-                </span>
-              </div>
-              <p className="text-xs text-slate-300 font-medium mt-0.5">
-                <strong className="text-emerald-400">Purpose:</strong> Measures emotional consistency over time across high-tempo operational units.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 self-start lg:self-auto">
-            <div className="text-right hidden sm:block">
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Temporal Model</span>
-              <span className="text-xs font-bold text-slate-200">7-Day Recency Weighted WMA</span>
-            </div>
-            <div className="px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-bold flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              95.8% Model Confidence
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content: Core Score + 6 Factors + Trajectory */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-4 relative z-10">
-          {/* Col 1: Hero ESI Score Box (Output: 82 • Stable) */}
-          <div className="lg:col-span-4 p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
-                  Unit Output Benchmark
-                </span>
-                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-500/30">
-                  Division Aggregation
-                </span>
-              </div>
-              <div className="mt-3 flex items-baseline gap-3">
-                <span className="text-4xl sm:text-5xl font-black text-emerald-400 tracking-tight">
-                  82%
-                </span>
-                <div className="flex flex-col">
-                  <span className="text-lg font-black text-white leading-tight">
-                    Stable
-                  </span>
-                  <span className="text-[11px] text-slate-300 font-medium">
-                    High Affective Consistency
-                  </span>
+                <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-slate-500">
+                      Post: Battery Patrol (06:00 - 18:00)
+                    </span>
+                    <button
+                      onClick={() => setActiveDossierUid('UID-EMP-013')}
+                      className="text-[10px] text-emerald-700 hover:text-emerald-800 underline font-bold cursor-pointer"
+                    >
+                      Form 16 🖨️
+                    </button>
+                  </div>
+                  {swappedRosters['UID-EMP-013'] ? (
+                    <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>{t('Stood Down • Capt. Connor Deployed')}</span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() =>
+                        handleExecuteRosterSwap(
+                          'UID-EMP-013',
+                          'Subedar Gurpreet Singh',
+                          'UID-EMP-011',
+                          'Captain Sarah Connor',
+                          'Sector Artillery Battery 2'
+                        )
+                      }
+                      disabled={isSwapping === 'UID-EMP-013'}
+                      className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] cursor-pointer shadow-xs transition-all flex items-center gap-1.5"
+                    >
+                      <RefreshCw className={`w-3 h-3 ${isSwapping === 'UID-EMP-013' ? 'animate-spin' : ''}`} />
+                      <span>{isSwapping === 'UID-EMP-013' ? t('Executing Swap...') : t('Fast-Track Compassionate Swap')}</span>
+                    </button>
+                  )}
                 </div>
               </div>
-              <div className="w-full bg-white/10 rounded-full h-2 mt-3 overflow-hidden">
-                <div className="bg-gradient-to-r from-emerald-500 to-teal-400 h-2 rounded-full" style={{ width: '82%' }} />
-              </div>
-            </div>
-
-            <div className="mt-4 pt-3 border-t border-white/10 space-y-1.5 text-xs">
-              <div className="flex items-center justify-between text-slate-300">
-                <span className="text-slate-400">Volatility Standard Deviation:</span>
-                <span className="font-mono font-bold text-emerald-300">&sigma; = 1.18 (Low)</span>
-              </div>
-              <div className="flex items-center justify-between text-slate-300">
-                <span className="text-slate-400">Active Duty Threshold:</span>
-                <span className="font-mono font-bold text-white">&ge; 75.0% Required</span>
-              </div>
-              <p className="text-[11px] text-slate-300 leading-relaxed pt-1">
-                <strong>Command Assessment:</strong> Unit exhibits strong baseline emotional regulation despite ongoing high-altitude watch rotations.
-              </p>
             </div>
           </div>
 
-          {/* Col 2: The 6 Factor Input Gauges */}
-          <div className="lg:col-span-8 p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
-                Algorithm Inputs / 6-Factor Multi-Modal Telemetry
-              </span>
+          {/* Section 19: Operational Risk Momentum & Real-Time Action Directives */}
+          <div className="p-5 rounded-2xl bg-[#0B1712] border border-amber-500/30 shadow-lg text-white space-y-3.5">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                  <Activity className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400">
+                      Risk Momentum Tracking • V = d(Stress)/dt
+                    </span>
+                    <span className="px-2 py-0.2 rounded bg-rose-500/20 text-rose-300 font-mono text-[10px] border border-rose-500/40">
+                      Acute Surge Alert
+                    </span>
+                  </div>
+                  <h4 className="text-sm font-black text-white">
+                    Early Interception Queue & Real-Time Command Directives
+                  </h4>
+                </div>
+              </div>
               <span className="text-[10px] font-mono text-slate-400">
-                Weights Sum: 100%
+                Threshold: &ge; +2.5 pts/day
               </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {[
-                { factor: 'Mood', score: 84, status: 'Optimal', weight: '22%', icon: Brain, desc: 'Affective valence & daily balance' },
-                { factor: 'Stress', score: 78, status: 'Regulated', weight: '20%', icon: Activity, desc: 'Allostatic stress resistance' },
-                { factor: 'Sleep', score: 80, status: 'Restorative', weight: '18%', icon: Moon, desc: 'Circadian stability & deep rest' },
-                { factor: 'Energy', score: 85, status: 'High Vitality', weight: '16%', icon: Zap, desc: 'Self-reported wellbeing' },
-                { factor: 'Voice', score: 88, status: 'Acoustic Steady', weight: '12%', icon: Mic, desc: 'Vocal jitter & pitch micro-tremors' },
-                { factor: 'Anxiety', score: 76, status: 'Controlled', weight: '12%', icon: ShieldCheck, desc: 'Hypervigilance recovery rate' },
+                {
+                  id: 'JC-2748',
+                  name: 'Naik Rohit Sharma',
+                  unit: 'Bravo Bn &bull; C Coy',
+                  stress: 86,
+                  velocity: '+4.8 pts/day',
+                  daysLeft: '2 Days',
+                  actionCode: 'ROSTER_STAND_DOWN_ROHIT',
+                  directive: 'Rotate Out of Night Watch & Grant 7-Day Furlough',
+                  reason: 'Continuous LOC watch >14 mos. Acceleration +0.9 pts/d² indicates imminent collapse.',
+                  btnLabel: 'Authorize Stand-Down',
+                },
+                {
+                  id: 'JC-1108',
+                  name: 'Subedar Gurpreet Singh',
+                  unit: 'Echo Bn &bull; A Coy',
+                  stress: 89,
+                  velocity: '+3.9 pts/day',
+                  daysLeft: '1 Day',
+                  actionCode: 'SWAP_ROSTER_GURPREET',
+                  directive: 'Reassign Night Watch Vigil Roster to Charlie Coy',
+                  reason: 'Consecutive night vigils causing severe circadian disruption. Swap night duty roster.',
+                  btnLabel: 'Authorize Roster Swap',
+                },
+                {
+                  id: 'JC-3910',
+                  name: 'Hav. Amit Kumar',
+                  unit: 'Charlie Bn &bull; A Coy',
+                  stress: 88,
+                  velocity: '+2.8 pts/day',
+                  daysLeft: '1 Day',
+                  actionCode: 'COMPASSIONATE_LEAVE_AMIT',
+                  directive: 'Approve Emergency Family Welfare Leave (14 Days)',
+                  reason: 'Domestic distress combined with acute sleep deficit. Direct compassionate bypass.',
+                  btnLabel: 'Grant 14-Day Leave',
+                },
               ].map((item) => {
-                const FactorIcon = item.icon;
+                const isDispatched = dispatchedActions.includes(item.actionCode);
                 return (
-                  <div key={item.factor} className="p-2.5 rounded-lg bg-black/25 border border-white/10 hover:border-emerald-500/40 transition-colors">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="flex items-center gap-1.5 font-bold text-white">
-                        <FactorIcon className="w-3.5 h-3.5 text-emerald-400" />
-                        {item.factor}
-                      </span>
-                      <span className="font-mono font-black text-emerald-300">{item.score}%</span>
+                  <div
+                    key={item.id}
+                    className="p-3.5 rounded-xl bg-white/5 border border-white/10 hover:border-amber-500/40 flex flex-col justify-between transition-all space-y-2.5"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-[10px] font-mono text-amber-400 font-bold block">{item.id}</span>
+                          <h5 className="text-xs font-bold text-white">{item.name}</h5>
+                          <span className="text-[10px] text-slate-400" dangerouslySetInnerHTML={{ __html: item.unit }} />
+                        </div>
+                        <div className="text-right">
+                          <div className="font-mono text-sm font-black text-rose-400">
+                            {item.velocity}
+                          </div>
+                          <span className="text-[9px] font-mono text-rose-300 block">
+                            Crit: {item.daysLeft}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="mt-2 p-2 rounded-lg bg-black/40 border border-white/5 space-y-0.5 text-[11px]">
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-amber-400 block">
+                          Directive
+                        </span>
+                        <p className="font-semibold text-slate-100">{item.directive}</p>
+                        <p className="text-[10px] text-slate-400 leading-tight">{item.reason}</p>
+                      </div>
                     </div>
-                    <div className="w-full bg-white/10 rounded-full h-1.5 my-1.5 overflow-hidden">
-                      <div className="bg-emerald-400 h-1.5 rounded-full" style={{ width: `${item.score}%` }} />
-                    </div>
-                    <div className="flex items-center justify-between text-[10px] text-slate-400">
-                      <span className="text-emerald-400 font-semibold">{item.status}</span>
-                      <span className="font-mono text-slate-400">W: {item.weight}</span>
-                    </div>
+
+                    <button
+                      onClick={() => handleDispatchCommand(`Directive Executed [${item.actionCode}]: ${item.directive}`)}
+                      disabled={isDispatched}
+                      className={`w-full py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs ${
+                        isDispatched
+                          ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                          : 'bg-rose-700 hover:bg-rose-600 text-white'
+                      }`}
+                    >
+                      <Send className="w-3 h-3" />
+                      <span>{isDispatched ? 'Dispatched ✓' : item.btnLabel}</span>
+                    </button>
                   </div>
                 );
               })}
             </div>
+          </div>
+        </div>
 
-            {/* 7-Day Trajectory Sparkline Bar */}
-            <div className="mt-3 pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+        {/* Right Column (4 cols): Live Command Event Stream & Telemetry Feed */}
+        <div className="lg:col-span-4 p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-3.5">
+          <div>
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">7-Day Trajectory:</span>
-                <div className="flex items-center gap-1 font-mono text-[11px] flex-wrap">
-                  {['Day -6: 79%', 'Day -5: 80%', 'Day -4: 81%', 'Day -3: 82%', 'Day -2: 81%', 'Yest: 83%', 'Today: 82%'].map((pt, i) => (
-                    <span key={i} className="px-1.5 py-0.5 rounded bg-white/10 text-emerald-300 text-[10px]">
-                      {pt}
-                    </span>
-                  ))}
-                </div>
+                <Radio className="w-4 h-4 text-emerald-600" />
+                <h3 className="text-xs sm:text-sm font-black text-slate-900 tracking-tight">
+                  {t('Live Operational Event Stream')}
+                </h3>
               </div>
-              <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                Consistency Variance: Minimal (&plusmn;1.4%)
+              <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-600 font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                STREAM ACTIVE
               </span>
             </div>
-          </div>
-        </div>
-      </div>
 
-      {/* ===================================================================== */}
-      {/* BEHAVIORAL CHANGE DETECTION - EXECUTIVE COMMAND ANOMALY SURVEILLANCE  */}
-      {/* ===================================================================== */}
-      <div id="commander-behavioral-change-panel" className="p-5 rounded-2xl bg-gradient-to-br from-[#111C2E] via-[#17253D] to-[#0D1624] text-white border-2 border-indigo-400/40 shadow-xl relative overflow-hidden">
-        {/* Ambient Glow */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        {/* Header with Title, Badge, and AI Process */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-4 border-b border-white/10 relative z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/50 flex items-center justify-center text-indigo-300 shadow-inner">
-              <Sliders className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2.5 flex-wrap">
-                <h3 className="text-base sm:text-lg font-black tracking-wide text-white flex items-center gap-2">
-                  Behavioral Change Detection
-                </h3>
-                <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-indigo-400 text-slate-950">
-                  Anomaly Surveillance
-                </span>
-                <span className="text-[10px] font-mono text-slate-300 bg-white/10 px-2.5 py-0.5 rounded-full border border-white/15">
-                  AI Process: <strong className="text-indigo-300">Compare: Current behavior VS Historical behavior</strong>
-                </span>
-              </div>
-              <p className="text-xs text-slate-300 font-medium mt-0.5">
-                <strong className="text-indigo-400">Purpose:</strong> Detects unusual changes in a person&apos;s behavior over time across battalion rosters.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 self-start lg:self-auto">
-            <div className="text-right hidden sm:block">
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Comparison Window</span>
-              <span className="text-xs font-bold text-slate-200">14-Day Current vs 90-Day Baseline</span>
-            </div>
-            <div className="px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold flex items-center gap-1.5">
-              <AlertTriangle className="w-3.5 h-3.5" />
-              14 High-Shift Anomaly Flags
-            </div>
-          </div>
-        </div>
-
-        {/* Content Grid: Unit Score + 5 Domains + High-Shift Troops Triage */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-4 relative z-10">
-          {/* Col 1: Unit Behavior Change Score */}
-          <div className="lg:col-span-4 p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
-                  Force Anomaly Drift
-                </span>
-                <span className="text-[10px] font-mono text-indigo-300 bg-indigo-950/60 px-2 py-0.5 rounded-md border border-indigo-500/30">
-                  Unit Aggregate
-                </span>
-              </div>
-              <div className="mt-3 flex items-baseline gap-3">
-                <span className="text-4xl sm:text-5xl font-black text-indigo-300 tracking-tight">
-                  28
-                </span>
-                <span className="text-sm font-mono text-slate-400">/ 100</span>
-                <div className="flex flex-col">
-                  <span className="text-sm font-black text-emerald-300 uppercase leading-tight">
-                    Mild Unit Drift
-                  </span>
-                  <span className="text-[10px] text-slate-400">
-                    89% Troops Stable
-                  </span>
-                </div>
-              </div>
-              <div className="w-full bg-white/10 rounded-full h-2 mt-3 overflow-hidden">
-                <div className="bg-gradient-to-r from-teal-500 to-indigo-500 h-2 rounded-full" style={{ width: '28%' }} />
-              </div>
+            {/* Filter Tabs */}
+            <div className="flex items-center gap-1 mt-2.5 p-1 rounded-lg bg-slate-100 text-[10px] font-mono">
+              {(['all', 'critical', 'roster', 'intel'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setLiveEventFilter(tab)}
+                  className={`flex-1 py-1 rounded capitalize font-bold transition-colors cursor-pointer ${
+                    liveEventFilter === tab
+                      ? 'bg-white text-slate-900 shadow-xs'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
             </div>
 
-            <div className="mt-4 pt-3 border-t border-white/10 space-y-2 text-xs">
-              <div className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">
-                Top Unit Outliers (Behavior Change Score)
-              </div>
-              <div className="space-y-1.5">
-                {[
-                  { name: 'Havildar Ramesh Chand', unit: 'High Altitude Guard', score: 88, issue: 'Overtime + Leave Spike' },
-                  { name: 'Subedar Gurpreet Singh', unit: 'Field Artillery 3rd Bn', score: 74, issue: 'Reduced Wellness Adherence' },
-                  { name: 'Sepoy Vikram Rathore', unit: 'Infantry 2nd Bn', score: 72, issue: 'Missing Drills & Training' },
-                ].map((soldier, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-white/5">
-                    <div>
-                      <div className="font-bold text-white text-[11px]">{soldier.name}</div>
-                      <div className="text-[9px] text-slate-400">{soldier.unit} &bull; {soldier.issue}</div>
+            {/* Event List */}
+            <div className="mt-3 space-y-2.5">
+              {liveEvents
+                .filter((evt) => liveEventFilter === 'all' || evt.category === liveEventFilter)
+                .map((evt) => (
+                  <div
+                    key={evt.id}
+                    className="p-2.5 rounded-xl bg-slate-50/80 border border-slate-200/70 hover:bg-slate-100/80 transition-colors space-y-1"
+                  >
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className={`px-1.5 py-0.2 rounded border text-[9px] font-bold ${evt.badge}`}>
+                        {evt.level}
+                      </span>
+                      <span className="font-mono text-slate-400">{evt.time}</span>
                     </div>
-                    <span className="px-2 py-0.5 rounded font-mono font-black text-xs bg-rose-500/20 text-rose-300 border border-rose-500/40">
-                      BCS: {soldier.score}
-                    </span>
+                    <p className="text-xs font-bold text-slate-900 leading-snug">
+                      {evt.title}
+                    </p>
+                    <p className="text-[11px] text-slate-500 leading-tight">
+                      {evt.details}
+                    </p>
                   </div>
                 ))}
-              </div>
             </div>
           </div>
 
-          {/* Col 2: The 5 Evaluated Behavior Domains (Current VS Historical) */}
-          <div className="lg:col-span-8 p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
-                5 Monitored Behavioral Domains &bull; Current VS Historical Baseline Comparison
-              </span>
-              <span className="text-[10px] font-mono text-indigo-300">
-                Continuous ML Telemetry
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              {[
-                {
-                  label: 'Suddenly taking many leave days',
-                  current: '4.8 days avg/mo',
-                  historical: '1.2 days avg/mo',
-                  shift: '+300% surge',
-                  anomalyPct: '18.4% affected',
-                  flag: 'Leave Spike',
-                  statusColor: 'text-amber-300',
-                  icon: Calendar
-                },
-                {
-                  label: 'Working excessive overtime',
-                  current: '24.5 hrs/wk avg',
-                  historical: '7.2 hrs/wk avg',
-                  shift: '+240% surge',
-                  anomalyPct: '24.2% affected',
-                  flag: 'Excessive Overtime',
-                  statusColor: 'text-rose-300',
-                  icon: Clock
-                },
-                {
-                  label: 'Missing training',
-                  current: '74.2% drill attendance',
-                  historical: '95.8% drill attendance',
-                  shift: '-21.6% drop',
-                  anomalyPct: '12.0% affected',
-                  flag: 'Drill Absences',
-                  statusColor: 'text-amber-300',
-                  icon: ShieldCheck
-                },
-                {
-                  label: 'Declining performance',
-                  current: '72.0 / 100 appraisal',
-                  historical: '89.4 / 100 appraisal',
-                  shift: '-17.4 pts',
-                  anomalyPct: '15.6% affected',
-                  flag: 'Performance Dip',
-                  statusColor: 'text-amber-300',
-                  icon: TrendingUp
-                },
-                {
-                  label: 'Reduced wellness participation',
-                  current: '44.0% check-in rate',
-                  historical: '91.2% check-in rate',
-                  shift: '-47.2% drop',
-                  anomalyPct: '28.1% affected',
-                  flag: 'Disengagement',
-                  statusColor: 'text-rose-300',
-                  icon: HeartPulse
-                },
-              ].map((domain, i) => {
-                const DomainIcon = domain.icon;
-                return (
-                  <div key={i} className={`p-2.5 rounded-lg bg-black/25 border border-white/10 ${i === 4 ? 'sm:col-span-2' : ''}`}>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="flex items-center gap-1.5 font-bold text-white">
-                        <DomainIcon className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                        <span>{domain.label}</span>
-                      </span>
-                      <span className={`font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/10 ${domain.statusColor}`}>
-                        {domain.flag}
-                      </span>
-                    </div>
-
-                    <div className="mt-2 grid grid-cols-3 gap-1 text-[10px] font-mono border-t border-white/5 pt-1.5 text-center">
-                      <div>
-                        <span className="text-slate-400 block text-[9px] uppercase">Historical</span>
-                        <span className="text-slate-300 font-bold">{domain.historical}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 block text-[9px] uppercase">Current</span>
-                        <span className="text-white font-bold">{domain.current}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 block text-[9px] uppercase">Net Shift</span>
-                        <span className={domain.statusColor}>{domain.shift}</span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Directive Footer */}
-            <div className="mt-3 pt-2.5 border-t border-white/10 text-xs text-slate-300 flex items-center justify-between">
-              <span className="text-[11px] text-slate-300">
-                <strong>Executive Action:</strong> 14 flagged individuals queued for proactive counseling stand-down.
-              </span>
-              <button
-                onClick={() => {
-                  handleDispatchCommand('Behavioral Anomaly Stand-Down & Overtime Roster Rebalancing');
-                }}
-                className="px-3 py-1 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-[11px] cursor-pointer shadow-sm transition-all shrink-0"
-              >
-                Rebalance Rosters
-              </button>
-            </div>
+          <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono text-slate-400">
+            <span>Audit Hash: #0x9F4B...21</span>
+            <span className="text-emerald-700 font-semibold">100% Ingest Verified</span>
           </div>
         </div>
       </div>
 
       {/* ===================================================================== */}
-      {/* TACTICAL COMMAND ROSTER STAND-DOWN & IMMEDIATE SWAPPING QUEUE         */}
+      {/* 3. VISUAL HIERARCHY: OPERATIONAL READINESS & FORCE POSTURE            */}
+      {/* (Replaced repetitive progress bars with bullet graphs, sparklines,    */}
+      {/*  historical baseline comparisons, radar overlay)                      */}
       {/* ===================================================================== */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-[#0A1628] border border-amber-500/30 shadow-lg text-white">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
-              <Zap className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-black text-white tracking-tight">
-                  Tactical Command Roster Actions & Immediate Stand-Down Queue
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Left (7 cols): Battalion Tactical Readiness Matrix (Bullet Graphs & Coy Status) */}
+        <div className="lg:col-span-7 p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-3">
+          <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
+            <div className="flex items-center gap-2">
+              <Layers className="w-4 h-4 text-emerald-800" />
+              <div>
+                <h3 className="text-xs sm:text-sm font-black text-slate-900 tracking-tight">
+                  {t('Formation Readiness & Company Distribution Matrix')}
                 </h3>
-                <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse">
-                  2 Critical Fatigue Triggers
+                <span className="text-[10px] text-slate-500">
+                  Target threshold benchmark: &ge; 85.0% readiness
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">
-                Actionable Command Decision Support: Relieve exhausted frontline jawans with verified SHAPE-1 standby personnel.
-              </p>
-            </div>
-          </div>
-          <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2.5 py-1 rounded-md border border-white/10 self-start sm:self-auto">
-            HQ RoP Standard 14-A Active
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 mt-3.5">
-          {/* Action Card 1: Havildar Ramesh Chand */}
-          <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 hover:border-amber-500/40 transition-all flex flex-col justify-between">
-            <div>
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-black text-white">Havildar Ramesh Chand</span>
-                    <span className="text-[9px] font-mono text-slate-400 bg-white/10 px-1.5 py-0.5 rounded">UID-EMP-012</span>
-                  </div>
-                  <div className="text-[10px] text-slate-300 mt-0.5">
-                    High Altitude Guard &bull; Observation Post Siachen B-4
-                  </div>
-                </div>
-                <span className="px-2 py-0.5 rounded font-mono font-black text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/40 shrink-0">
-                  8 Night Shifts
-                </span>
-              </div>
-
-              <div className="mt-2.5 p-2 rounded-lg bg-black/40 border border-rose-500/20 text-[11px] space-y-1">
-                <div className="flex items-center justify-between text-[10px]">
-                  <span className="text-slate-400 font-semibold">Critical Trigger:</span>
-                  <span className="text-rose-300 font-bold">Hypoxia Strain + 3.8h Rest Debt</span>
-                </div>
-                <div className="flex items-center justify-between text-[10px]">
-                  <span className="text-slate-400 font-semibold">Tactical Replacement:</span>
-                  <span className="text-emerald-300 font-bold">Sepoy Amit Kumar (10 Para SF &bull; SHAPE-1 Standby)</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] text-slate-400">
-                  Post: Night Sentry (00:00 - 06:00)
-                </span>
-                <button
-                  onClick={() => setActiveDossierUid('UID-EMP-012')}
-                  className="text-[10px] text-amber-300 hover:text-amber-200 underline font-bold cursor-pointer"
-                >
-                  Form 16 Dossier 🖨️
-                </button>
-              </div>
-              {swappedRosters['UID-EMP-012'] ? (
-                <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-500/30">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Stood Down &bull; Sepoy Amit Deployed</span>
-                </div>
-              ) : (
-                <button
-                  onClick={() =>
-                    handleExecuteRosterSwap(
-                      'UID-EMP-012',
-                      'Havildar Ramesh Chand',
-                      'UID-SLD-015',
-                      'Sepoy Amit Kumar',
-                      'Observation Post Siachen B-4'
-                    )
-                  }
-                  disabled={isSwapping === 'UID-EMP-012'}
-                  className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-black text-[11px] cursor-pointer shadow-md transition-all flex items-center gap-1.5"
-                >
-                  <RefreshCw className={`w-3 h-3 ${isSwapping === 'UID-EMP-012' ? 'animate-spin' : ''}`} />
-                  <span>{isSwapping === 'UID-EMP-012' ? 'Executing Swap...' : 'Approve Roster Swap & Stand-down'}</span>
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Action Card 2: Subedar Gurpreet Singh */}
-          <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 hover:border-amber-500/40 transition-all flex flex-col justify-between">
-            <div>
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-black text-white">Subedar Gurpreet Singh</span>
-                    <span className="text-[9px] font-mono text-slate-400 bg-white/10 px-1.5 py-0.5 rounded">UID-EMP-013</span>
-                  </div>
-                  <div className="text-[10px] text-slate-300 mt-0.5">
-                    Field Artillery 3rd Bn &bull; Sector Artillery Battery 2
-                  </div>
-                </div>
-                <span className="px-2 py-0.5 rounded font-mono font-black text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0">
-                  5 Shifts + Family Emergency
-                </span>
-              </div>
-
-              <div className="mt-2.5 p-2 rounded-lg bg-black/40 border border-amber-500/20 text-[11px] space-y-1">
-                <div className="flex items-center justify-between text-[10px]">
-                  <span className="text-slate-400 font-semibold">Critical Trigger:</span>
-                  <span className="text-amber-300 font-bold">Mother Hospitalized + Acute Vigil Stress</span>
-                </div>
-                <div className="flex items-center justify-between text-[10px]">
-                  <span className="text-slate-400 font-semibold">Tactical Replacement:</span>
-                  <span className="text-emerald-300 font-bold">Captain Sarah Connor (Security Wing &bull; SHAPE-1 Available)</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] text-slate-400">
-                  Post: Battery Patrol (06:00 - 18:00)
-                </span>
-                <button
-                  onClick={() => setActiveDossierUid('UID-EMP-013')}
-                  className="text-[10px] text-indigo-300 hover:text-indigo-200 underline font-bold cursor-pointer"
-                >
-                  Form 16 Dossier 🖨️
-                </button>
-              </div>
-              {swappedRosters['UID-EMP-013'] ? (
-                <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-500/30">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Stood Down &bull; Capt. Connor Deployed</span>
-                </div>
-              ) : (
-                <button
-                  onClick={() =>
-                    handleExecuteRosterSwap(
-                      'UID-EMP-013',
-                      'Subedar Gurpreet Singh',
-                      'UID-EMP-011',
-                      'Captain Sarah Connor',
-                      'Sector Artillery Battery 2'
-                    )
-                  }
-                  disabled={isSwapping === 'UID-EMP-013'}
-                  className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-primary hover:from-indigo-600 hover:to-primary-700 text-white font-black text-[11px] cursor-pointer shadow-md transition-all flex items-center gap-1.5"
-                >
-                  <RefreshCw className={`w-3 h-3 ${isSwapping === 'UID-EMP-013' ? 'animate-spin' : ''}`} />
-                  <span>{isSwapping === 'UID-EMP-013' ? 'Executing Swap...' : 'Approve Roster Swap & Leave Fast-Track'}</span>
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Multi-Source Signal Fusion Flow Indicator (Jury Fix Item 2.5) */}
-      <MultiSourceSignalFusionCard />
-
-      {/* "What-If" Counterfactual Intervention Simulator */}
-      <WhatIfSimulator
-        personnelUid="UID-EMP-012"
-        initialSleep={4.5}
-        initialFatigue={8}
-        initialDutyDays={6}
-        initialStress={91.6}
-        onApplyPlan={(plan) => showToast(`Command Protocol Updated: ${plan}`)}
-      />
-
-      {/* Interactive Unit Hierarchy Tree (Corps -> Division -> Brigade -> Battalion -> Company) */}
-      <UnitHierarchyTree />
-
-      {/* ===================================================================== */}
-      {/* ROW 2: 4 CORE VISUALIZATIONS (DONUT, PROGRESS BARS, LINE CHART, RADAR)*/}
-      {/* ===================================================================== */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
-
-        {/* Card 1: Personnel Risk Distribution (Donut Chart) */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center gap-2 font-bold text-slate-900 text-xs tracking-tight">
-            <Users className="w-4 h-4 text-[#163A5F]" />
-            <span>Personnel Risk Distribution</span>
-          </div>
-
-          <div className="py-2 flex items-center justify-center gap-3">
-            {/* SVG Donut */}
-            <div className="relative w-28 h-28 shrink-0">
-              <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-                {/* Low: 58% (Circumference ~ 226) */}
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="36"
-                  fill="transparent"
-                  stroke="#10B981"
-                  strokeWidth="14"
-                  strokeDasharray="131 226"
-                  strokeDashoffset="0"
-                />
-                {/* Medium: 26% */}
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="36"
-                  fill="transparent"
-                  stroke="#F59E0B"
-                  strokeWidth="14"
-                  strokeDasharray="59 226"
-                  strokeDashoffset="-131"
-                />
-                {/* High: 12% */}
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="36"
-                  fill="transparent"
-                  stroke="#F97316"
-                  strokeWidth="14"
-                  strokeDasharray="27 226"
-                  strokeDashoffset="-190"
-                />
-                {/* Critical: 4% */}
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="36"
-                  fill="transparent"
-                  stroke="#EF4444"
-                  strokeWidth="14"
-                  strokeDasharray="9 226"
-                  strokeDashoffset="-217"
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Total</span>
-                <span className="text-base font-black text-slate-900 leading-none">520</span>
-                <span className="text-[9px] text-slate-500 font-medium">Personnel</span>
-              </div>
-            </div>
-
-            {/* Legend */}
-            <div className="space-y-1.5 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
-                <span className="text-slate-600 font-medium text-[11px]">Critical</span>
-                <span className="ml-auto font-black text-slate-900 text-[11px]">4% (24)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-orange-500 shrink-0" />
-                <span className="text-slate-600 font-medium text-[11px]">High</span>
-                <span className="ml-auto font-black text-slate-900 text-[11px]">12% (62)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
-                <span className="text-slate-600 font-medium text-[11px]">Medium</span>
-                <span className="ml-auto font-black text-slate-900 text-[11px]">26% (135)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
-                <span className="text-slate-600 font-medium text-[11px]">Low</span>
-                <span className="ml-auto font-black text-slate-900 text-[11px]">58% (299)</span>
-              </div>
-            </div>
-          </div>
-          <div className="text-[10px] text-slate-400 text-center font-medium pt-1 border-t border-slate-100">
-            Psychometric Stress &amp; Fatigue Population
-          </div>
-        </div>
-
-        {/* Card 2: Unit Readiness Comparison (Horizontal Progress Bars) */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 font-bold text-slate-900 text-xs tracking-tight">
-              <Layers className="w-4 h-4 text-[#163A5F]" />
-              <span>Unit Readiness Comparison</span>
             </div>
             <button
               onClick={() => setActiveDecisionModal(true)}
-              className="text-[11px] font-bold text-primary hover:text-primary-700 cursor-pointer"
+              className="text-[11px] font-bold text-emerald-800 hover:text-emerald-950 cursor-pointer"
             >
-              View All &rarr;
+              Command Directives &rarr;
             </button>
           </div>
 
-          <div className="space-y-2.5 py-1">
-            <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              <span>Unit</span>
-              <span>Readiness</span>
-            </div>
-
+          {/* Unit Bullet Graph Matrix */}
+          <div className="space-y-3 py-1">
             {[
-              { name: 'Alpha Battalion', pct: 92, color: 'bg-emerald-500' },
-              { name: 'Bravo Battalion', pct: 88, color: 'bg-amber-500' },
-              { name: 'Charlie Battalion', pct: 81, color: 'bg-amber-500' },
-              { name: 'Delta Battalion', pct: 94, color: 'bg-emerald-500' },
-              { name: 'Echo Battalion', pct: 78, color: 'bg-rose-500' },
-            ].map((u) => (
-              <div
-                key={u.name}
-                onClick={() => handleOpenBattalion(u.name.split(' ')[0])}
-                className="group cursor-pointer space-y-1"
-                title="Click to drill down into unit companies & personnel"
-              >
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="font-semibold text-slate-700 group-hover:text-primary transition-colors">
-                    {u.name}
-                  </span>
-                  <span className="font-black text-slate-900">{u.pct}%</span>
+              { name: 'Alpha Battalion', key: 'Alpha', pct: 92, strength: 510, coys: ['Low', 'Low', 'Low', 'Low', 'Low'], status: 'Optimal' },
+              { name: 'Bravo Battalion', key: 'Bravo', pct: 88, strength: 495, coys: ['High', 'Med', 'Crit', 'Crit', 'Low'], status: 'Overload Watch' },
+              { name: 'Charlie Battalion', key: 'Charlie', pct: 81, strength: 505, coys: ['Crit', 'Med', 'Med', 'High', 'Low'], status: 'Separation Stress' },
+              { name: 'Delta Battalion', key: 'Delta', pct: 94, strength: 512, coys: ['Low', 'Low', 'Low', 'Med', 'Low'], status: 'Combat Ready' },
+              { name: 'Echo Battalion', key: 'Echo', pct: 78, strength: 498, coys: ['Crit', 'Crit', 'High', 'Med', 'Low'], status: 'Sleep Deprivation' },
+            ].map((u) => {
+              const isAboveTarget = u.pct >= 85;
+              return (
+                <div
+                  key={u.key}
+                  onClick={() => handleOpenBattalion(u.key)}
+                  className="group p-2.5 rounded-xl border border-slate-100 hover:border-emerald-300 hover:bg-slate-50/80 transition-all cursor-pointer space-y-1.5"
+                  title="Click to drill down into company breakdown & flagged jawans"
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-slate-900 group-hover:text-emerald-800 transition-colors">
+                        {u.name}
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        ({u.strength} Jawans)
+                      </span>
+                      <span className={`text-[9px] px-1.5 py-0.2 rounded font-semibold ${
+                        isAboveTarget ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                      }`}>
+                        {u.status}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 font-mono">
+                      <span className="text-[10px] text-slate-400">Readiness:</span>
+                      <span className="font-black text-slate-900 text-xs">{u.pct}%</span>
+                    </div>
+                  </div>
+
+                  {/* Bullet Graph with Target Notch at 85% */}
+                  <div className="relative w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        u.pct >= 90 ? 'bg-emerald-500' : u.pct >= 85 ? 'bg-emerald-600' : u.pct >= 80 ? 'bg-amber-500' : 'bg-rose-500'
+                      }`}
+                      style={{ width: `${u.pct}%` }}
+                    />
+                    {/* Target marker line at 85% */}
+                    <div
+                      className="absolute top-0 bottom-0 w-0.5 bg-slate-900 z-10"
+                      style={{ left: '85%' }}
+                    />
+                  </div>
+
+                  {/* Company Distribution Pips */}
+                  <div className="flex items-center justify-between text-[10px]">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-slate-400 font-mono text-[9px] uppercase">Coys:</span>
+                      {u.coys.map((c, cIdx) => (
+                        <span
+                          key={cIdx}
+                          className={`w-4 h-4 rounded text-[9px] font-bold flex items-center justify-center font-mono ${
+                            c === 'Crit' ? 'bg-rose-100 text-rose-800' :
+                            c === 'High' ? 'bg-orange-100 text-orange-800' :
+                            c === 'Med' ? 'bg-amber-100 text-amber-800' :
+                            'bg-emerald-100 text-emerald-800'
+                          }`}
+                          title={`Company ${String.fromCharCode(65 + cIdx)}: ${c}`}
+                        >
+                          {String.fromCharCode(65 + cIdx)}
+                        </span>
+                      ))}
+                    </div>
+                    <span className="text-[10px] text-emerald-800 font-semibold group-hover:underline flex items-center gap-0.5">
+                      Dossier Drill-down <ChevronRight className="w-3 h-3" />
+                    </span>
+                  </div>
                 </div>
-                <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
-                  <div
-                    className={`h-full ${u.color} rounded-full transition-all duration-500 group-hover:opacity-90`}
-                    style={{ width: `${u.pct}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
+
           <div className="text-[10px] text-slate-400 text-center font-medium pt-1 border-t border-slate-100">
-            Click any unit to open drill-down dossier
+            Threshold target line indicates 85.0% General Staff Operational Benchmark
           </div>
         </div>
 
-        {/* Card 3: Operational Readiness Trend (Line Chart) */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 font-bold text-slate-900 text-xs tracking-tight">
-              <TrendingUp className="w-4 h-4 text-[#163A5F]" />
-              <span>Operational Readiness Trend</span>
+        {/* Right (5 cols): Operational Readiness 6-Month Trend Curve */}
+        <div className="lg:col-span-5 p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-emerald-800" />
+              <div>
+                <h3 className="text-xs sm:text-sm font-black text-slate-900 tracking-tight">
+                  {t('Operational Readiness Trend')}
+                </h3>
+                <span className="text-[10px] text-slate-500">6-Month Moving Aggregate</span>
+              </div>
             </div>
             <select
               value={trendRange}
               onChange={(e) => setTrendRange(e.target.value as any)}
-              className="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200 outline-none cursor-pointer"
+              className="text-[10px] font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200 outline-none cursor-pointer"
             >
               <option value="6m">Last 6 Months</option>
               <option value="30d">Last 30 Days</option>
@@ -1475,10 +1409,10 @@ export const CommanderDashboard: React.FC = () => {
           </div>
 
           <div className="py-2 relative">
-            <svg viewBox="0 0 240 100" className="w-full h-28 overflow-visible">
+            <svg viewBox="0 0 240 100" className="w-full h-32 overflow-visible">
               <defs>
-                <linearGradient id="readinessGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#10B981" stopOpacity="0.25" />
+                <linearGradient id="readinessGradEnterprise" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10B981" stopOpacity="0.3" />
                   <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
                 </linearGradient>
               </defs>
@@ -1489,17 +1423,19 @@ export const CommanderDashboard: React.FC = () => {
               <line x1="25" y1="65" x2="235" y2="65" stroke="#E2E8F0" strokeDasharray="3 3" />
               <line x1="25" y1="90" x2="235" y2="90" stroke="#E2E8F0" strokeDasharray="3 3" />
 
-              {/* Y Axis Labels */}
-              <text x="5" y="18" fill="#94A3B8" fontSize="9" fontWeight="bold">100</text>
-              <text x="10" y="43" fill="#94A3B8" fontSize="9" fontWeight="bold">90</text>
-              <text x="10" y="68" fill="#94A3B8" fontSize="9" fontWeight="bold">80</text>
-              <text x="10" y="93" fill="#94A3B8" fontSize="9" fontWeight="bold">70</text>
+              {/* Target Benchmark Line at 85% */}
+              <line x1="25" y1="52" x2="235" y2="52" stroke="#F59E0B" strokeWidth="1" strokeDasharray="4 2" />
 
-              {/* Area fill under trend curve */}
-              {/* Mar: 86->50, Apr: 88->45, May: 85->52, Jun: 90->40, Jul: 92->35, Aug: 92->35 */}
+              {/* Y Axis Labels */}
+              <text x="5" y="18" fill="#94A3B8" fontSize="8" fontWeight="bold">100%</text>
+              <text x="5" y="43" fill="#94A3B8" fontSize="8" fontWeight="bold">90%</text>
+              <text x="5" y="68" fill="#94A3B8" fontSize="8" fontWeight="bold">80%</text>
+              <text x="5" y="93" fill="#94A3B8" fontSize="8" fontWeight="bold">70%</text>
+
+              {/* Area fill */}
               <path
                 d="M 35,50 L 75,45 L 115,52 L 155,40 L 195,35 L 230,35 L 230,90 L 35,90 Z"
-                fill="url(#readinessGrad)"
+                fill="url(#readinessGradEnterprise)"
               />
 
               {/* Line */}
@@ -1534,9 +1470,9 @@ export const CommanderDashboard: React.FC = () => {
                   />
                   <text
                     x={p.x}
-                    y={p.y - 7}
-                    fill="#1E293B"
-                    fontSize="9"
+                    y={p.y - 6}
+                    fill="#0F172A"
+                    fontSize="8"
                     fontWeight="bold"
                     textAnchor="middle"
                   >
@@ -1544,9 +1480,9 @@ export const CommanderDashboard: React.FC = () => {
                   </text>
                   <text
                     x={p.x}
-                    y="102"
+                    y="100"
                     fill="#64748B"
-                    fontSize="9"
+                    fontSize="8"
                     fontWeight="600"
                     textAnchor="middle"
                   >
@@ -1556,22 +1492,44 @@ export const CommanderDashboard: React.FC = () => {
               ))}
             </svg>
           </div>
-          <div className="text-[10px] text-slate-400 text-center font-medium pt-1 border-t border-slate-100">
-            {hoveredTrendPoint
-              ? `${hoveredTrendPoint.month}: ${hoveredTrendPoint.value}% Readiness Recorded`
-              : 'Northern Command 6-Month Aggregate'}
+
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+            <span className="text-slate-500 font-mono">
+              {hoveredTrendPoint
+                ? `${hoveredTrendPoint.month}: ${hoveredTrendPoint.value}% Recorded`
+                : 'Benchmark Target: ≥85%'}
+            </span>
+            <span className="text-emerald-700 font-bold font-mono">+6.0% Surge Since Mar</span>
           </div>
         </div>
+      </div>
 
-        {/* Card 4: Force Health Radar (Hexagonal Radar Chart) */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center gap-2 font-bold text-slate-900 text-xs tracking-tight">
-            <Activity className="w-4 h-4 text-[#163A5F]" />
-            <span>Force Health Radar</span>
+      {/* Force Health Radar & Risk Distribution (Donut + Radar Pair) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4">
+        {/* Force Health Hexagonal Radar (7 cols) */}
+        <div className="lg:col-span-7 p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-2">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div className="flex items-center gap-2">
+              <Activity className="w-4 h-4 text-emerald-800" />
+              <div>
+                <h3 className="text-xs sm:text-sm font-black text-slate-900 tracking-tight">
+                  {t('Force Health Hexagonal Multi-Axial Radar')}
+                </h3>
+                <span className="text-[10px] text-slate-500">Current Deployment Cycle vs Previous Cycle Baseline</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 text-[10px] font-bold">
+              <span className="flex items-center gap-1 text-emerald-600">
+                <span className="w-2.5 h-0.5 bg-emerald-500 rounded-full" /> Current
+              </span>
+              <span className="flex items-center gap-1 text-slate-400">
+                <span className="w-2.5 h-0.5 border-t border-slate-400 border-dashed" /> Baseline
+              </span>
+            </div>
           </div>
 
-          <div className="py-1 flex items-center justify-center">
-            <svg viewBox="0 0 190 180" className="w-36 h-36">
+          <div className="py-2 flex items-center justify-center">
+            <svg viewBox="0 0 190 180" className="w-44 h-44">
               {/* Web Rings */}
               {[0.25, 0.5, 0.75, 1.0].map((level, lIdx) => {
                 const poly = radarAxes.map((a) => getRadarPoint(a.angle, level)).join(' ');
@@ -1631,35 +1589,124 @@ export const CommanderDashboard: React.FC = () => {
             </svg>
           </div>
 
-          <div className="flex items-center justify-center gap-4 text-[10px] font-bold text-slate-500 pt-1 border-t border-slate-100">
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-0.5 bg-emerald-500 rounded-full" />
-              <span>Current</span>
+          <div className="text-[10px] text-slate-400 text-center font-medium pt-1 border-t border-slate-100">
+            Burnout index improved by 10% following watch roster rebalancing
+          </div>
+        </div>
+
+        {/* Psychometric Risk Distribution Donut (5 cols) */}
+        <div className="lg:col-span-5 p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-2">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
+              <Users className="w-4 h-4 text-emerald-800" />
+              <span>Personnel Risk Distribution</span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-0.5 border-t border-slate-400 border-dashed" />
-              <span>Previous</span>
+            <span className="font-mono text-[10px] text-slate-400">Total: 520 Sample</span>
+          </div>
+
+          <div className="py-2 flex items-center justify-center gap-4">
+            {/* SVG Donut */}
+            <div className="relative w-28 h-28 shrink-0">
+              <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="36"
+                  fill="transparent"
+                  stroke="#10B981"
+                  strokeWidth="14"
+                  strokeDasharray="131 226"
+                  strokeDashoffset="0"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="36"
+                  fill="transparent"
+                  stroke="#F59E0B"
+                  strokeWidth="14"
+                  strokeDasharray="59 226"
+                  strokeDashoffset="-131"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="36"
+                  fill="transparent"
+                  stroke="#F97316"
+                  strokeWidth="14"
+                  strokeDasharray="27 226"
+                  strokeDashoffset="-190"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="36"
+                  fill="transparent"
+                  stroke="#EF4444"
+                  strokeWidth="14"
+                  strokeDasharray="9 226"
+                  strokeDashoffset="-217"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Total</span>
+                <span className="text-base font-black text-slate-900 leading-none">520</span>
+                <span className="text-[9px] text-slate-500 font-medium">Troops</span>
+              </div>
             </div>
+
+            {/* Legend */}
+            <div className="space-y-1.5 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
+                <span className="text-slate-600 font-medium text-[11px]">Critical Tier</span>
+                <span className="ml-auto font-black text-slate-900 text-[11px]">4% (24)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-orange-500 shrink-0" />
+                <span className="text-slate-600 font-medium text-[11px]">High Tier</span>
+                <span className="ml-auto font-black text-slate-900 text-[11px]">12% (62)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
+                <span className="text-slate-600 font-medium text-[11px]">Medium Tier</span>
+                <span className="ml-auto font-black text-slate-900 text-[11px]">26% (135)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                <span className="text-slate-600 font-medium text-[11px]">Low Tier</span>
+                <span className="ml-auto font-black text-slate-900 text-[11px]">58% (299)</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-[10px] text-slate-400 text-center font-medium pt-1 border-t border-slate-100">
+            Psychometric Stress &amp; Fatigue Population Census
           </div>
         </div>
       </div>
 
       {/* ===================================================================== */}
-      {/* ROW 3: 3 GRID CARDS (HEATMAP, HIGH PRIORITY UNITS, AI EARLY WARNINGS)  */}
+      {/* 4. VISUAL HIERARCHY: CURRENT INTELLIGENCE & FORMATION SURVEILLANCE    */}
+      {/* (Tactical Coy x Bn Heatmap, Priority Unit Triage, Early Warnings)     */}
       {/* ===================================================================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
-        {/* Card 1: Risk Heatmap (Units vs Risk Level) */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center gap-2 font-bold text-slate-900 text-xs tracking-tight">
-            <Layers className="w-4 h-4 text-[#163A5F]" />
-            <span>Risk Heatmap (Units vs Risk Level)</span>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Heatmap Matrix (6 cols) */}
+        <div className="lg:col-span-6 p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div className="flex items-center gap-2 font-bold text-slate-900 text-xs tracking-tight">
+              <Layers className="w-4 h-4 text-emerald-800" />
+              <span>Tactical Risk Heatmap (Battalions &times; Companies)</span>
+            </div>
+            <span className="text-[10px] font-mono text-slate-400">Click unit to drill down</span>
           </div>
 
-          <div className="py-2 overflow-x-auto">
+          <div className="py-1 overflow-x-auto">
             <table className="w-full text-center border-separate border-spacing-1.5">
               <thead>
                 <tr>
-                  <th className="w-14" />
+                  <th className="w-16" />
                   {['A coy', 'B coy', 'C coy', 'D coy', 'E coy'].map((c) => (
                     <th key={c} className="text-[10px] font-black text-slate-500 uppercase tracking-wider py-1">
                       {c}
@@ -1672,7 +1719,7 @@ export const CommanderDashboard: React.FC = () => {
                   <tr key={row.unit}>
                     <td
                       onClick={() => handleOpenBattalion(row.unit)}
-                      className="text-left font-bold text-xs text-slate-700 hover:text-primary cursor-pointer pr-2 whitespace-nowrap"
+                      className="text-left font-bold text-xs text-slate-800 hover:text-emerald-700 cursor-pointer pr-2 whitespace-nowrap"
                     >
                       {row.unit}
                     </td>
@@ -1693,7 +1740,6 @@ export const CommanderDashboard: React.FC = () => {
             </table>
           </div>
 
-          {/* Legend */}
           <div className="flex items-center justify-center gap-4 text-[10px] font-bold pt-2 border-t border-slate-100">
             <span className="flex items-center gap-1 text-slate-600">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-600" /> Critical
@@ -1710,440 +1756,575 @@ export const CommanderDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Card 2: High Priority Units Table */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 font-bold text-slate-900 text-xs tracking-tight">
+        {/* High Priority Units & Early Warnings Triage (6 cols) */}
+        <div className="lg:col-span-6 p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-slate-100 gap-2">
+            <div className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-rose-600" />
-              <span>High Priority Units</span>
+              <div className="flex items-center gap-1 p-0.5 rounded-lg bg-slate-100 text-[10px] font-mono">
+                <button
+                  onClick={() => setTriageTab('units')}
+                  className={`px-2 py-1 rounded font-bold cursor-pointer transition-colors ${
+                    triageTab === 'units'
+                      ? 'bg-white text-slate-900 shadow-2xs'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  High Priority Units ({highPriorityUnits.length})
+                </button>
+                <button
+                  onClick={() => setTriageTab('warnings')}
+                  className={`px-2 py-1 rounded font-bold cursor-pointer transition-colors ${
+                    triageTab === 'warnings'
+                      ? 'bg-white text-rose-700 shadow-2xs'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  Early Warnings ({earlyWarnings.length})
+                </button>
+              </div>
             </div>
             <button
               onClick={() => setActiveDecisionModal(true)}
-              className="text-[11px] font-bold text-primary hover:text-primary-700 cursor-pointer"
+              className="text-[11px] font-bold text-emerald-800 hover:text-emerald-950 cursor-pointer self-start sm:self-auto"
             >
-              View All &rarr;
+              Action Center &rarr;
             </button>
           </div>
 
-          <div className="py-2 overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-wider">
-                  <th className="py-1.5 pr-2">#</th>
-                  <th className="py-1.5 pr-2">Unit</th>
-                  <th className="py-1.5 pr-2">Risk Level</th>
-                  <th className="py-1.5 pr-2">Key Concern</th>
-                  <th className="py-1.5 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {highPriorityUnits.map((u) => (
-                  <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-2 text-[11px] font-bold text-slate-400">{u.id}</td>
-                    <td
-                      onClick={() => handleOpenBattalion(u.unit.split(' ')[0])}
-                      className="py-2 font-bold text-slate-900 hover:text-primary cursor-pointer whitespace-nowrap"
-                    >
-                      {u.unit}
-                    </td>
-                    <td className="py-2 whitespace-nowrap">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-bold text-slate-900">{u.risk}</span>
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold ${u.badge}`}>
-                          {u.tier}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="py-2 text-[11px] text-slate-600 whitespace-nowrap">{u.concern}</td>
-                    <td className="py-2 text-right">
-                      <button
+          <div className="overflow-x-auto">
+            {triageTab === 'units' ? (
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                    <th className="py-1.5 pr-2">Unit</th>
+                    <th className="py-1.5 pr-2">Stress/Risk</th>
+                    <th className="py-1.5 pr-2">Primary Driver</th>
+                    <th className="py-1.5 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {highPriorityUnits.map((u) => (
+                    <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td
                         onClick={() => handleOpenBattalion(u.unit.split(' ')[0])}
-                        className="px-2.5 py-1 rounded-lg bg-emerald-950 text-emerald-300 hover:bg-emerald-900 text-[10px] font-bold transition-colors cursor-pointer"
+                        className="py-2 font-bold text-slate-900 hover:text-emerald-700 cursor-pointer whitespace-nowrap"
                       >
-                        View
-                      </button>
-                    </td>
+                        {u.unit}
+                      </td>
+                      <td className="py-2 whitespace-nowrap">
+                        <div className="flex items-center gap-1.5 font-mono">
+                          <span className="font-bold text-slate-900">{u.risk}</span>
+                          <span className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold ${u.badge}`}>
+                            {u.tier}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-2 text-[11px] text-slate-600 whitespace-nowrap">{u.concern}</td>
+                      <td className="py-2 text-right">
+                        <button
+                          onClick={() => handleOpenBattalion(u.unit.split(' ')[0])}
+                          className="px-2.5 py-1 rounded-md bg-[#0B1712] text-emerald-300 hover:bg-emerald-950 text-[10px] font-bold transition-colors cursor-pointer"
+                        >
+                          Inspect
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                    <th className="py-1.5 pr-2">Indicator</th>
+                    <th className="py-1.5 pr-2">Formation</th>
+                    <th className="py-1.5 pr-2">Risk Tier</th>
+                    <th className="py-1.5 text-right">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {earlyWarnings.map((w) => (
+                    <tr key={w.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="py-2 font-bold text-slate-800 whitespace-nowrap">{w.indicator}</td>
+                      <td
+                        onClick={() => handleOpenBattalion(w.unit.split(' ')[0])}
+                        className="py-2 font-medium text-slate-600 hover:text-emerald-700 cursor-pointer whitespace-nowrap"
+                      >
+                        {w.unit}
+                      </td>
+                      <td className="py-2 whitespace-nowrap">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${w.badge}`}>
+                          {w.risk}
+                        </span>
+                      </td>
+                      <td className="py-2 text-right">
+                        <button
+                          onClick={() => handleOpenBattalion(w.unit.split(' ')[0])}
+                          className="px-2.5 py-1 rounded-md bg-[#0B1712] text-emerald-300 hover:bg-emerald-950 text-[10px] font-bold transition-colors cursor-pointer"
+                        >
+                          Triage
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
 
           <div className="text-[10px] text-slate-400 text-center font-medium pt-1 border-t border-slate-100">
-            Automated Operational Psychometric Triage Queue
-          </div>
-        </div>
-
-        {/* Card 3: AI Early Warnings Table */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 font-bold text-slate-900 text-xs tracking-tight">
-              <Brain className="w-4 h-4 text-[#163A5F]" />
-              <span>AI Early Warnings</span>
-            </div>
-            <button
-              onClick={() => setActiveDecisionModal(true)}
-              className="text-[11px] font-bold text-primary hover:text-primary-700 cursor-pointer"
-            >
-              View All &rarr;
-            </button>
-          </div>
-
-          <div className="py-2 overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-wider">
-                  <th className="py-1.5 pr-2">#</th>
-                  <th className="py-1.5 pr-2">Indicator</th>
-                  <th className="py-1.5 pr-2">Unit</th>
-                  <th className="py-1.5 pr-2 text-center">Risk</th>
-                  <th className="py-1.5 text-right">Trend</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {earlyWarnings.map((w) => (
-                  <tr key={w.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-2 text-[11px] font-bold text-slate-400">{w.id}</td>
-                    <td className="py-2 font-bold text-slate-800 whitespace-nowrap">{w.indicator}</td>
-                    <td
-                      onClick={() => handleOpenBattalion(w.unit.split(' ')[0])}
-                      className="py-2 font-medium text-slate-600 hover:text-primary cursor-pointer whitespace-nowrap"
-                    >
-                      {w.unit}
-                    </td>
-                    <td className="py-2 text-center whitespace-nowrap">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${w.badge}`}>
-                        {w.risk}
-                      </span>
-                    </td>
-                    <td className="py-2 text-right">
-                      <span className="font-bold text-rose-600 text-sm">&uarr;</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="text-[10px] text-slate-400 text-center font-medium pt-1 border-t border-slate-100">
-            Predictive Horizon: Next 14 &ndash; 30 Operational Days
+            {triageTab === 'units'
+              ? 'Automated Operational Psychometric Triage Queue'
+              : 'Predictive Early Warning Interception Horizon: 14 – 30 Days'}
           </div>
         </div>
       </div>
 
+      {/* Multi-Source Signal Fusion Flow & Unit Hierarchy */}
+      <MultiSourceSignalFusionCard />
+      <UnitHierarchyTree />
+
       {/* ===================================================================== */}
-      {/* SECTION 19: OPERATIONAL RISK MOMENTUM & REAL-TIME ACTION DIRECTIVES   */}
-      {/* (Top 1% Principle #1 & #3: d(Stress)/dt Velocity Radar & Directives)  */}
+      {/* 5. VISUAL HIERARCHY: BEHAVIORAL ANALYTICS & ANOMALY SURVEILLANCE      */}
+      {/* (Cleaned of buzzword badges; authentic telemetry & baseline shifts)   */}
       {/* ===================================================================== */}
-      <div className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 via-[#0E231B] to-slate-900 border border-[#D4A017]/30 shadow-xl text-white space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+
+      {/* Emotional Stability Index Panel */}
+      <div id="commander-emotional-stability-panel" className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/90 shadow-xs relative overflow-hidden space-y-4">
+        {/* Top Header & Metadata */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-100 relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#D4A017]/20 border border-[#D4A017]/40 flex items-center justify-center text-[#D4A017] shrink-0">
-              <Zap className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-800 shadow-2xs">
+              <Activity className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black uppercase tracking-widest text-[#D4A017]">
-                  Top 1% Operational Intelligence &bull; Section 19
-                </span>
-                <span className="px-2 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300 font-mono text-[10px] font-bold animate-pulse">
-                  Acute Surge Alert
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <h3 className="text-base sm:text-lg font-black tracking-tight text-slate-900 flex items-center gap-2">
+                  {t('Emotional Stability Index (ESI)')}
+                </h3>
+                <span className="text-[10px] font-mono text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                  Model: Weighted Recency Telemetry (7-Day WMA)
                 </span>
               </div>
-              <h3 className="text-base sm:text-lg font-black text-white tracking-tight">
-                Risk Momentum &amp; Real-Time Command Action Directives
-              </h3>
-              <p className="text-xs text-slate-300">
-                Mathematical velocity <span className="font-mono text-[#D4A017] font-bold">V = d(Stress)/dt</span> tracks stress acceleration to intercept acute breakdowns before operational impairment.
+              <p className="text-xs text-slate-600 font-medium mt-0.5">
+                Measures affective consistency and allostatic strain recovery across high-tempo operational formations.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-mono text-slate-400">
-              Threshold: &ge; +2.5 pts/day
-            </span>
-            <button
-              onClick={() => setActiveDecisionModal(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-[#D4A017] text-slate-950 font-black text-xs hover:bg-[#c39213] transition-all cursor-pointer shadow-sm"
-            >
-              Open Command Decision Center &rarr;
-            </button>
+          <div className="flex items-center gap-3 self-start lg:self-auto">
+            <div className="text-right hidden sm:block font-mono text-[10px]">
+              <span className="text-slate-400 uppercase tracking-wider block">Temporal Window</span>
+              <span className="font-bold text-slate-800">7-Day Recency Weighted</span>
+            </div>
+            <div className="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono text-xs font-bold flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              95.8% Model Confidence
+            </div>
           </div>
         </div>
 
-        {/* 3 Acute Velocity Personnel Action Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-          {[
-            {
-              id: 'JC-2748',
-              name: 'Naik Rohit Sharma',
-              unit: 'Bravo Bn &bull; C Coy',
-              role: 'Section 2IC',
-              stress: 86,
-              velocity: '+4.8 pts/day',
-              accel: '+0.9 pts/d²',
-              state: 'ACUTE_SURGE',
-              daysLeft: '2 Days',
-              actionCode: 'ROSTER_STAND_DOWN_ROHIT',
-              directive: 'Rotate Out of Night Watch & Grant 7-Day Furlough',
-              reason: 'Continuous LOC watch >14 mos. Acceleration +0.9 pts/d² indicates imminent collapse.',
-              badgeColor: 'bg-rose-500/20 border-rose-500/50 text-rose-300',
-              btnLabel: 'Execute 7-Day Stand-Down',
-            },
-            {
-              id: 'JC-1108',
-              name: 'Subedar Gurpreet Singh',
-              unit: 'Echo Bn &bull; A Coy',
-              role: 'Platoon Commander',
-              stress: 89,
-              velocity: '+3.9 pts/day',
-              accel: '+0.6 pts/d²',
-              state: 'ACUTE_SURGE',
-              daysLeft: '1 Day',
-              actionCode: 'SWAP_ROSTER_GURPREET',
-              directive: 'Reassign Night Watch Vigil Roster to Charlie Coy',
-              reason: 'Consecutive night vigils causing severe circadian disruption. Swap night duty roster.',
-              badgeColor: 'bg-rose-500/20 border-rose-500/50 text-rose-300',
-              btnLabel: 'Execute Roster Swap',
-            },
-            {
-              id: 'JC-3910',
-              name: 'Hav. Amit Kumar',
-              unit: 'Charlie Bn &bull; A Coy',
-              role: 'Signals Section',
-              stress: 88,
-              velocity: '+2.8 pts/day',
-              accel: '+0.3 pts/d²',
-              state: 'ACUTE_SURGE',
-              daysLeft: '1 Day',
-              actionCode: 'COMPASSIONATE_LEAVE_AMIT',
-              directive: 'Approve Emergency Family Welfare Leave (14 Days)',
-              reason: 'Domestic distress combined with acute sleep deficit. Direct compassionate bypass.',
-              badgeColor: 'bg-rose-500/20 border-rose-500/50 text-rose-300',
-              btnLabel: 'Grant 14-Day Leave',
-            },
-          ].map((item) => {
-            const isDispatched = dispatchedActions.includes(item.actionCode);
-            return (
-              <div
-                key={item.id}
-                className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-[#D4A017]/40 flex flex-col justify-between transition-all space-y-3"
-              >
-                <div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-[10px] font-mono text-[#D4A017] font-bold block">{item.id}</span>
-                      <h4 className="text-sm font-bold text-white">{item.name}</h4>
-                      <span className="text-[10px] text-slate-400" dangerouslySetInnerHTML={{ __html: item.unit }} />
-                    </div>
-                    <div className="text-right">
-                      <div className="font-mono text-base font-black text-rose-400">
-                        &uarr; {item.velocity}
-                      </div>
-                      <span className="text-[10px] font-mono text-rose-300 font-bold block">
-                        Crit Limit: {item.daysLeft}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="mt-3 p-2.5 rounded-xl bg-black/40 border border-white/5 space-y-1">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-[#D4A017] block">
-                      Recommended Directive
-                    </span>
-                    <p className="text-xs font-bold text-slate-100">{item.directive}</p>
-                    <p className="text-[11px] text-slate-400 leading-tight">{item.reason}</p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => handleDispatchCommand(`Directive Executed [${item.actionCode}]: ${item.directive}`)}
-                  disabled={isDispatched}
-                  className={`w-full py-2 px-3 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-md ${
-                    isDispatched
-                      ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white'
-                  }`}
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>{isDispatched ? 'Directive Dispatched ✓' : item.btnLabel}</span>
-                </button>
+        {/* Content Grid: Hero ESI + 6 Factors */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-2 relative z-10">
+          {/* Col 1: Composite Benchmark */}
+          <div className="lg:col-span-4 p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                  Composite Stability
+                </span>
+                <span className="text-[10px] font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-bold">
+                  Division Mean
+                </span>
               </div>
-            );
-          })}
+              <div className="mt-3 flex items-baseline gap-3 font-mono">
+                <span className="text-4xl sm:text-5xl font-black text-emerald-800 tracking-tight">
+                  82%
+                </span>
+                <div className="flex flex-col font-sans">
+                  <span className="text-base font-black text-slate-900 leading-tight">
+                    {t('Stable')}
+                  </span>
+                  <span className="text-[11px] text-slate-500 font-medium">
+                    {t('High Affective Consistency')}
+                  </span>
+                </div>
+              </div>
+              <div className="w-full bg-slate-200 rounded-full h-2 mt-3 overflow-hidden">
+                <div className="bg-emerald-600 h-2 rounded-full" style={{ width: '82%' }} />
+              </div>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-slate-200/80 space-y-1 text-xs">
+              <div className="flex items-center justify-between text-slate-600">
+                <span className="text-slate-500">Volatility Standard Deviation:</span>
+                <span className="font-mono font-bold text-slate-900">&sigma; = 1.18 (Low)</span>
+              </div>
+              <div className="flex items-center justify-between text-slate-600">
+                <span className="text-slate-500">Active Duty Threshold:</span>
+                <span className="font-mono font-bold text-slate-900">&ge; 75.0% Required</span>
+              </div>
+              <p className="text-[11px] text-slate-600 leading-relaxed pt-1">
+                <strong>Command Assessment:</strong> Formations exhibit strong baseline emotional regulation despite ongoing high-altitude watch rotations.
+              </p>
+            </div>
+          </div>
+
+          {/* Col 2: 6 Factors */}
+          <div className="lg:col-span-8 p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                6-Factor Telemetry Array
+              </span>
+              <span className="text-[10px] font-mono text-slate-500">
+                Normalized Weights: 100%
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+              {[
+                { factor: 'Mood', score: 84, status: 'Optimal', weight: '22%', icon: Brain },
+                { factor: 'Stress', score: 78, status: 'Regulated', weight: '20%', icon: Activity },
+                { factor: 'Sleep', score: 80, status: 'Restorative', weight: '18%', icon: Moon },
+                { factor: 'Energy', score: 85, status: 'High Vitality', weight: '16%', icon: Zap },
+                { factor: 'Voice', score: 88, status: 'Steady Acoustic', weight: '12%', icon: Mic },
+                { factor: 'Anxiety', score: 76, status: 'Controlled', weight: '12%', icon: ShieldCheck },
+              ].map((item) => {
+                const FactorIcon = item.icon;
+                return (
+                  <div key={item.factor} className="p-2.5 rounded-lg bg-white border border-slate-200 shadow-2xs hover:border-emerald-300 transition-colors">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="flex items-center gap-1.5 font-bold text-slate-800">
+                        <FactorIcon className="w-3.5 h-3.5 text-emerald-700" />
+                        {t(item.factor)}
+                      </span>
+                      <span className="font-mono font-black text-emerald-800">{item.score}%</span>
+                    </div>
+                    <div className="w-full bg-slate-100 rounded-full h-1.5 my-1.5 overflow-hidden">
+                      <div className="bg-emerald-600 h-1.5 rounded-full" style={{ width: `${item.score}%` }} />
+                    </div>
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-emerald-800 font-bold">{t(item.status)}</span>
+                      <span className="font-mono text-slate-400">W: {item.weight}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* 7-Day Trajectory */}
+            <div className="mt-3 pt-2.5 border-t border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold font-mono">7-Day Trajectory:</span>
+                <div className="flex items-center gap-1 font-mono text-[10px] flex-wrap">
+                  {['Day -6: 79%', 'Day -5: 80%', 'Day -4: 81%', 'Day -3: 82%', 'Day -2: 81%', 'Yest: 83%', 'Today: 82%'].map((pt, i) => (
+                    <span key={i} className="px-1.5 py-0.2 rounded bg-white border border-slate-200 text-slate-700 font-semibold">
+                      {pt}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <span className="text-[10px] font-mono text-emerald-700 font-bold flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                Minimal Variance (&plusmn;1.4%)
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* ===================================================================== */}
-      {/* ROW 4: 3 CARDS (WELFARE PROGRESS, RESOURCES, AI COMMAND RECOMMENDATIONS)*/}
-      {/* ===================================================================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
-        {/* Card 1: Welfare Intervention Progress */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 font-bold text-slate-900 text-xs tracking-tight">
-              <HeartPulse className="w-4 h-4 text-rose-600" />
-              <span>Welfare Intervention Progress</span>
+      {/* Behavioral Change Detection Panel */}
+      <div id="commander-behavioral-change-panel" className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/90 shadow-xs relative overflow-hidden space-y-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-100 relative z-10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-800 shadow-2xs">
+              <Sliders className="w-5 h-5" />
             </div>
-            <button
-              onClick={() => setActiveDecisionModal(true)}
-              className="text-[11px] font-bold text-primary hover:text-primary-700 cursor-pointer"
-            >
-              View Details &rarr;
-            </button>
+            <div>
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <h3 className="text-base sm:text-lg font-black tracking-tight text-slate-900 flex items-center gap-2">
+                  {t('Behavioral Drift & Anomaly Surveillance')}
+                </h3>
+                <span className="text-[10px] font-mono text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                  Telemetry Comparison: 14-Day Rolling vs 90-Day Baseline
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 font-medium mt-0.5">
+                Detects statistical deviations in troop routine patterns before operational impairment occurs.
+              </p>
+            </div>
           </div>
 
-          <div className="space-y-3 py-2">
-            {[
-              { label: 'Counselling Sessions', pct: 82, count: '124 / 150', color: 'bg-emerald-500', icon: Users },
-              { label: 'Medical Review', pct: 61, count: '91 / 150', color: 'bg-blue-500', icon: UserCheck },
-              { label: 'Duty Adjustment', pct: 91, count: '137 / 150', color: 'bg-indigo-600', icon: Sliders },
-              { label: 'Follow-up & Monitoring', pct: 76, count: '114 / 150', color: 'bg-purple-600', icon: Clock },
-            ].map((item) => {
-              const ItemIcon = item.icon;
-              return (
-                <div key={item.label} className="space-y-1">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="flex items-center gap-1.5 font-semibold text-slate-700">
-                      <ItemIcon className="w-3.5 h-3.5 text-slate-400" />
-                      {item.label}
+          <div className="flex items-center gap-2 self-start lg:self-auto">
+            <div className="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 font-mono text-xs font-bold flex items-center gap-1.5">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+              14 High-Shift Anomaly Flags
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-2 relative z-10">
+          {/* Outliers Table */}
+          <div className="lg:col-span-4 p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                  Aggregate Drift
+                </span>
+                <span className="text-[10px] font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-bold">
+                  89% Stable
+                </span>
+              </div>
+              <div className="mt-3 flex items-baseline gap-2 font-mono">
+                <span className="text-4xl font-black text-slate-900">28</span>
+                <span className="text-sm font-bold text-slate-400">/ 100</span>
+                <span className="text-xs font-bold text-emerald-600 font-sans ml-1">Mild Drift</span>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-slate-200/80 space-y-2">
+              <div className="text-[10px] font-mono font-bold uppercase text-slate-400">
+                Top Unit Outliers
+              </div>
+              <div className="space-y-1.5">
+                {[
+                  { name: 'Havildar Ramesh Chand', unit: 'High Altitude Guard', score: 88, issue: 'Overtime + Leave Spike' },
+                  { name: 'Subedar Gurpreet Singh', unit: 'Field Artillery 3rd Bn', score: 74, issue: 'Reduced Wellness Adherence' },
+                  { name: 'Sepoy Vikram Rathore', unit: 'Infantry 2nd Bn', score: 72, issue: 'Missing Drills & Training' },
+                ].map((soldier, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200 shadow-2xs">
+                    <div>
+                      <div className="font-bold text-slate-900 text-xs">{soldier.name}</div>
+                      <div className="text-[9px] text-slate-500">{soldier.unit} &bull; {soldier.issue}</div>
+                    </div>
+                    <span className="px-1.5 py-0.2 rounded font-mono font-black text-[10px] bg-rose-50 text-rose-700 border border-rose-200">
+                      BCS: {soldier.score}
                     </span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-black text-slate-900">{item.pct}%</span>
-                      <span className="text-[11px] text-slate-400 font-mono">({item.count})</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 5 Monitored Behavioral Domains */}
+          <div className="lg:col-span-8 p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                5 Behavioral Domains • 14D Current vs 90D Baseline Comparison
+              </span>
+              <span className="text-[10px] font-mono text-emerald-800 font-bold">
+                Continuous ML Telemetry
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {[
+                {
+                  label: 'Suddenly taking many leave days',
+                  current: '4.8 days avg/mo',
+                  historical: '1.2 days avg/mo',
+                  shift: '+300% surge',
+                  flag: 'Leave Spike',
+                  statusColor: 'text-amber-800 bg-amber-50 border-amber-200',
+                  icon: Calendar,
+                },
+                {
+                  label: 'Working excessive overtime',
+                  current: '24.5 hrs/wk avg',
+                  historical: '7.2 hrs/wk avg',
+                  shift: '+240% surge',
+                  flag: 'Excessive Overtime',
+                  statusColor: 'text-rose-800 bg-rose-50 border-rose-200',
+                  icon: Clock,
+                },
+                {
+                  label: 'Missing training attendance',
+                  current: '74.2% attendance',
+                  historical: '95.8% attendance',
+                  shift: '-21.6% drop',
+                  flag: 'Drill Absences',
+                  statusColor: 'text-amber-800 bg-amber-50 border-amber-200',
+                  icon: ShieldCheck,
+                },
+                {
+                  label: 'Declining performance ratings',
+                  current: '72.0 / 100 score',
+                  historical: '89.4 / 100 score',
+                  shift: '-17.4 pts',
+                  flag: 'Performance Dip',
+                  statusColor: 'text-amber-800 bg-amber-50 border-amber-200',
+                  icon: TrendingUp,
+                },
+                {
+                  label: 'Reduced wellness check-in rate',
+                  current: '44.0% completion',
+                  historical: '91.2% completion',
+                  shift: '-47.2% drop',
+                  flag: 'Disengagement',
+                  statusColor: 'text-rose-800 bg-rose-50 border-rose-200',
+                  icon: HeartPulse,
+                },
+              ].map((domain, i) => {
+                const DomainIcon = domain.icon;
+                return (
+                  <div key={i} className={`p-2.5 rounded-lg bg-white border border-slate-200 shadow-2xs ${i === 4 ? 'sm:col-span-2' : ''}`}>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="flex items-center gap-1.5 font-bold text-slate-900">
+                        <DomainIcon className="w-3.5 h-3.5 text-slate-700 shrink-0" />
+                        <span>{t(domain.label)}</span>
+                      </span>
+                      <span className={`font-mono text-[9px] font-bold px-1.5 py-0.2 rounded border ${domain.statusColor}`}>
+                        {t(domain.flag)}
+                      </span>
+                    </div>
+
+                    <div className="mt-2 grid grid-cols-3 gap-1 text-[10px] font-mono border-t border-slate-100 pt-1.5 text-center">
+                      <div>
+                        <span className="text-slate-400 block text-[9px] uppercase">{t('Baseline')}</span>
+                        <span className="text-slate-700 font-semibold">{domain.historical}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block text-[9px] uppercase">{t('Current')}</span>
+                        <span className="text-slate-900 font-bold">{domain.current}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block text-[9px] uppercase">{t('Shift')}</span>
+                        <span className="font-bold text-amber-700">{domain.shift}</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div
-                      className={`h-full ${item.color} rounded-full transition-all duration-500`}
-                      style={{ width: `${item.pct}%` }}
-                    />
+                );
+              })}
+            </div>
+
+            <div className="mt-3 pt-2.5 border-t border-slate-200/80 text-xs text-slate-600 flex items-center justify-between">
+              <span className="text-[11px]">
+                <strong>Executive Action:</strong> 14 flagged individuals queued for proactive counseling stand-down.
+              </span>
+              <button
+                onClick={() => handleDispatchCommand('Behavioral Anomaly Stand-Down & Overtime Roster Rebalancing')}
+                className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] cursor-pointer shadow-xs transition-all"
+              >
+                {t('Rebalance Rosters')}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* "What-If" Counterfactual Intervention Simulator */}
+      <WhatIfSimulator
+        personnelUid="UID-EMP-012"
+        initialSleep={4.5}
+        initialFatigue={8}
+        initialDutyDays={6}
+        initialStress={91.6}
+        onApplyPlan={(plan) => showToast(`Command Protocol Updated: ${plan}`)}
+      />
+
+      {/* ===================================================================== */}
+      {/* 6. VISUAL HIERARCHY: SUPPORTING METRICS & MISSION ASSURANCE           */}
+      {/* (Welfare Pipeline, Resource Availability, Mission Impact, Audit)      */}
+      {/* ===================================================================== */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        {/* Card 1: Welfare Intervention Progress */}
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-2">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div className="flex items-center gap-1.5 font-bold text-slate-900 text-xs">
+              <HeartPulse className="w-4 h-4 text-rose-600" />
+              <span>Welfare Interventions</span>
+            </div>
+            <span className="font-mono text-[10px] text-emerald-700 font-bold">81.4% Rate</span>
+          </div>
+
+          <div className="space-y-2 py-1">
+            {[
+              { label: 'Counselling Sessions', pct: 82, count: '124 / 150', color: 'bg-emerald-500' },
+              { label: 'Medical Review', pct: 61, count: '91 / 150', color: 'bg-blue-500' },
+              { label: 'Duty Adjustment', pct: 91, count: '137 / 150', color: 'bg-indigo-600' },
+              { label: 'Follow-up Monitoring', pct: 76, count: '114 / 150', color: 'bg-purple-600' },
+            ].map((item) => (
+              <div key={item.label} className="space-y-0.5">
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-slate-600 font-medium">{item.label}</span>
+                  <div className="flex items-center gap-1.5 font-mono text-[10px]">
+                    <span className="font-bold text-slate-900">{item.pct}%</span>
+                    <span className="text-slate-400">({item.count})</span>
                   </div>
                 </div>
-              );
-            })}
+                <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                  <div className={`h-full ${item.color} rounded-full`} style={{ width: `${item.pct}%` }} />
+                </div>
+              </div>
+            ))}
           </div>
 
           <div className="text-[10px] text-slate-400 text-center font-medium pt-1 border-t border-slate-100">
-            Intervention Completion: 81.4% Formation Standard
+            Form 16 Medical Endorsements Synchronized
           </div>
         </div>
 
         {/* Card 2: Resource Availability */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center gap-2 font-bold text-slate-900 text-xs tracking-tight">
-            <Truck className="w-4 h-4 text-[#163A5F]" />
-            <span>Resource Availability</span>
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-2">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div className="flex items-center gap-1.5 font-bold text-slate-900 text-xs">
+              <Truck className="w-4 h-4 text-emerald-800" />
+              <span>Logistical Capacity</span>
+            </div>
+            <span className="font-mono text-[10px] text-slate-500">60-Day Forward Reserve</span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-2.5 py-2">
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-center space-y-1">
-              <span className="text-[10px] font-bold text-slate-500 uppercase block">Welfare Officers</span>
-              <div className="text-xl font-black text-slate-900">8 / 10</div>
-              <span className="text-[10px] font-bold text-emerald-600 block">Available</span>
+          <div className="grid grid-cols-2 gap-2 py-1">
+            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 text-center space-y-0.5">
+              <span className="text-[9px] font-mono text-slate-500 uppercase block">Welfare Off.</span>
+              <div className="text-base font-black text-slate-900 font-mono">8 / 10</div>
+              <span className="text-[9px] font-bold text-emerald-600 block">Available</span>
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-center space-y-1">
-              <span className="text-[10px] font-bold text-slate-500 uppercase block">Medical Officers</span>
-              <div className="text-xl font-black text-slate-900">5 / 6</div>
-              <span className="text-[10px] font-bold text-emerald-600 block">Available</span>
+            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 text-center space-y-0.5">
+              <span className="text-[9px] font-mono text-slate-500 uppercase block">Medical Off.</span>
+              <div className="text-base font-black text-slate-900 font-mono">5 / 6</div>
+              <span className="text-[9px] font-bold text-emerald-600 block">Available</span>
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-center space-y-1">
-              <span className="text-[10px] font-bold text-slate-500 uppercase block">Counsellors</span>
-              <div className="text-xl font-black text-slate-900">12 / 15</div>
-              <span className="text-[10px] font-bold text-emerald-600 block">Available</span>
+            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 text-center space-y-0.5">
+              <span className="text-[9px] font-mono text-slate-500 uppercase block">Counsellors</span>
+              <div className="text-base font-black text-slate-900 font-mono">12 / 15</div>
+              <span className="text-[9px] font-bold text-emerald-600 block">Available</span>
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-center space-y-1">
-              <span className="text-[10px] font-bold text-slate-500 uppercase block">Mobile Clinics</span>
-              <div className="text-xl font-black text-slate-900">3 / 4</div>
-              <span className="text-[10px] font-bold text-blue-600 block">Operational</span>
+            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 text-center space-y-0.5">
+              <span className="text-[9px] font-mono text-slate-500 uppercase block">Mobile Clinics</span>
+              <div className="text-base font-black text-slate-900 font-mono">3 / 4</div>
+              <span className="text-[9px] font-bold text-blue-600 block">Operational</span>
             </div>
           </div>
 
           <div className="text-[10px] text-slate-400 text-center font-medium pt-1 border-t border-slate-100">
-            Logistical Reserves Sufficient for 60-Day Forward Deployment
+            Logistical Reserves Sufficient for Forward Ops
           </div>
         </div>
 
-        {/* Card 3: AI Command Recommendations */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 font-bold text-slate-900 text-xs tracking-tight">
-              <Brain className="w-4 h-4 text-emerald-600" />
-              <span>AI Command Recommendations</span>
+        {/* Card 3: Mission Impact Metrics */}
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-2">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div className="flex items-center gap-1.5 font-bold text-slate-900 text-xs">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span>Mission Impact Metrics</span>
             </div>
-            <button
-              onClick={() => setActiveDecisionModal(true)}
-              className="text-[11px] font-bold text-primary hover:text-primary-700 cursor-pointer"
-            >
-              View All &rarr;
-            </button>
+            <span className="font-mono text-[10px] text-emerald-700 font-bold">Coefficient: 0.942</span>
           </div>
 
-          <div className="space-y-2 py-1.5">
-            {aiRecommendations.map((rec) => {
-              const isDispatched = dispatchedActions.includes(rec.text);
-              return (
-                <div
-                  key={rec.id}
-                  className="flex items-center justify-between p-2 rounded-xl bg-slate-50/80 hover:bg-slate-100/80 border border-slate-100 transition-colors gap-2"
-                >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className={`w-2 h-2 rounded-full shrink-0 ${rec.dot}`} />
-                    <span className="text-xs font-semibold text-slate-800 truncate" title={rec.text}>
-                      {rec.text}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-extrabold ${rec.color}`}>
-                      {rec.priority}
-                    </span>
-                    <button
-                      onClick={() => handleDispatchCommand(rec.text)}
-                      disabled={isDispatched}
-                      className={`px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors ${
-                        isDispatched
-                          ? 'bg-slate-200 text-slate-500 cursor-not-allowed'
-                          : 'bg-primary text-white hover:bg-primary-700'
-                      }`}
-                    >
-                      {isDispatched ? 'Sent' : 'Act'}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="text-[10px] text-slate-400 text-center font-medium pt-1 border-t border-slate-100">
-            One-click directive dispatch directly to Battalion commanders
-          </div>
-        </div>
-      </div>
-
-      {/* ===================================================================== */}
-      {/* ROW 5: 4 CARDS (MISSION IMPACT, TIMELINE, AI BRIEFING, PRIVACY)       */}
-      {/* ===================================================================== */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        {/* Card 1: Mission Impact Metrics (Gauges) */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center gap-2 font-bold text-slate-900 text-xs tracking-tight">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Mission Impact Metrics</span>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 py-2 text-center">
+          <div className="grid grid-cols-3 gap-1.5 py-1 text-center">
             {[
               { label: 'Operational Efficiency', pct: 93, trend: '+4%', color: '#10B981' },
               { label: 'Deployment Stability', pct: 89, trend: '+3%', color: '#0284C7' },
               { label: 'Personnel Availability', pct: 96, trend: '+2%', color: '#16A34A' },
             ].map((m) => (
               <div key={m.label} className="space-y-1 flex flex-col items-center">
-                <div className="relative w-16 h-12 flex items-center justify-center">
+                <div className="relative w-14 h-11 flex items-center justify-center">
                   <svg viewBox="0 0 100 60" className="w-full h-full">
-                    {/* Background Arc */}
                     <path
                       d="M 10 50 A 40 40 0 0 1 90 50"
                       fill="none"
@@ -2151,7 +2332,6 @@ export const CommanderDashboard: React.FC = () => {
                       strokeWidth="10"
                       strokeLinecap="round"
                     />
-                    {/* Foreground Arc */}
                     <path
                       d="M 10 50 A 40 40 0 0 1 90 50"
                       fill="none"
@@ -2163,10 +2343,10 @@ export const CommanderDashboard: React.FC = () => {
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-end justify-center pb-0.5">
-                    <span className="text-xs font-black text-slate-900">{m.pct}%</span>
+                    <span className="text-xs font-black text-slate-900 font-mono">{m.pct}%</span>
                   </div>
                 </div>
-                <span className="text-[10px] font-bold text-emerald-600 flex items-center justify-center gap-0.5">
+                <span className="text-[10px] font-bold text-emerald-600 flex items-center justify-center">
                   <ArrowUp className="w-2.5 h-2.5" />
                   {m.trend}
                 </span>
@@ -2178,110 +2358,38 @@ export const CommanderDashboard: React.FC = () => {
           </div>
 
           <div className="text-[10px] text-slate-400 text-center font-medium pt-1 border-t border-slate-100">
-            Combat Readiness Coefficient: 0.942
+            Combat Readiness Retention Index: High
           </div>
         </div>
 
-        {/* Card 2: Recent Events & Timeline */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 font-bold text-slate-900 text-xs tracking-tight">
-              <Calendar className="w-4 h-4 text-[#163A5F]" />
-              <span>Recent Events &amp; Timeline</span>
+        {/* Card 4: Security Airgap & Audit */}
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-2">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div className="flex items-center gap-1.5 font-bold text-slate-900 text-xs">
+              <Lock className="w-4 h-4 text-emerald-800" />
+              <span>Privacy & Airgap Protocol</span>
             </div>
-            <button
-              onClick={() => setActiveDecisionModal(true)}
-              className="text-[11px] font-bold text-primary hover:text-primary-700 cursor-pointer"
-            >
-              View All &rarr;
-            </button>
+            <span className="font-mono text-[10px] text-emerald-700 font-bold">RBAC Enforced</span>
           </div>
 
-          <div className="space-y-2.5 py-1.5 text-xs">
-            <div className="flex items-start gap-2.5">
-              <span className="w-2 h-2 rounded-full bg-rose-600 mt-1.5 shrink-0" />
-              <div>
-                <p className="font-bold text-slate-900 leading-snug">Critical alerts raised</p>
-                <p className="text-[10px] text-slate-400">Today, 08:30 AM</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-2.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-600 mt-1.5 shrink-0" />
-              <div>
-                <p className="font-bold text-slate-900 leading-snug">Counselling session completed (5 personnel)</p>
-                <p className="text-[10px] text-slate-400">Yesterday, 04:15 PM</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-2.5">
-              <span className="w-2 h-2 rounded-full bg-blue-600 mt-1.5 shrink-0" />
-              <div>
-                <p className="font-bold text-slate-900 leading-snug">Workload adjustment approved for Bravo Bn</p>
-                <p className="text-[10px] text-slate-400">6 Sep 2025</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-2.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-600 mt-1.5 shrink-0" />
-              <div>
-                <p className="font-bold text-slate-900 leading-snug">Readiness improved by 4%</p>
-                <p className="text-[10px] text-slate-400">5 Sep 2025</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-[10px] text-slate-400 text-center font-medium pt-1 border-t border-slate-100">
-            Immutable Audit Trail Logged on HQ Server
-          </div>
-        </div>
-
-        {/* Card 3: AI Executive Insight */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between space-y-3">
-          <div className="flex items-center gap-2 font-bold text-slate-900 text-xs tracking-tight">
-            <Sparkles className="w-4 h-4 text-emerald-600" />
-            <span>AI Executive Insight</span>
-          </div>
-
-          <p className="text-xs text-slate-700 leading-relaxed font-medium">
-            Overall operational readiness has improved by 3% compared to last month. Bravo Battalion continues to show elevated deployment fatigue. Welfare interventions have reduced high-risk personnel by 21% in the last 30 days.
-          </p>
-
-          <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200/80 text-[11px] text-amber-900 font-medium flex items-start gap-2">
-            <span className="text-amber-600 font-bold shrink-0">&bull;</span>
-            <span>Continued focus on workload balancing and leave allocation is recommended to maintain readiness.</span>
-          </div>
-
-          <div className="text-[10px] text-slate-400 text-center font-medium pt-1 border-t border-slate-100">
-            Natural-Language Command Synthesis Engine v3.1
-          </div>
-        </div>
-
-        {/* Card 4: Privacy & Security */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between space-y-3">
-          <div className="flex items-center gap-2 font-bold text-slate-900 text-xs tracking-tight">
-            <Lock className="w-4 h-4 text-[#163A5F]" />
-            <span>Privacy &amp; Security</span>
-          </div>
-
-          <div className="space-y-1.5 text-xs">
+          <div className="space-y-1 text-xs py-1">
             {[
-              'Data Encrypted',
-              'Role-Based Access',
-              'AI Model Audited',
-              'No Disciplinary Usage',
-              'Compliant with Data Protection Norms',
+              'End-to-End Cryptographic Ledger',
+              'Strict Medical Airgap Active',
+              'Non-Disciplinary Firewalled Use',
+              'Aadhaar / PPO Vault Separation',
+              'Ministry of Defence Norms Compliant',
             ].map((item) => (
-              <div key={item} className="flex items-center gap-2 text-slate-700">
+              <div key={item} className="flex items-center gap-2 text-slate-700 text-[11px]">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span className="font-semibold text-[11px]">{item}</span>
+                <span className="font-medium">{item}</span>
               </div>
             ))}
           </div>
 
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-center">
-            <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
-              Secure | Trusted | Welfare-Focused
+          <div className="pt-1.5 border-t border-slate-100 flex items-center justify-center">
+            <span className="px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">
+              Verified Defense Airgap Architecture
             </span>
           </div>
         </div>
@@ -2330,15 +2438,15 @@ export const CommanderDashboard: React.FC = () => {
               {/* Unit Vitals */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Deployed Strength</span>
-                  <div className="text-lg font-black text-slate-900 mt-0.5">{selectedBattalion.strength} Troops</div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">{t('Deployed Strength')}</span>
+                  <div className="text-lg font-black text-slate-900 mt-0.5">{selectedBattalion.strength} {t('Troops')}</div>
                 </div>
                 <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Operational Readiness</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">{t('Operational Readiness')}</span>
                   <div className="text-lg font-black text-slate-900 mt-0.5">{selectedBattalion.readiness}%</div>
                 </div>
                 <div className="p-3 rounded-xl bg-rose-50 border border-rose-200">
-                  <span className="text-[10px] font-bold text-rose-700 uppercase">Primary Driver</span>
+                  <span className="text-[10px] font-bold text-rose-700 uppercase">{t('Primary Driver')}</span>
                   <div className="text-sm font-bold text-rose-900 mt-1">{selectedBattalion.keyConcern}</div>
                 </div>
               </div>
@@ -2346,16 +2454,16 @@ export const CommanderDashboard: React.FC = () => {
               {/* Company Breakdown Table */}
               <div className="space-y-2">
                 <h4 className="font-black text-slate-900 text-xs uppercase tracking-wider">
-                  Company Level Tactical Readiness (5 Companies)
+                  {t('Company Level Tactical Readiness (5 Companies)')}
                 </h4>
                 <div className="rounded-xl border border-slate-200 overflow-hidden">
                   <table className="w-full text-left">
                     <thead className="bg-slate-50 text-[10px] font-black text-slate-500 uppercase tracking-wider">
                       <tr>
-                        <th className="p-2.5">Company</th>
-                        <th className="p-2.5">Risk Tier</th>
-                        <th className="p-2.5">Stress Index</th>
-                        <th className="p-2.5">Troops</th>
+                        <th className="p-2.5">{t('Company')}</th>
+                        <th className="p-2.5">{t('Risk Tier')}</th>
+                        <th className="p-2.5">{t('Stress Index')}</th>
+                        <th className="p-2.5">{t('Troops')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-xs">
@@ -2369,7 +2477,7 @@ export const CommanderDashboard: React.FC = () => {
                               c.risk === 'Medium' ? 'bg-amber-100 text-amber-700' :
                               'bg-emerald-100 text-emerald-700'
                             }`}>
-                              {c.risk}
+                              {t(c.risk)}
                             </span>
                           </td>
                           <td className="p-2.5 font-mono font-semibold">{c.stressScore}%</td>
@@ -2386,7 +2494,7 @@ export const CommanderDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <h4 className="font-black text-slate-900 text-xs uppercase tracking-wider flex items-center gap-1.5">
                     <Activity className="w-3.5 h-3.5 text-rose-600" />
-                    <span>Flagged Personnel &bull; Risk Velocity &amp; Action Directives</span>
+                    <span>{t('Flagged Personnel • Risk Velocity & Action Directives')}</span>
                   </h4>
                   <span className="text-[10px] font-mono text-slate-500">
                     Formula: V = &Delta;Stress / &Delta;t
@@ -2408,7 +2516,7 @@ export const CommanderDashboard: React.FC = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-800 font-black text-xs">
-                              Risk: {p.risk}
+                              {t('Risk:')} {p.risk}
                             </span>
                             {p.momentum && (
                               <RiskMomentumBadge momentum={p.momentum} compact />
@@ -2435,14 +2543,14 @@ export const CommanderDashboard: React.FC = () => {
             {/* Footer */}
             <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
               <span className="text-[11px] text-slate-500 font-medium">
-                Authorized for Formation Commander Review
+                {t('Authorized for Formation Commander Review')}
               </span>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setIsDrillDownOpen(false)}
                   className="px-3.5 py-1.5 rounded-xl border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-100 cursor-pointer"
                 >
-                  Close
+                  {t('Close')}
                 </button>
                 <button
                   onClick={() => {
@@ -2452,7 +2560,7 @@ export const CommanderDashboard: React.FC = () => {
                   className="px-4 py-1.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-700 flex items-center gap-1.5 cursor-pointer shadow-sm"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>Issue Workload Redistribution</span>
+                  <span>{t('Issue Workload Redistribution')}</span>
                 </button>
               </div>
             </div>
@@ -2475,7 +2583,7 @@ export const CommanderDashboard: React.FC = () => {
                   <span className="text-[10px] font-black uppercase tracking-wider text-[#D4A017]">
                     Section 20 &bull; Command Decision Center
                   </span>
-                  <h2 className="text-xl font-black text-white">Action-Oriented Command Interface</h2>
+                  <h2 className="text-xl font-black text-white">{t('Action-Oriented Command Interface')}</h2>
                 </div>
               </div>
               <button
@@ -2523,7 +2631,7 @@ export const CommanderDashboard: React.FC = () => {
                           : 'bg-primary text-white hover:bg-primary-700 shadow-sm'
                       }`}
                     >
-                      {isSent ? 'Dispatched ✓' : 'Execute'}
+                      {isSent ? t('Dispatched ✓') : t('Execute')}
                     </button>
                   </div>
                 );
@@ -2535,7 +2643,7 @@ export const CommanderDashboard: React.FC = () => {
                 onClick={() => setActiveDecisionModal(false)}
                 className="px-4 py-2 rounded-xl bg-slate-800 text-white text-xs font-bold hover:bg-slate-900 cursor-pointer"
               >
-                Close Decision Center
+                {t('Close Decision Center')}
               </button>
             </div>
           </div>

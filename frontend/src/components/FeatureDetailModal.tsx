@@ -16,6 +16,7 @@ import {
   Printer,
 } from 'lucide-react';
 import { WelfareFeatureDetail } from '../utils/welfareMetricsData';
+import { useLanguageStore } from '../localization';
 
 interface PriorityPersonnelMini {
   id: string;
@@ -46,6 +47,7 @@ export const FeatureDetailModal: React.FC<FeatureDetailModalProps> = ({
   onSelectPersonnel,
   onInitiateProtocol,
 }) => {
+  const { t } = useLanguageStore();
   const [activeTab, setActiveTab] = useState<'overview' | 'formula' | 'cohort' | 'sop'>('overview');
 
   // Close on Escape key
@@ -114,10 +116,10 @@ export const FeatureDetailModal: React.FC<FeatureDetailModalProps> = ({
           {/* Navigation Tabs */}
           <div className="flex items-center gap-2 mt-5 pt-3 border-t border-white/10 overflow-x-auto text-xs font-bold scrollbar-none">
             {[
-              { id: 'overview', label: 'Clinical & Operational Overview', icon: Brain },
-              { id: 'formula', label: 'Formula & AI Architecture', icon: Sliders },
-              { id: 'cohort', label: `Flagged Cohort (${cohortPersonnel.length})`, icon: Users },
-              { id: 'sop', label: 'Welfare SOP & Triage Protocols', icon: FileText },
+              { id: 'overview', label: t('Clinical & Operational Overview'), icon: Brain },
+              { id: 'formula', label: t('Formula & AI Architecture'), icon: Sliders },
+              { id: 'cohort', label: `${t('Flagged Cohort')} (${cohortPersonnel.length})`, icon: Users },
+              { id: 'sop', label: t('Welfare SOP & Triage Protocols'), icon: FileText },
             ].map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -418,7 +420,7 @@ export const FeatureDetailModal: React.FC<FeatureDetailModalProps> = ({
         <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2 text-[11px] text-slate-500 font-medium hidden sm:flex">
             <Shield className="w-4 h-4 text-emerald-600" />
-            <span>Encrypted Defense Medical Record &bull; Confidential Protocol</span>
+            <span>{t('Encrypted Defense Medical Record • Confidential Protocol')}</span>
           </div>
 
           <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
@@ -429,7 +431,7 @@ export const FeatureDetailModal: React.FC<FeatureDetailModalProps> = ({
               className="px-4 py-2 rounded-xl bg-white border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-100 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
               <Printer className="w-3.5 h-3.5 text-slate-500" />
-              <span>Print Dossier</span>
+              <span>{t('Print Dossier')}</span>
             </button>
 
             {onInitiateProtocol && (
@@ -440,7 +442,7 @@ export const FeatureDetailModal: React.FC<FeatureDetailModalProps> = ({
                 }}
                 className="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
-                <span>Initiate Cohort Protocol</span>
+                <span>{t('Initiate Cohort Protocol')}</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </button>
             )}
@@ -449,7 +451,7 @@ export const FeatureDetailModal: React.FC<FeatureDetailModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
             >
-              Dismiss
+              {t('Dismiss')}
             </button>
           </div>
         </div>
