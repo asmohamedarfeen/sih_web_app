@@ -103,7 +103,9 @@ class _WellnessCheckinScreenState extends State<WellnessCheckinScreen> {
             TextButton(
               onPressed: () {
                 Navigator.of(ctx).pop();
-                Navigator.of(context).pop();
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
               },
               child: const Text('Return to Dashboard', style: TextStyle(fontWeight: FontWeight.w800)),
             ),
@@ -119,238 +121,239 @@ class _WellnessCheckinScreenState extends State<WellnessCheckinScreen> {
     final estimated = _estimatedStress();
 
     return Scaffold(
+      backgroundColor: AppColors.background,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
+        toolbarHeight: 46,
+        elevation: 0,
         title: Text(
           loc.t('checkin', 'Daily Telemetry Check-in'),
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
         ),
         actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: estimated > 70 ? AppColors.roseLight : AppColors.emeraldLight,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: estimated > 70 ? AppColors.rose : AppColors.emerald,
-                width: 1,
+          Center(
+            child: Container(
+              margin: const EdgeInsets.only(right: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: estimated > 70 ? AppColors.roseLight : AppColors.emeraldLight,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: estimated > 70 ? AppColors.rose : AppColors.emerald,
+                  width: 1,
+                ),
               ),
-            ),
-            child: Text(
-              'Stress: ${estimated.toStringAsFixed(0)}%',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w900,
-                color: estimated > 70 ? AppColors.rose : AppColors.emerald,
+              child: Text(
+                'Stress: ${estimated.toStringAsFixed(0)}%',
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w900,
+                  color: estimated > 70 ? AppColors.rose : AppColors.emerald,
+                ),
               ),
             ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Header Info Card
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.monitor_heart, color: AppColors.accent, size: 28),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Frontline Daily Pulse',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 8, 14, 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 1. Sleek Compact Header Info Bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.monitor_heart, color: AppColors.accent, size: 20),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Frontline Daily Pulse',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
+                          Text(
+                            'Cryptographically signed & saved locally if offline.',
+                            style: TextStyle(color: Color(0xFF8D99AE), fontSize: 9.5),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // 2. Fixed Sliders Card (dynamically fits viewport)
+              Expanded(
+                child: Card(
+                  margin: EdgeInsets.zero,
+                  elevation: 1,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Sleep Duration
+                        _buildSlider(
+                          title: 'Sleep Duration',
+                          valueText: '${_sleepHours.toStringAsFixed(1)} Hours',
+                          icon: Icons.nightlight_round,
+                          value: _sleepHours,
+                          min: 2.0,
+                          max: 12.0,
+                          divisions: 20,
+                          onChanged: (v) => setState(() => _sleepHours = v),
                         ),
-                        SizedBox(height: 2),
-                        Text(
-                          'Logs are cryptographically signed & saved locally if offline.',
-                          style: TextStyle(color: Color(0xFF8D99AE), fontSize: 11),
+                        const Divider(height: 1, thickness: 0.5),
+
+                        // Fatigue Level
+                        _buildSlider(
+                          title: 'Fatigue & Exhaustion',
+                          valueText: '$_fatigueLevel / 10',
+                          icon: Icons.battery_alert,
+                          value: _fatigueLevel.toDouble(),
+                          min: 1,
+                          max: 10,
+                          divisions: 9,
+                          activeColor: _fatigueLevel > 7 ? AppColors.rose : AppColors.accent,
+                          onChanged: (v) => setState(() => _fatigueLevel = v.round()),
+                        ),
+                        const Divider(height: 1, thickness: 0.5),
+
+                        // Mood Score
+                        _buildSlider(
+                          title: 'Mood & Morale',
+                          valueText: '$_moodScore / 10',
+                          icon: Icons.sentiment_satisfied_alt,
+                          value: _moodScore.toDouble(),
+                          min: 1,
+                          max: 10,
+                          divisions: 9,
+                          activeColor: _moodScore < 4 ? AppColors.rose : AppColors.emerald,
+                          onChanged: (v) => setState(() => _moodScore = v.round()),
+                        ),
+                        const Divider(height: 1, thickness: 0.5),
+
+                        // Physical Strain
+                        _buildSlider(
+                          title: 'Physical Strain & Exertion',
+                          valueText: '$_physicalStrain / 10',
+                          icon: Icons.directions_run,
+                          value: _physicalStrain.toDouble(),
+                          min: 1,
+                          max: 10,
+                          divisions: 9,
+                          onChanged: (v) => setState(() => _physicalStrain = v.round()),
+                        ),
+                        const Divider(height: 1, thickness: 0.5),
+
+                        // Workload Pressure
+                        _buildSlider(
+                          title: 'Operational Workload Strain',
+                          valueText: '$_workloadPressure / 10',
+                          icon: Icons.fitness_center,
+                          value: _workloadPressure.toDouble(),
+                          min: 1,
+                          max: 10,
+                          divisions: 9,
+                          activeColor: _workloadPressure > 7 ? AppColors.rose : AppColors.accent,
+                          onChanged: (v) => setState(() => _workloadPressure = v.round()),
+                        ),
+                        const Divider(height: 1, thickness: 0.5),
+
+                        // Consecutive Duty Days
+                        _buildSlider(
+                          title: 'Consecutive Duty Days',
+                          valueText: '$_consecutiveDutyDays Days',
+                          icon: Icons.calendar_today,
+                          value: _consecutiveDutyDays.toDouble(),
+                          min: 1,
+                          max: 21,
+                          divisions: 20,
+                          activeColor: _consecutiveDutyDays > 7 ? AppColors.amber : AppColors.accent,
+                          onChanged: (v) => setState(() => _consecutiveDutyDays = v.round()),
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Sliders Card
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Sleep Duration
-                    _buildSlider(
-                      title: 'Sleep Duration',
-                      valueText: '${_sleepHours.toStringAsFixed(1)} Hours',
-                      icon: Icons.nightlight_round,
-                      value: _sleepHours,
-                      min: 2.0,
-                      max: 12.0,
-                      divisions: 20,
-                      onChanged: (v) => setState(() => _sleepHours = v),
-                    ),
-                    const Divider(height: 24),
-
-                    // Fatigue Level
-                    _buildSlider(
-                      title: 'Fatigue & Exhaustion',
-                      valueText: '$_fatigueLevel / 10',
-                      icon: Icons.battery_alert,
-                      value: _fatigueLevel.toDouble(),
-                      min: 1,
-                      max: 10,
-                      divisions: 9,
-                      activeColor: _fatigueLevel > 7 ? AppColors.rose : AppColors.accent,
-                      onChanged: (v) => setState(() => _fatigueLevel = v.round()),
-                    ),
-                    const Divider(height: 24),
-
-                    // Mood Score
-                    _buildSlider(
-                      title: 'Mood & Morale',
-                      valueText: '$_moodScore / 10',
-                      icon: Icons.sentiment_satisfied_alt,
-                      value: _moodScore.toDouble(),
-                      min: 1,
-                      max: 10,
-                      divisions: 9,
-                      activeColor: _moodScore < 4 ? AppColors.rose : AppColors.emerald,
-                      onChanged: (v) => setState(() => _moodScore = v.round()),
-                    ),
-                    // Physical Strain
-                    _buildSlider(
-                      title: 'Physical Strain & Exertion',
-                      valueText: '$_physicalStrain / 10',
-                      icon: Icons.directions_run,
-                      value: _physicalStrain.toDouble(),
-                      min: 1,
-                      max: 10,
-                      divisions: 9,
-                      onChanged: (v) => setState(() => _physicalStrain = v.round()),
-                    ),
-                    const Divider(height: 24),
-
-                    // Workload Pressure
-                    _buildSlider(
-                      title: 'Operational Workload Strain',
-                      valueText: '$_workloadPressure / 10',
-                      icon: Icons.fitness_center,
-                      value: _workloadPressure.toDouble(),
-                      min: 1,
-                      max: 10,
-                      divisions: 9,
-                      onChanged: (v) => setState(() => _workloadPressure = v.round()),
-                    ),
-                    const Divider(height: 24),
-
-                    // Consecutive Duty Days
-                    _buildSlider(
-                      title: 'Consecutive Duty Days',
-                      valueText: '$_consecutiveDutyDays Days',
-                      icon: Icons.calendar_today,
-                      value: _consecutiveDutyDays.toDouble(),
-                      min: 1,
-                      max: 21,
-                      divisions: 20,
-                      onChanged: (v) => setState(() => _consecutiveDutyDays = v.round()),
-                    ),
-                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 8),
 
-            // Optional Notes
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'OPTIONAL NOTES / PATROL REMARKS',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textSecondary,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _notesController,
-                      maxLines: 2,
-                      style: const TextStyle(fontSize: 13),
-                      decoration: InputDecoration(
-                        hintText: 'e.g. Night patrol mountain ridge, mild headache',
-                        hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 12),
-                        filled: true,
-                        fillColor: AppColors.background,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.cardBorder),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.cardBorder),
-                        ),
-                      ),
-                    ),
-                  ],
+              // 3. Compact Optional Notes / Remarks
+              Container(
+                height: 42,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.cardBorder),
+                ),
+                child: TextField(
+                  controller: _notesController,
+                  maxLines: 1,
+                  style: const TextStyle(fontSize: 12),
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.edit_note, size: 20, color: AppColors.textSecondary),
+                    hintText: 'Optional remarks / notes (e.g. night patrol)...',
+                    hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 11),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    border: InputBorder.none,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
+              const SizedBox(height: 8),
 
-            // Submit Button
-            SizedBox(
-              height: 50,
-              child: ElevatedButton(
-                onPressed: _isSubmitting ? null : _handleSubmit,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  elevation: 2,
-                ),
-                child: _isSubmitting
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.send, size: 18),
-                          SizedBox(width: 8),
-                          Text(
-                            'TRANSMIT TELEMETRY',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.8,
+              // 4. Submit Button
+              SizedBox(
+                height: 44,
+                child: ElevatedButton(
+                  onPressed: _isSubmitting ? null : _handleSubmit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 1,
+                  ),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          height: 18,
+                          width: 18,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.send_rounded, size: 16),
+                            SizedBox(width: 8),
+                            Text(
+                              'TRANSMIT TELEMETRY',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.6,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -368,6 +371,7 @@ class _WellnessCheckinScreenState extends State<WellnessCheckinScreen> {
     Color? activeColor,
   }) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -375,31 +379,39 @@ class _WellnessCheckinScreenState extends State<WellnessCheckinScreen> {
           children: [
             Row(
               children: [
-                Icon(icon, size: 16, color: AppColors.textSecondary),
+                Icon(icon, size: 14, color: AppColors.textSecondary),
                 const SizedBox(width: 6),
                 Text(
                   title,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                  style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700),
                 ),
               ],
             ),
             Text(
               valueText,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11.5,
                 fontWeight: FontWeight.w900,
                 color: activeColor ?? AppColors.accent,
               ),
             ),
           ],
         ),
-        Slider(
-          value: value,
-          min: min,
-          max: max,
-          divisions: divisions,
-          activeColor: activeColor ?? AppColors.accent,
-          onChanged: onChanged,
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            trackHeight: 3.5,
+            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6.5),
+            overlayShape: const RoundSliderOverlayShape(overlayRadius: 13.0),
+            tickMarkShape: const RoundSliderTickMarkShape(tickMarkRadius: 1.5),
+          ),
+          child: Slider(
+            value: value,
+            min: min,
+            max: max,
+            divisions: divisions,
+            activeColor: activeColor ?? AppColors.accent,
+            onChanged: onChanged,
+          ),
         ),
       ],
     );

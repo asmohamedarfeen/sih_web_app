@@ -22,6 +22,10 @@ import {
   Activity,
   Sliders,
   GitFork,
+  Layers,
+  Zap,
+  Sparkles,
+  Scale,
 } from 'lucide-react';
 import { useAuthStore, getRoleDashboardRoute } from '../store/authStore';
 import { authService } from '../services/authService';
@@ -145,13 +149,17 @@ export const DashboardLayout: React.FC = () => {
     if (isCommander) {
       return [
         { name: 'Dashboard', path: '/dashboard/commander', icon: LayoutDashboard },
+        { name: 'Mission Planner ⭐', path: '/mission-planner', icon: Compass, badge: 'AI' },
+        { name: 'Unit Digital Twin ⭐', path: '/unit-twin', icon: Layers, badge: 'NEW' },
+        { name: 'Impact Simulator ⭐', path: '/mission-impact', icon: Zap, badge: 'AI' },
+        { name: 'Policy Discovery ⭐', path: '/policy-discovery', icon: Sparkles, badge: 'AI' },
+        { name: 'Force Balancing ⭐', path: '/force-balancing', icon: Scale, badge: 'AI' },
         { name: 'Unit Hierarchy', path: '/organization', icon: GitFork },
-        { name: 'Force Overview', path: '/personnel', icon: Users },
         { name: 'Unit Analysis', path: '/analytics', icon: BarChart3 },
         { name: 'Risk & Alerts', path: '/alerts', icon: AlertTriangle, badge: '4' },
         { name: 'AI Insights', path: '/ai-risk', icon: Brain },
         { name: 'Welfare Actions', path: '/interventions', icon: HandHeart },
-        { name: 'Reports', path: '/reports', icon: FileText },
+        { name: 'Privacy & Security', path: '/security', icon: ShieldCheck },
         { name: 'Resources', path: '/wellness', icon: HeartPulse },
         { name: 'Settings', path: '/alerts', icon: Sliders },
       ];
@@ -166,6 +174,7 @@ export const DashboardLayout: React.FC = () => {
         { name: 'AI Predictions', path: '/ai-risk', icon: Brain },
         { name: 'Welfare Actions', path: '/interventions', icon: HandHeart },
         { name: 'Reports & Analytics', path: '/reports', icon: FileText },
+        { name: 'Privacy & Security', path: '/security', icon: ShieldCheck },
         { name: 'Resource Center', path: '/wellness', icon: HeartPulse },
         { name: 'Settings', path: '/alerts', icon: Sliders },
       ];
@@ -173,6 +182,11 @@ export const DashboardLayout: React.FC = () => {
 
     return [
       { name: 'System Command', path: getRoleDashboardRoute(user?.role), icon: LayoutDashboard },
+      { name: 'Mission Planner ⭐', path: '/mission-planner', icon: Compass, badge: 'AI' },
+      { name: 'Unit Digital Twin ⭐', path: '/unit-twin', icon: Layers, badge: 'NEW' },
+      { name: 'Impact Simulator ⭐', path: '/mission-impact', icon: Zap, badge: 'AI' },
+      { name: 'Policy Discovery ⭐', path: '/policy-discovery', icon: Sparkles, badge: 'AI' },
+      { name: 'Force Balancing ⭐', path: '/force-balancing', icon: Scale, badge: 'AI' },
       { name: 'Unit Hierarchy Tree', path: '/organization', icon: GitFork },
       { name: 'Personnel Directory', path: '/personnel', icon: Users },
       { name: 'Wellness Check-ins', path: '/wellness', icon: HeartPulse },
@@ -181,6 +195,7 @@ export const DashboardLayout: React.FC = () => {
       { name: 'Tactical Alerts', path: '/alerts', icon: AlertTriangle },
       { name: 'Analytics Center', path: '/analytics', icon: BarChart3 },
       { name: 'Dossier Reports', path: '/reports', icon: FileText },
+      { name: 'Privacy & Security', path: '/security', icon: ShieldCheck },
     ];
   };
 
@@ -225,6 +240,8 @@ export const DashboardLayout: React.FC = () => {
                     </span>
                   </div>
                   <h1 className="font-black text-sm tracking-tight text-white flex items-center gap-2">
+                    <span className="text-[#D4A017] font-black tracking-wider bg-white/10 px-2 py-0.5 rounded border border-[#D4A017]/40">KAIZEN</span>
+                    <span className="text-white/40">|</span>
                     AI Command Readiness Center
                     <span className="hidden sm:inline-block text-[10px] font-semibold text-slate-300 font-normal">
                       &bull; People Ready | Units Strong | Nation Secure
@@ -241,7 +258,7 @@ export const DashboardLayout: React.FC = () => {
                 <div>
                   <div className="flex items-center gap-2">
                     <h1 className="font-black text-sm tracking-wider text-white uppercase flex items-center gap-2">
-                      PSWMS
+                      <span className="text-[#D4A017] font-black tracking-wider bg-white/10 px-2 py-0.5 rounded border border-[#D4A017]/40">KAIZEN</span>
                       <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-secondary-900 text-accent border border-secondary-700">
                         {t('DEFENSE COMMAND')}
                       </span>
@@ -371,13 +388,11 @@ export const DashboardLayout: React.FC = () => {
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar */}
         <aside
-          className={`${
-            isMobileMenuOpen ? 'block fixed inset-0 top-16 z-30' : 'hidden'
-          } md:block w-64 ${
-            isCommander
+          className={`${isMobileMenuOpen ? 'block fixed inset-0 top-16 z-30' : 'hidden'
+            } md:block w-64 ${isCommander
               ? 'bg-[#0E231B] border-r border-[#193A2D] text-slate-200'
               : 'bg-white border-r border-slate-200/90 text-gray-800'
-          } p-3.5 space-y-4 shrink-0 z-20 flex flex-col justify-between shadow-xs overflow-y-auto`}
+            } p-3.5 space-y-4 shrink-0 z-20 flex flex-col justify-between shadow-xs overflow-y-auto`}
         >
           <div className="space-y-4">
             <div>
@@ -396,15 +411,14 @@ export const DashboardLayout: React.FC = () => {
                         navigate(item.path);
                         setIsMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all cursor-pointer ${
-                        isActive
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all cursor-pointer ${isActive
                           ? isCommander
                             ? 'bg-[#1F4A38] text-white shadow-md font-bold border border-emerald-500/40'
                             : 'bg-primary text-white shadow-md shadow-primary/20 font-bold'
                           : isCommander
-                          ? 'text-slate-300 hover:text-white hover:bg-white/5 font-medium'
-                          : 'text-slate-600 hover:text-gray-900 hover:bg-slate-100 font-medium'
-                      }`}
+                            ? 'text-slate-300 hover:text-white hover:bg-white/5 font-medium'
+                            : 'text-slate-600 hover:text-gray-900 hover:bg-slate-100 font-medium'
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         <Icon className={`w-4 h-4 ${isActive ? (isCommander ? 'text-emerald-400' : 'text-accent') : (isCommander ? 'text-slate-400' : 'text-slate-400')}`} />
@@ -428,11 +442,10 @@ export const DashboardLayout: React.FC = () => {
               <div className="space-y-1 px-1">
                 <button
                   onClick={() => navigate('/login')}
-                  className={`w-full text-left p-2.5 rounded-xl ${
-                    isCommander
+                  className={`w-full text-left p-2.5 rounded-xl ${isCommander
                       ? 'bg-black/30 border-[#1B382D] hover:bg-black/40 text-slate-300'
                       : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-700 hover:text-gray-900'
-                  } border text-xs transition-all flex items-center justify-between group cursor-pointer shadow-sm`}
+                    } border text-xs transition-all flex items-center justify-between group cursor-pointer shadow-sm`}
                 >
                   <div className="flex items-center gap-2 font-medium">
                     <Compass className="w-3.5 h-3.5 text-slate-400 group-hover:text-primary transition-colors" />

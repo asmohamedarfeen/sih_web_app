@@ -12,6 +12,11 @@ from backend.app.api.interventions.routes import router as interventions_router
 from backend.app.api.alerts.routes import router as alerts_router
 from backend.app.api.analytics.routes import router as analytics_router
 from backend.app.api.reports.routes import router as reports_router
+from backend.app.api.missions.routes import router as missions_router
+from backend.app.api.unit_twin.routes import router as unit_twin_router
+from backend.app.api.mission_impact.routes import router as mission_impact_router
+from backend.app.api.policy_discovery.routes import router as policy_discovery_router
+from backend.app.api.force_balancing.routes import router as force_balancing_router
 from backend.app.middleware.security_headers import SecurityHeadersMiddleware
 from backend.app.middleware.rate_limiter import RateLimiterMiddleware
 
@@ -55,6 +60,11 @@ app.include_router(interventions_router, prefix=settings.API_V1_STR)
 app.include_router(alerts_router, prefix=settings.API_V1_STR)
 app.include_router(analytics_router, prefix=settings.API_V1_STR)
 app.include_router(reports_router, prefix=settings.API_V1_STR)
+app.include_router(missions_router, prefix=settings.API_V1_STR)
+app.include_router(unit_twin_router, prefix=settings.API_V1_STR)
+app.include_router(mission_impact_router, prefix=settings.API_V1_STR)
+app.include_router(policy_discovery_router, prefix=settings.API_V1_STR)
+app.include_router(force_balancing_router, prefix=settings.API_V1_STR)
 
 
 

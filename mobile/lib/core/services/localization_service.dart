@@ -121,7 +121,7 @@ class LocalizationService extends ChangeNotifier {
     'en': {
       'app_title': 'SOLDIER PULSE',
       'jai_hind': 'Jai Hind',
-      'welcome_subtitle': 'Biological recovery, field telemetry & AI health cockpit.',
+      'welcome_subtitle': 'Biological recovery, field telemetry & health cockpit.',
       'dashboard': 'Dashboard',
       'checkin': 'Check-in',
       'screen_time': 'Screen Time',
@@ -152,7 +152,7 @@ class LocalizationService extends ChangeNotifier {
     'hi': {
       'app_title': 'सैनिक पल्स',
       'jai_hind': 'जय हिंद',
-      'welcome_subtitle': 'शारीरिक सुधार, फील्ड टेलीमेट्री और एआई स्वास्थ्य कॉकपिट।',
+      'welcome_subtitle': 'शारीरिक सुधार, फील्ड टेलीमेट्री और स्वास्थ्य कॉकपिट।',
       'dashboard': 'डैशबोर्ड',
       'checkin': 'चेक-इन',
       'screen_time': 'स्क्रीन टाइम',
@@ -183,7 +183,7 @@ class LocalizationService extends ChangeNotifier {
     'pa': {
       'app_title': 'ਸੋਲਜਰ ਪਲਸ',
       'jai_hind': 'ਜੈ ਹਿੰਦ',
-      'welcome_subtitle': 'ਸਰੀਰਕ ਰਿਕਵਰੀ, ਫੀਲਡ ਟੈਲੀਮੈਟਰੀ ਅਤੇ ਏਆਈ ਸਿਹਤ ਕਾਕਪਿਟ।',
+      'welcome_subtitle': 'ਸਰੀਰਕ ਰਿਕਵਰੀ, ਫੀਲਡ ਟੈਲੀਮੈਟਰੀ ਅਤੇ ਸਿਹਤ ਕਾਕਪਿਟ।',
       'dashboard': 'ਡੈਸ਼ਬੋਰਡ',
       'checkin': 'ਚੈੱਕ-ਇਨ',
       'screen_time': 'ਸਕ੍ਰੀਨ ਸਮਾਂ',
@@ -214,7 +214,7 @@ class LocalizationService extends ChangeNotifier {
     'bn': {
       'app_title': 'সোলজার পালস',
       'jai_hind': 'জয় হিন্দ',
-      'welcome_subtitle': 'শারীরিক পুনরুদ্ধার ও এআই স্বাস্থ্য ককপিট।',
+      'welcome_subtitle': 'শারীরিক পুনরুদ্ধার ও স্বাস্থ্য ককপিট।',
       'dashboard': 'ড্যাশবোর্ড',
       'checkin': 'চেক-ইন',
       'screen_time': 'স্ক্রিন টাইম',
@@ -245,7 +245,7 @@ class LocalizationService extends ChangeNotifier {
     'ta': {
       'app_title': 'சோல்ஜர் பல்ஸ்',
       'jai_hind': 'ஜெய் ஹிந்த்',
-      'welcome_subtitle': 'உடல்நிலை மீட்பு மற்றும் ஏஐ சுகாதார மையம்.',
+      'welcome_subtitle': 'உடல்நிலை மீட்பு மற்றும் சுகாதார மையம்.',
       'dashboard': 'டாஷ்போர்டு',
       'checkin': 'செக்-இன்',
       'screen_time': 'திரை நேரம்',
@@ -276,7 +276,7 @@ class LocalizationService extends ChangeNotifier {
     'te': {
       'app_title': 'సోల్జర్ పల్స్',
       'jai_hind': 'జై హింద్',
-      'welcome_subtitle': 'శారీరక స్వస్థత, ఫీల్డ్ టెలిమెట్రీ మరియు ఏఐ ఆరోగ్య కాక్‌పిట్.',
+      'welcome_subtitle': 'శారీరక స్వస్థత, ఫీల్డ్ టెలిమెట్రీ మరియు ఆరోగ్య కాక్‌పిట్.',
       'dashboard': 'డ్యాష్‌బోర్డ్',
       'checkin': 'చెకిన్',
       'screen_time': 'స్క్రీన్ సమయం',
@@ -307,7 +307,7 @@ class LocalizationService extends ChangeNotifier {
     'mr': {
       'app_title': 'सोल्जर पल्स',
       'jai_hind': 'जय हिंद',
-      'welcome_subtitle': 'शारीरिक सुधारणा, फील्ड टेलिमेट्री आणि एआय आरोग्य कॉकपिट.',
+      'welcome_subtitle': 'शारीरिक सुधारणा, फील्ड टेलिमेट्री आणि आरोग्य कॉकपिट.',
       'dashboard': 'डॅशबोर्ड',
       'checkin': 'चेक-इन',
       'screen_time': 'स्क्रीन वेळ',
@@ -338,7 +338,7 @@ class LocalizationService extends ChangeNotifier {
     'gu': {
       'app_title': 'સોલ્જર પલ્સ',
       'jai_hind': 'જય હિન્દ',
-      'welcome_subtitle': 'શારીરિક સુધારો, ફીલ્ડ ટેલિમેટ્રી અને એઆઈ આરોગ્ય કોકપિટ.',
+      'welcome_subtitle': 'શારીરિક સુધારો, ફીલ્ડ ટેલિમેટ્રી અને આરોગ્ય કોકપિટ.',
       'dashboard': 'ડેશબોર્ડ',
       'checkin': 'ચેક-ઇન',
       'screen_time': 'સ્ક્રીન સમય',
@@ -369,7 +369,7 @@ class LocalizationService extends ChangeNotifier {
     'kn': {
       'app_title': 'ಸೋಲ್ಜರ್ ಪಲ್ಸ್',
       'jai_hind': 'ಜೈ ಹಿಂದ್',
-      'welcome_subtitle': 'ದೈಹಿಕ ಚೇತರಿಕೆ, ಫೀಲ್ಡ್ ಟೆಲಿಮೆಟ್ರಿ ಮತ್ತು ಎಐ ಆರೋಗ್ಯ ಕಾಕ್‌ಪಿಟ್.',
+      'welcome_subtitle': 'ದೈಹಿಕ ಚೇತರಿಕೆ, ಫೀಲ್ಡ್ ಟೆಲಿಮೆಟ್ರಿ ಮತ್ತು ಆರೋಗ್ಯ ಕಾಕ್‌ಪಿಟ್.',
       'dashboard': 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್',
       'checkin': 'ಚೆಕ್-ಇನ್',
       'screen_time': 'ಸ್ಕ್ರೀನ್ ಸಮಯ',
@@ -400,7 +400,7 @@ class LocalizationService extends ChangeNotifier {
     'ml': {
       'app_title': 'സോൾജർ പൾസ്',
       'jai_hind': 'ജയ് ഹിന്ദ്',
-      'welcome_subtitle': 'ശാരീരിക വീണ്ടെടുക്കൽ, ഫീൽഡ് ടെലിമെട്രി & എഐ ഹെൽത്ത് കോക്ക്പിറ്റ്.',
+      'welcome_subtitle': 'ശാരീരിക വീണ്ടെടുക്കൽ, ഫീൽഡ് ടെലിമെട്രി & ഹെൽത്ത് കോക്ക്പിറ്റ്.',
       'dashboard': 'ഡാഷ്‌ബോർഡ്',
       'checkin': 'ചെക്ക്-ഇൻ',
       'screen_time': 'സ്ക്രീൻ സമയം',
@@ -431,7 +431,7 @@ class LocalizationService extends ChangeNotifier {
     'or': {
       'app_title': 'ସୋଲଜର ପଲ୍ସ',
       'jai_hind': 'ଜୟ ହିନ୍ଦ',
-      'welcome_subtitle': 'ଶାରୀରିକ ସୁସ୍ଥତା, ଫିଲ୍ଡ ଟେଲିମେଟ୍ରି ଏବଂ ଏଆଇ ସ୍ୱାସ୍ଥ୍ୟ କକ୍‌ପିଟ୍।',
+      'welcome_subtitle': 'ଶାରୀରିକ ସୁସ୍ଥତା, ଫିଲ୍ଡ ଟେଲିମେଟ୍ରି ଏବଂ ସ୍ୱାସ୍ଥ୍ୟ କକ୍‌ପିଟ୍।',
       'dashboard': 'ଡ୍ୟାସବୋର୍ଡ',
       'checkin': 'ଚେକ୍-ଇନ୍',
       'screen_time': 'ସ୍କ୍ରିନ୍ ସମୟ',

@@ -219,6 +219,7 @@ export const LoginPage: React.FC = () => {
           </div>
           <div>
             <h1 className="font-extrabold text-sm tracking-wide text-white uppercase flex items-center gap-2">
+              <span className="text-accent font-black tracking-wider bg-white/10 px-2 py-0.5 rounded border border-accent/40">KAIZEN</span>
               Defense HRMS & Welfare Portal
               <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-secondary-900 text-accent border border-secondary-700">
                 STRATEGIC COMMAND

@@ -26,6 +26,10 @@ import {
   ShieldAlert,
   Terminal,
   ChevronRight,
+  Search,
+  Crosshair,
+  LayoutGrid,
+  ListFilter,
 } from 'lucide-react';
 import { personnelService } from '../../services/personnelService';
 import { WhatIfSimulator } from '../../components/analytics/WhatIfSimulator';
@@ -445,6 +449,13 @@ export const CommanderDashboard: React.FC = () => {
   const [liveEventFilter, setLiveEventFilter] = useState<'all' | 'critical' | 'roster' | 'intel'>('all');
   const [triageTab, setTriageTab] = useState<'units' | 'warnings'>('units');
 
+  // Individual Soldier Readiness Roster States
+  const [soldierSearchQuery, setSoldierSearchQuery] = useState('');
+  const [soldierTierFilter, setSoldierTierFilter] = useState<'all' | 'combat_ready' | 'mission_capable' | 'standby' | 'critical_standdown'>('all');
+  const [soldierUnitFilter, setSoldierUnitFilter] = useState<string>('all');
+  const [soldierSortBy, setSoldierSortBy] = useState<'readiness_desc' | 'readiness_asc' | 'duty_desc' | 'sleep_asc'>('readiness_desc');
+  const [soldierViewMode, setSoldierViewMode] = useState<'table' | 'grid'>('table');
+
   const liveEvents = [
     {
       id: 'EVT-904',
@@ -736,6 +747,14 @@ export const CommanderDashboard: React.FC = () => {
               <FileText className="w-3.5 h-3.5 text-emerald-400" />
               <span>{t('Form 16 Dossier')}</span>
             </button>
+            <a
+              href="#individual-soldier-readiness-roster"
+              className="px-3 py-2 rounded-xl bg-emerald-950/80 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5"
+              title="Jump to Individual Soldier Readiness Roster"
+            >
+              <Users className="w-3.5 h-3.5 text-emerald-400" />
+              <span>{t('Soldier Readiness Roster')}</span>
+            </a>
           </div>
         </div>
       </div>
@@ -1685,6 +1704,956 @@ export const CommanderDashboard: React.FC = () => {
             Psychometric Stress &amp; Fatigue Population Census
           </div>
         </div>
+      </div>
+
+      {/* ===================================================================== */}
+      {/* 3B. INDIVIDUAL SOLDIER COMBAT READINESS ROSTER                        */}
+      {/* (Readiness Score & Operational Telemetry for Each and Every Soldier)   */}
+      {/* ===================================================================== */}
+      <div id="individual-soldier-readiness-roster" className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/90 shadow-xs space-y-4">
+        {/* Section Header */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-800 shadow-2xs shrink-0">
+              <Users className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-base sm:text-lg font-black tracking-tight text-slate-900 flex items-center gap-2">
+                  {t('Individual Soldier Combat Readiness Roster')}
+                </h3>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 font-mono text-[10px] font-black uppercase tracking-wider">
+                  ALL DEPLOYED JAWANS &bull; LIVE TELEMETRY
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-mono text-[10px] font-bold">
+                  DEFENSE FORM 16 INTEGRATED
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Real-time operational readiness scores for each individual soldier. Synthesizes continuous duty duration, restorative sleep telemetry, 21-day stress momentum, and mission capability bands.
+              </p>
+            </div>
+          </div>
+
+          {/* Quick Summary Counter Badges */}
+          <div className="flex items-center gap-2 flex-wrap text-[11px] font-mono">
+            <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
+              Avg Readiness: <strong>71.7%</strong>
+            </span>
+            <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-700 font-bold border border-emerald-300">
+              Ready (&ge;80%): <strong>5</strong>
+            </span>
+            <span className="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 font-bold border border-rose-200">
+              Stand-Down (&lt;50%): <strong>4</strong>
+            </span>
+          </div>
+        </div>
+
+        {/* 4 Summary Stat Mini-Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs">
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+            <div>
+              <span className="text-[10px] font-mono text-slate-500 uppercase">Total Tracked Jawans</span>
+              <p className="text-lg font-black text-slate-900 mt-0.5">15 Deployed</p>
+              <span className="text-[10px] text-slate-500">Across 6 Formations</span>
+            </div>
+            <div className="w-8 h-8 rounded-lg bg-slate-200/70 flex items-center justify-center text-slate-700 font-bold">
+              <Crosshair className="w-4 h-4" />
+            </div>
+          </div>
+
+          <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 flex items-center justify-between">
+            <div>
+              <span className="text-[10px] font-mono text-emerald-700 uppercase font-bold">Tier 1 &bull; Combat Ready</span>
+              <p className="text-lg font-black text-emerald-900 mt-0.5">5 Soldiers (33%)</p>
+              <span className="text-[10px] text-emerald-700">&ge; 80% Readiness Score</span>
+            </div>
+            <div className="w-8 h-8 rounded-lg bg-emerald-200 text-emerald-900 flex items-center justify-center font-bold">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+          </div>
+
+          <div className="p-3 rounded-xl bg-sky-50/70 border border-sky-200 flex items-center justify-between">
+            <div>
+              <span className="text-[10px] font-mono text-sky-700 uppercase font-bold">Tier 2 &bull; Mission Capable</span>
+              <p className="text-lg font-black text-sky-900 mt-0.5">4 Soldiers (27%)</p>
+              <span className="text-[10px] text-sky-700">65% &ndash; 79% Readiness Score</span>
+            </div>
+            <div className="w-8 h-8 rounded-lg bg-sky-200 text-sky-900 flex items-center justify-center font-bold">
+              <Activity className="w-4 h-4" />
+            </div>
+          </div>
+
+          <div className="p-3 rounded-xl bg-rose-50/70 border border-rose-200 flex items-center justify-between">
+            <div>
+              <span className="text-[10px] font-mono text-rose-700 uppercase font-bold">Tier 4 &bull; Stand-Down Alert</span>
+              <p className="text-lg font-black text-rose-900 mt-0.5">4 Soldiers (27%)</p>
+              <span className="text-[10px] text-rose-700">&lt; 50% Critical Burnout Risk</span>
+            </div>
+            <div className="w-8 h-8 rounded-lg bg-rose-200 text-rose-900 flex items-center justify-center font-bold">
+              <AlertTriangle className="w-4 h-4" />
+            </div>
+          </div>
+        </div>
+
+        {/* Filter, Search & View Controls Bar */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+          {/* Search Box */}
+          <div className="relative flex-1 min-w-[240px]">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={soldierSearchQuery}
+              onChange={(e) => setSoldierSearchQuery(e.target.value)}
+              placeholder={t('Search by soldier name, rank, regimental ID, or tactical skill...')}
+              className="w-full pl-9 pr-8 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 placeholder:text-slate-400 focus:outline-hidden focus:border-emerald-500 transition-colors"
+            />
+            {soldierSearchQuery && (
+              <button
+                onClick={() => setSoldierSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Filter Pills */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {[
+              { key: 'all', label: 'All Soldiers (15)' },
+              { key: 'combat_ready', label: 'Tier 1 &bull; Ready &ge;80% (5)', color: 'text-emerald-800' },
+              { key: 'mission_capable', label: 'Tier 2 &bull; 65-79% (4)', color: 'text-sky-800' },
+              { key: 'standby', label: 'Tier 3 &bull; 50-64% (2)', color: 'text-amber-800' },
+              { key: 'critical_standdown', label: 'Tier 4 &bull; Stand-Down &lt;50% (4)', color: 'text-rose-800' },
+            ].map((f) => (
+              <button
+                key={f.key}
+                onClick={() => setSoldierTierFilter(f.key as any)}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                  soldierTierFilter === f.key
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200'
+                }`}
+                dangerouslySetInnerHTML={{ __html: f.label }}
+              />
+            ))}
+          </div>
+
+          {/* Unit Filter, Sort & View Mode */}
+          <div className="flex items-center gap-2 shrink-0">
+            <select
+              value={soldierUnitFilter}
+              onChange={(e) => setSoldierUnitFilter(e.target.value)}
+              className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-[11px] font-bold text-slate-700 cursor-pointer focus:outline-hidden"
+            >
+              <option value="all">All Formations</option>
+              <option value="High Altitude Guard">High Altitude Guard</option>
+              <option value="Field Artillery 3rd Bn">Field Artillery 3rd Bn</option>
+              <option value="Mountain Recon 7th">Mountain Recon 7th</option>
+              <option value="Disaster Response 1st">Disaster Response 1st</option>
+              <option value="Alpha Battalion">Alpha Battalion</option>
+              <option value="Bravo Battalion">Bravo Battalion</option>
+              <option value="Delta Battalion">Delta Battalion</option>
+              <option value="Training Center">Training Center</option>
+              <option value="VIP Escort Convoy">VIP Escort Convoy</option>
+            </select>
+
+            <select
+              value={soldierSortBy}
+              onChange={(e) => setSoldierSortBy(e.target.value as any)}
+              className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-[11px] font-bold text-slate-700 cursor-pointer focus:outline-hidden"
+            >
+              <option value="readiness_desc">Readiness: High to Low</option>
+              <option value="readiness_asc">Readiness: Low to High (Urgent)</option>
+              <option value="duty_desc">Most Duty Days</option>
+              <option value="sleep_asc">Least Sleep (Sleep Debt)</option>
+            </select>
+
+            {/* View Mode Toggle */}
+            <div className="flex items-center rounded-lg border border-slate-200 bg-white p-0.5">
+              <button
+                onClick={() => setSoldierViewMode('table')}
+                className={`p-1.5 rounded-md transition-colors cursor-pointer ${
+                  soldierViewMode === 'table' ? 'bg-slate-900 text-white' : 'text-slate-400 hover:text-slate-600'
+                }`}
+                title="Table Roster View"
+              >
+                <ListFilter className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => setSoldierViewMode('grid')}
+                className={`p-1.5 rounded-md transition-colors cursor-pointer ${
+                  soldierViewMode === 'grid' ? 'bg-slate-900 text-white' : 'text-slate-400 hover:text-slate-600'
+                }`}
+                title="Tactical Grid View"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Soldiers Roster List / Table */}
+        {(() => {
+          const allSoldiersList = [
+            {
+              uid: 'UID-SOL-102',
+              name: 'Havildar Gurpreet Singh',
+              rank: 'Havildar',
+              regimentalNumber: 'ARMY-2018-8013',
+              unit: 'Field Artillery 3rd Bn',
+              station: 'Forward Observation Post Echo',
+              readinessScore: 94,
+              stressScore: 16,
+              sleepHours: 7.8,
+              consecutiveDutyDays: 2,
+              fatigueLevel: 2,
+              trend21d: 3.1,
+              stressVelocity: '-0.8 pts/day',
+              medicalCategory: 'SHAPE-1',
+              primarySkill: 'Urban Combat & CQB',
+              status: 'Combat Ready',
+              tier: 'TIER_1',
+            },
+            {
+              uid: 'UID-SOL-101',
+              name: 'Subedar R. N. Yadav',
+              rank: 'Subedar',
+              regimentalNumber: 'CRPF-2015-8011',
+              unit: 'High Altitude Guard',
+              station: 'LOC Siachen Forward Post Alpha',
+              readinessScore: 92,
+              stressScore: 22,
+              sleepHours: 7.4,
+              consecutiveDutyDays: 3,
+              fatigueLevel: 3,
+              trend21d: 2.4,
+              stressVelocity: '-0.5 pts/day',
+              medicalCategory: 'SHAPE-1',
+              primarySkill: 'High Altitude Tactical Command',
+              status: 'Combat Ready',
+              tier: 'TIER_1',
+            },
+            {
+              uid: 'UID-SOL-104',
+              name: 'Havildar Manpreet Singh',
+              rank: 'Havildar',
+              regimentalNumber: 'ARMY-2017-8015',
+              unit: 'VIP Escort Convoy',
+              station: 'Command Perimeter Security',
+              readinessScore: 88,
+              stressScore: 24,
+              sleepHours: 7.5,
+              consecutiveDutyDays: 3,
+              fatigueLevel: 3,
+              trend21d: 1.8,
+              stressVelocity: '-0.3 pts/day',
+              medicalCategory: 'SHAPE-1',
+              primarySkill: 'Close Protection & Protocol',
+              status: 'Combat Ready',
+              tier: 'TIER_1',
+            },
+            {
+              uid: 'UID-SOL-103',
+              name: 'Naik Sandeep Singh',
+              rank: 'Naik',
+              regimentalNumber: 'CRPF-2019-8014',
+              unit: 'Mountain Recon 7th',
+              station: 'Northern Ridge Outpost B-2',
+              readinessScore: 86,
+              stressScore: 26,
+              sleepHours: 7.2,
+              consecutiveDutyDays: 4,
+              fatigueLevel: 4,
+              trend21d: 1.2,
+              stressVelocity: '+0.2 pts/day',
+              medicalCategory: 'SHAPE-1',
+              primarySkill: 'Marksman & Long-Range Recon',
+              status: 'Combat Ready',
+              tier: 'TIER_1',
+            },
+            {
+              uid: 'UID-SOL-111',
+              name: 'Havildar Arjun Nair',
+              rank: 'Havildar',
+              regimentalNumber: 'CRPF-2018-8022',
+              unit: 'Disaster Response 1st',
+              station: 'Base Camp Sector 4',
+              readinessScore: 82,
+              stressScore: 32,
+              sleepHours: 7.1,
+              consecutiveDutyDays: 4,
+              fatigueLevel: 4,
+              trend21d: 1.1,
+              stressVelocity: '+0.4 pts/day',
+              medicalCategory: 'SHAPE-1',
+              primarySkill: 'Amphibious Triage & Heavy Rescue',
+              status: 'Combat Ready',
+              tier: 'TIER_1',
+            },
+            {
+              uid: 'UID-SOL-107',
+              name: 'Sepoy Kuldeep Singh',
+              rank: 'Sepoy',
+              regimentalNumber: 'CRPF-2021-8018',
+              unit: 'Alpha Battalion',
+              station: 'Battalion Watch Gate 2',
+              readinessScore: 74,
+              stressScore: 38,
+              sleepHours: 7.0,
+              consecutiveDutyDays: 3,
+              fatigueLevel: 5,
+              trend21d: 0.8,
+              stressVelocity: '+0.5 pts/day',
+              medicalCategory: 'SHAPE-1',
+              primarySkill: 'Perimeter Watch & Comms',
+              status: 'Mission Capable',
+              tier: 'TIER_2',
+            },
+            {
+              uid: 'UID-SOL-105',
+              name: 'Naik Rajesh Kumar',
+              rank: 'Naik',
+              regimentalNumber: 'CRPF-2020-8016',
+              unit: 'Alpha Battalion',
+              station: 'Forward LOC Mobile Patrol',
+              readinessScore: 71,
+              stressScore: 42,
+              sleepHours: 6.8,
+              consecutiveDutyDays: 4,
+              fatigueLevel: 5,
+              trend21d: 0.4,
+              stressVelocity: '+0.6 pts/day',
+              medicalCategory: 'SHAPE-1',
+              primarySkill: 'Crowd De-escalation & Surveillance',
+              status: 'Mission Capable',
+              tier: 'TIER_2',
+            },
+            {
+              uid: 'UID-SOL-106',
+              name: 'Sepoy Amit Verma',
+              rank: 'Sepoy',
+              regimentalNumber: 'ARMY-2022-8017',
+              unit: 'Field Artillery 3rd Bn',
+              station: 'Munitions Supply Depot',
+              readinessScore: 67,
+              stressScore: 44,
+              sleepHours: 6.9,
+              consecutiveDutyDays: 5,
+              fatigueLevel: 6,
+              trend21d: -0.2,
+              stressVelocity: '+0.9 pts/day',
+              medicalCategory: 'SHAPE-1',
+              primarySkill: 'Heavy Equipment Logistics',
+              status: 'Mission Capable',
+              tier: 'TIER_2',
+            },
+            {
+              uid: 'UID-SOL-108',
+              name: 'Sepoy Dinesh Sharma',
+              rank: 'Sepoy',
+              regimentalNumber: 'CRPF-2020-8019',
+              unit: 'Delta Battalion',
+              station: 'Waterborne Operations Dock',
+              readinessScore: 65,
+              stressScore: 46,
+              sleepHours: 6.7,
+              consecutiveDutyDays: 4,
+              fatigueLevel: 6,
+              trend21d: 0.2,
+              stressVelocity: '+0.7 pts/day',
+              medicalCategory: 'SHAPE-1',
+              primarySkill: 'Water Rescue & Engineering',
+              status: 'Mission Capable',
+              tier: 'TIER_2',
+            },
+            {
+              uid: 'UID-SOL-112',
+              name: 'Subedar Sunil Mehta',
+              rank: 'Subedar',
+              regimentalNumber: 'ARMY-2014-8023',
+              unit: 'Training Center',
+              station: 'Firing Range Command Post',
+              readinessScore: 62,
+              stressScore: 48,
+              sleepHours: 6.8,
+              consecutiveDutyDays: 3,
+              fatigueLevel: 6,
+              trend21d: 0.3,
+              stressVelocity: '+0.5 pts/day',
+              medicalCategory: 'SHAPE-1',
+              primarySkill: 'Drill Instruction & Mentoring',
+              status: 'Operational Standby',
+              tier: 'TIER_3',
+            },
+            {
+              uid: 'UID-EMP-015',
+              name: 'Sepoy Amit Kumar',
+              rank: 'Sepoy',
+              regimentalNumber: 'CRPF-2020-8015',
+              unit: 'High Altitude Guard',
+              station: 'Rear Echelon Rest Camp',
+              readinessScore: 60,
+              stressScore: 50,
+              sleepHours: 6.5,
+              consecutiveDutyDays: 4,
+              fatigueLevel: 5,
+              trend21d: 0.6,
+              stressVelocity: '+0.3 pts/day',
+              medicalCategory: 'SHAPE-1',
+              primarySkill: 'Base Security & Rapid Relief',
+              status: 'Operational Standby',
+              tier: 'TIER_3',
+            },
+            {
+              uid: 'UID-SOL-109',
+              name: 'Naik Vikram Rathore',
+              rank: 'Naik',
+              regimentalNumber: 'CRPF-2019-8020',
+              unit: 'High Altitude Guard',
+              station: 'Glacier Outpost Delta (17,200 ft)',
+              readinessScore: 52,
+              stressScore: 69,
+              sleepHours: 4.1,
+              consecutiveDutyDays: 15,
+              fatigueLevel: 8,
+              trend21d: -14.2,
+              stressVelocity: '+2.9 pts/day',
+              medicalCategory: 'SHAPE-1 (Temporary P2)',
+              primarySkill: 'Extreme Altitude Surveillance',
+              status: 'Fatigue Risk &bull; Monitor',
+              tier: 'TIER_3',
+            },
+            {
+              uid: 'UID-SOL-110',
+              name: 'Sepoy Sanjay Patel',
+              rank: 'Sepoy',
+              regimentalNumber: 'ARMY-2021-8021',
+              unit: 'Bravo Battalion',
+              station: 'Urban Breach Outpost C',
+              readinessScore: 49,
+              stressScore: 72,
+              sleepHours: 4.3,
+              consecutiveDutyDays: 14,
+              fatigueLevel: 8,
+              trend21d: -11.8,
+              stressVelocity: '+3.1 pts/day',
+              medicalCategory: 'SHAPE-1 (Temporary P2)',
+              primarySkill: 'Tactical Urban Patrol',
+              status: 'Stand-Down Indicated',
+              tier: 'TIER_4',
+            },
+            {
+              uid: 'UID-EMP-012',
+              name: 'Havildar Ramesh Chand',
+              rank: 'Havildar',
+              regimentalNumber: 'CRPF-2016-8012',
+              unit: 'High Altitude Guard',
+              station: 'Forward Sentry Post Charlie',
+              readinessScore: 42,
+              stressScore: 88,
+              sleepHours: 3.8,
+              consecutiveDutyDays: 8,
+              fatigueLevel: 9,
+              trend21d: -18.5,
+              stressVelocity: '+3.8 pts/day',
+              medicalCategory: 'SHAPE-1 (Temporary P2)',
+              primarySkill: 'High Altitude Sentry Watch',
+              status: 'Critical Stand-Down',
+              tier: 'TIER_4',
+            },
+            {
+              uid: 'UID-EMP-014',
+              name: 'Naik Rohit Sharma',
+              rank: 'Naik',
+              regimentalNumber: 'ARMY-2019-2748',
+              unit: 'Bravo Bn &bull; C Coy',
+              station: 'LOC Night Watch Bunker 4',
+              readinessScore: 38,
+              stressScore: 86,
+              sleepHours: 3.5,
+              consecutiveDutyDays: 16,
+              fatigueLevel: 9,
+              trend21d: -16.8,
+              stressVelocity: '+4.8 pts/day',
+              medicalCategory: 'SHAPE-2 (Severe Strain)',
+              primarySkill: 'Night Perimeter Observation',
+              status: 'Critical Stand-Down',
+              tier: 'TIER_4',
+            },
+          ];
+
+          // 1. Filter by Search Query
+          let filtered = allSoldiersList.filter((s) => {
+            if (!soldierSearchQuery.trim()) return true;
+            const q = soldierSearchQuery.toLowerCase();
+            return (
+              s.name.toLowerCase().includes(q) ||
+              s.regimentalNumber.toLowerCase().includes(q) ||
+              s.rank.toLowerCase().includes(q) ||
+              s.unit.toLowerCase().includes(q) ||
+              s.primarySkill.toLowerCase().includes(q) ||
+              s.station.toLowerCase().includes(q)
+            );
+          });
+
+          // 2. Filter by Tier
+          if (soldierTierFilter === 'combat_ready') {
+            filtered = filtered.filter((s) => s.readinessScore >= 80);
+          } else if (soldierTierFilter === 'mission_capable') {
+            filtered = filtered.filter((s) => s.readinessScore >= 65 && s.readinessScore < 80);
+          } else if (soldierTierFilter === 'standby') {
+            filtered = filtered.filter((s) => s.readinessScore >= 50 && s.readinessScore < 65);
+          } else if (soldierTierFilter === 'critical_standdown') {
+            filtered = filtered.filter((s) => s.readinessScore < 50);
+          }
+
+          // 3. Filter by Unit
+          if (soldierUnitFilter !== 'all') {
+            filtered = filtered.filter((s) => s.unit.toLowerCase().includes(soldierUnitFilter.toLowerCase()));
+          }
+
+          // 4. Sort
+          filtered.sort((a, b) => {
+            if (soldierSortBy === 'readiness_desc') return b.readinessScore - a.readinessScore;
+            if (soldierSortBy === 'readiness_asc') return a.readinessScore - b.readinessScore;
+            if (soldierSortBy === 'duty_desc') return b.consecutiveDutyDays - a.consecutiveDutyDays;
+            if (soldierSortBy === 'sleep_asc') return a.sleepHours - b.sleepHours;
+            return 0;
+          });
+
+          if (filtered.length === 0) {
+            return (
+              <div className="p-8 text-center rounded-xl bg-slate-50 border border-slate-200">
+                <Users className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                <p className="text-sm font-bold text-slate-700">No personnel match your search or filter criteria.</p>
+                <p className="text-xs text-slate-400 mt-1">Try clearing your search query or selecting "All Soldiers".</p>
+                <button
+                  onClick={() => {
+                    setSoldierSearchQuery('');
+                    setSoldierTierFilter('all');
+                    setSoldierUnitFilter('all');
+                  }}
+                  className="mt-3 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-colors"
+                >
+                  Reset All Filters
+                </button>
+              </div>
+            );
+          }
+
+          if (soldierViewMode === 'table') {
+            return (
+              <div className="overflow-x-auto rounded-xl border border-slate-200/90 shadow-2xs">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-slate-100/90 border-b border-slate-200 text-[10.5px] font-mono font-bold text-slate-600 uppercase tracking-wider">
+                      <th className="py-2.5 px-3.5">Soldier Identity</th>
+                      <th className="py-2.5 px-3">Unit &amp; Deployment Post</th>
+                      <th className="py-2.5 px-3 text-center">Readiness Score</th>
+                      <th className="py-2.5 px-3">Vitals (Sleep &amp; Duty)</th>
+                      <th className="py-2.5 px-3">21-Day Trajectory</th>
+                      <th className="py-2.5 px-3">Category</th>
+                      <th className="py-2.5 px-3 text-right">Command Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 bg-white">
+                    {filtered.map((s) => {
+                      const isSwapped = swappedRosters[s.uid];
+                      const isHighTier = s.readinessScore >= 80;
+                      const isMedTier = s.readinessScore >= 65 && s.readinessScore < 80;
+                      const isStandbyTier = s.readinessScore >= 50 && s.readinessScore < 65;
+                      const isLowTier = s.readinessScore < 50;
+
+                      const scoreBadgeColor = isHighTier
+                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                        : isMedTier
+                        ? 'bg-sky-50 text-sky-800 border-sky-300'
+                        : isStandbyTier
+                        ? 'bg-amber-50 text-amber-800 border-amber-300'
+                        : 'bg-rose-50 text-rose-800 border-rose-300';
+
+                      const barColor = isHighTier
+                        ? 'bg-emerald-600'
+                        : isMedTier
+                        ? 'bg-sky-600'
+                        : isStandbyTier
+                        ? 'bg-amber-500'
+                        : 'bg-rose-600';
+
+                      return (
+                        <tr
+                          key={s.uid}
+                          className="hover:bg-slate-50/80 transition-colors group"
+                        >
+                          {/* Soldier Identity */}
+                          <td className="py-3 px-3.5">
+                            <div className="flex items-center gap-2.5">
+                              <div
+                                className={`w-8 h-8 rounded-lg flex items-center justify-center font-mono font-bold text-xs shrink-0 ${
+                                  isHighTier
+                                    ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                                    : isLowTier
+                                    ? 'bg-rose-100 text-rose-900 border border-rose-300'
+                                    : 'bg-slate-100 text-slate-800 border border-slate-300'
+                                }`}
+                              >
+                                {s.name
+                                  .split(' ')
+                                  .map((n) => n[0])
+                                  .slice(0, 2)
+                                  .join('')}
+                              </div>
+                              <div>
+                                <div className="font-black text-slate-900 flex items-center gap-1.5">
+                                  <span>{s.name}</span>
+                                </div>
+                                <div className="text-[10px] font-mono text-slate-500 flex items-center gap-1">
+                                  <span>{s.rank}</span>
+                                  <span>&bull;</span>
+                                  <span className="text-slate-400">{s.regimentalNumber}</span>
+                                </div>
+                                <span className="text-[9.5px] text-slate-400 font-medium">
+                                  {s.primarySkill}
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Unit & Station */}
+                          <td className="py-3 px-3">
+                            <div className="font-bold text-slate-800 text-[11px]">{s.unit}</div>
+                            <div className="text-[10px] text-slate-500 font-mono flex items-center gap-1">
+                              <Crosshair className="w-2.5 h-2.5 text-slate-400" />
+                              <span>{s.station}</span>
+                            </div>
+                          </td>
+
+                          {/* Readiness Score & Gauge */}
+                          <td className="py-3 px-3">
+                            <div className="flex flex-col items-center">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-base font-black font-mono tracking-tight text-slate-900">
+                                  {s.readinessScore}%
+                                </span>
+                                <span
+                                  className={`px-1.5 py-0.2 rounded text-[9px] font-mono font-bold border ${scoreBadgeColor}`}
+                                >
+                                  {isHighTier
+                                    ? 'COMBAT READY'
+                                    : isMedTier
+                                    ? 'CAPABLE'
+                                    : isStandbyTier
+                                    ? 'STANDBY'
+                                    : 'STAND-DOWN'}
+                                </span>
+                              </div>
+
+                              {/* Visual Progress Bar */}
+                              <div className="w-28 h-2 bg-slate-100 rounded-full overflow-hidden mt-1 relative">
+                                <div
+                                  className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+                                  style={{ width: `${s.readinessScore}%` }}
+                                />
+                                {/* 85% Benchmark Line */}
+                                <div
+                                  className="absolute top-0 bottom-0 w-0.5 bg-slate-400"
+                                  style={{ left: '85%' }}
+                                  title="85% Defense Combat Benchmark"
+                                />
+                              </div>
+                              <span className="text-[8.5px] font-mono text-slate-400 mt-0.5">
+                                Stress: {s.stressScore}/100
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* Vitals: Sleep & Continuous Duty */}
+                          <td className="py-3 px-3">
+                            <div className="space-y-0.5 font-mono text-[10.5px]">
+                              <div className="flex items-center gap-1.5">
+                                <Moon className="w-3 h-3 text-slate-400" />
+                                <span
+                                  className={`font-bold ${
+                                    s.sleepHours < 4.5
+                                      ? 'text-rose-600 font-black'
+                                      : s.sleepHours < 6.5
+                                      ? 'text-amber-600'
+                                      : 'text-emerald-700'
+                                  }`}
+                                >
+                                  {s.sleepHours}h rest/night
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1.5 text-slate-500 text-[10px]">
+                                <Clock className="w-3 h-3 text-slate-400" />
+                                <span className={s.consecutiveDutyDays > 10 ? 'text-rose-600 font-black' : ''}>
+                                  {s.consecutiveDutyDays} consecutive days
+                                </span>
+                              </div>
+                              <div className="text-[9.5px] text-slate-400">
+                                Fatigue Index: <strong>{s.fatigueLevel}/10</strong>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* 21-Day Trajectory & Momentum */}
+                          <td className="py-3 px-3">
+                            <div className="font-mono text-[10.5px]">
+                              <div
+                                className={`flex items-center gap-1 font-bold ${
+                                  s.trend21d >= 0 ? 'text-emerald-700' : 'text-rose-600'
+                                }`}
+                              >
+                                {s.trend21d >= 0 ? (
+                                  <ArrowUp className="w-3 h-3 text-emerald-600" />
+                                ) : (
+                                  <ArrowUp className="w-3 h-3 text-rose-600 rotate-180" />
+                                )}
+                                <span>{s.trend21d >= 0 ? `+${s.trend21d}` : s.trend21d} pts/21d</span>
+                              </div>
+                              <div className="text-[9.5px] text-slate-400 mt-0.5">
+                                Velocity: <span className="font-bold text-slate-600">{s.stressVelocity}</span>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Category */}
+                          <td className="py-3 px-3">
+                            <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 font-mono text-[10px] font-bold">
+                              {s.medicalCategory}
+                            </span>
+                          </td>
+
+                          {/* Action Buttons */}
+                          <td className="py-3 px-3 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                onClick={() => setActiveDossierUid(s.uid)}
+                                className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold text-[10.5px] transition-colors cursor-pointer flex items-center gap-1"
+                                title="Inspect Form 16 Executive Welfare Dossier"
+                              >
+                                <FileText className="w-3 h-3 text-emerald-700" />
+                                <span>Dossier</span>
+                              </button>
+
+                              {isLowTier && (
+                                <button
+                                  onClick={() => {
+                                    if (s.uid === 'UID-EMP-012') {
+                                      handleExecuteRosterSwap(
+                                        'UID-EMP-012',
+                                        'Hav. Ramesh Chand',
+                                        'UID-EMP-015',
+                                        'Sepoy Amit Kumar',
+                                        'Sentry Post Charlie'
+                                      );
+                                    } else if (s.uid === 'UID-EMP-014') {
+                                      handleExecuteRosterSwap(
+                                        'UID-EMP-014',
+                                        'Naik Rohit Sharma',
+                                        'UID-SOL-107',
+                                        'Sepoy Kuldeep Singh',
+                                        'LOC Bunker 4'
+                                      );
+                                    } else {
+                                      showToast(`Fast-Track Stand-Down Authorized: ${s.name} rotated to 48h restorative recovery.`);
+                                    }
+                                  }}
+                                  disabled={isSwapped || isSwapping === s.uid}
+                                  className={`px-2 py-1 rounded font-bold text-[10.5px] transition-all cursor-pointer flex items-center gap-1 shadow-2xs ${
+                                    isSwapped
+                                      ? 'bg-slate-200 text-slate-500 cursor-not-allowed'
+                                      : 'bg-rose-700 hover:bg-rose-800 text-white'
+                                  }`}
+                                  title="Rotate soldier to 48h decompression rest"
+                                >
+                                  <RefreshCw className={`w-3 h-3 ${isSwapping === s.uid ? 'animate-spin' : ''}`} />
+                                  <span>{isSwapped ? 'Rotated' : 'Stand-Down'}</span>
+                                </button>
+                              )}
+
+                              {isHighTier && (
+                                <span className="px-2 py-1 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono text-[10px] font-bold">
+                                  Deployable
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            );
+          }
+
+          // Tactical Grid View
+          return (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {filtered.map((s) => {
+                const isSwapped = swappedRosters[s.uid];
+                const isHighTier = s.readinessScore >= 80;
+                const isMedTier = s.readinessScore >= 65 && s.readinessScore < 80;
+                const isStandbyTier = s.readinessScore >= 50 && s.readinessScore < 65;
+                const isLowTier = s.readinessScore < 50;
+
+                const borderAccent = isHighTier
+                  ? 'border-emerald-200 hover:border-emerald-400'
+                  : isLowTier
+                  ? 'border-rose-300 hover:border-rose-500 bg-rose-50/10'
+                  : 'border-slate-200 hover:border-slate-400';
+
+                return (
+                  <div
+                    key={s.uid}
+                    className={`p-4 rounded-xl bg-white border ${borderAccent} shadow-2xs space-y-3 transition-all`}
+                  >
+                    {/* Top Identity & Score */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={`w-9 h-9 rounded-lg flex items-center justify-center font-mono font-bold text-xs ${
+                            isHighTier
+                              ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                              : isLowTier
+                              ? 'bg-rose-100 text-rose-900 border border-rose-300'
+                              : 'bg-slate-100 text-slate-800 border border-slate-300'
+                          }`}
+                        >
+                          {s.name
+                            .split(' ')
+                            .map((n) => n[0])
+                            .slice(0, 2)
+                            .join('')}
+                        </div>
+                        <div>
+                          <h4 className="font-black text-slate-900 text-xs">{s.name}</h4>
+                          <span className="text-[10px] font-mono text-slate-500">
+                            {s.rank} &bull; {s.regimentalNumber}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Prominent Score Gauge Badge */}
+                      <div className="text-right">
+                        <div className="flex items-baseline gap-0.5 justify-end">
+                          <span className="text-xl font-black font-mono tracking-tight text-slate-900">
+                            {s.readinessScore}
+                          </span>
+                          <span className="text-[10px] font-mono font-bold text-slate-400">%</span>
+                        </div>
+                        <span
+                          className={`inline-block px-1.5 py-0.2 rounded text-[8.5px] font-mono font-black border ${
+                            isHighTier
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                              : isMedTier
+                              ? 'bg-sky-50 text-sky-800 border-sky-300'
+                              : isStandbyTier
+                              ? 'bg-amber-50 text-amber-800 border-amber-300'
+                              : 'bg-rose-50 text-rose-800 border-rose-300'
+                          }`}
+                        >
+                          {isHighTier
+                            ? 'COMBAT READY'
+                            : isMedTier
+                            ? 'MISSION CAPABLE'
+                            : isStandbyTier
+                            ? 'STANDBY'
+                            : 'STAND-DOWN ALERT'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Unit & Station */}
+                    <div className="px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-100 text-[10.5px]">
+                      <div className="font-bold text-slate-800">{s.unit}</div>
+                      <div className="text-slate-500 text-[10px] font-mono flex items-center gap-1">
+                        <Crosshair className="w-2.5 h-2.5 text-slate-400" />
+                        <span>{s.station}</span>
+                      </div>
+                    </div>
+
+                    {/* Vitals Grid */}
+                    <div className="grid grid-cols-3 gap-1.5 font-mono text-center text-[10px]">
+                      <div className="p-1.5 rounded bg-slate-50 border border-slate-100">
+                        <span className="text-[9px] text-slate-400 uppercase block">Sleep</span>
+                        <span className={`font-bold ${s.sleepHours < 4.5 ? 'text-rose-600' : 'text-slate-800'}`}>
+                          {s.sleepHours}h/d
+                        </span>
+                      </div>
+                      <div className="p-1.5 rounded bg-slate-50 border border-slate-100">
+                        <span className="text-[9px] text-slate-400 uppercase block">Duty Days</span>
+                        <span className={`font-bold ${s.consecutiveDutyDays > 10 ? 'text-rose-600' : 'text-slate-800'}`}>
+                          {s.consecutiveDutyDays}d
+                        </span>
+                      </div>
+                      <div className="p-1.5 rounded bg-slate-50 border border-slate-100">
+                        <span className="text-[9px] text-slate-400 uppercase block">21d Trend</span>
+                        <span className={`font-bold ${s.trend21d >= 0 ? 'text-emerald-700' : 'text-rose-600'}`}>
+                          {s.trend21d >= 0 ? `+${s.trend21d}` : s.trend21d}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Action Footer */}
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                      <button
+                        onClick={() => setActiveDossierUid(s.uid)}
+                        className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10.5px] font-bold transition-colors cursor-pointer flex items-center gap-1"
+                      >
+                        <FileText className="w-3 h-3 text-emerald-700" />
+                        <span>Form 16</span>
+                      </button>
+
+                      {isLowTier ? (
+                        <button
+                          onClick={() => {
+                            if (s.uid === 'UID-EMP-012') {
+                              handleExecuteRosterSwap(
+                                'UID-EMP-012',
+                                'Hav. Ramesh Chand',
+                                'UID-EMP-015',
+                                'Sepoy Amit Kumar',
+                                'Sentry Post Charlie'
+                              );
+                            } else if (s.uid === 'UID-EMP-014') {
+                              handleExecuteRosterSwap(
+                                'UID-EMP-014',
+                                'Naik Rohit Sharma',
+                                'UID-SOL-107',
+                                'Sepoy Kuldeep Singh',
+                                'LOC Bunker 4'
+                              );
+                            } else {
+                              showToast(`Fast-Track Stand-Down Authorized: ${s.name} rotated to 48h restorative recovery.`);
+                            }
+                          }}
+                          disabled={isSwapped || isSwapping === s.uid}
+                          className={`px-2.5 py-1 rounded font-bold text-[10.5px] transition-all cursor-pointer flex items-center gap-1 shadow-2xs ${
+                            isSwapped
+                              ? 'bg-slate-200 text-slate-500 cursor-not-allowed'
+                              : 'bg-rose-700 hover:bg-rose-800 text-white'
+                          }`}
+                        >
+                          <RefreshCw className={`w-3 h-3 ${isSwapping === s.uid ? 'animate-spin' : ''}`} />
+                          <span>{isSwapped ? 'Rotated' : 'Stand-Down'}</span>
+                        </button>
+                      ) : (
+                        <span className="text-[10px] font-mono text-emerald-700 font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          <span>Deployable</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
       </div>
 
       {/* ===================================================================== */}

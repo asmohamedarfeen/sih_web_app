@@ -25,7 +25,6 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
   // Filter / Jump navigation keys
   final GlobalKey _overviewKey = GlobalKey();
   final GlobalKey _aiCoachKey = GlobalKey();
-  final GlobalKey _readinessKey = GlobalKey();
   final GlobalKey _healthKey = GlobalKey();
   final GlobalKey _supportKey = GlobalKey();
 
@@ -167,7 +166,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
       workloadPressure: 4,
       physicalStrain: 3,
       consecutiveDutyDays: 4,
-      notes: 'Logged via AI Welfare Companion',
+      notes: 'Logged via Welfare Companion',
     );
 
     final res = await sync.submitCheckin(item);
@@ -304,11 +303,12 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
   }
 
   void _showAiChatModal() {
+    final loc = Provider.of<LocalizationService>(context, listen: false);
     final TextEditingController chatController = TextEditingController();
     final List<Map<String, String>> chatMessages = [
       {
         'sender': 'ai',
-        'text': 'Jai Hind, Rifleman Arjun! I am your AI Welfare Companion. How can I assist your physical recovery or mental readiness today?'
+        'text': loc.t('ai_chat_greeting', 'Jai Hind, Rifleman Arjun! I am your Welfare Companion. How can I assist your physical recovery or mental readiness today?')
       },
       {
         'sender': 'user',
@@ -364,17 +364,17 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                         child: const Icon(Icons.psychology, color: AppColors.accent, size: 20),
                       ),
                       const SizedBox(width: 10),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'AI Welfare Companion',
-                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AppColors.secondary),
+                              loc.t('ai_welfare_companion', 'Welfare Companion'),
+                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AppColors.secondary),
                             ),
                             Text(
-                              'Indian Armed Forces Defense Clinical AI Assistant',
-                              style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                              loc.t('defense_clinical_ai', 'Indian Armed Forces Defense Clinical Assistant'),
+                              style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
                             ),
                           ],
                         ),
@@ -482,7 +482,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                           controller: chatController,
                           style: const TextStyle(fontSize: 12),
                           decoration: InputDecoration(
-                            hintText: 'Ask AI (e.g. recovery tips, stress relief)...',
+                            hintText: loc.t('Ask Coach (e.g. recovery tips, stress relief)...'),
                             hintStyle: const TextStyle(fontSize: 11, color: AppColors.textMuted),
                             filled: true,
                             fillColor: AppColors.background,
@@ -588,25 +588,25 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                 const SizedBox(height: 16),
 
                 // =============================================================
-                // SECTION 1: PERSONALIZED HOME SCREEN & AI WELLNESS SCORE
+                // SECTION 1: PERSONALIZED HOME SCREEN & WELLNESS SCORE
                 // =============================================================
                 Container(key: _overviewKey),
-                _buildSectionTitleBadge('1', 'Personalized Home Screen', 'AI-Powered Wellness Status'),
+                _buildSectionTitleBadge('1', 'Personalized Home Screen', 'Personal Wellness Status'),
                 _buildPersonalizedHeaderCard(soldierName, sync),
                 const SizedBox(height: 20),
 
                 // =============================================================
-                // SECTION 2: TODAY'S AI SUMMARY
+                // SECTION 2: TODAY'S SUMMARY
                 // =============================================================
-                _buildSectionTitleBadge('2', 'AI Daily Summary', 'Executive Overview in Seconds'),
+                _buildSectionTitleBadge('2', 'Daily Summary', 'Executive Overview in Seconds'),
                 _buildAiDailySummaryCard(),
                 const SizedBox(height: 20),
 
                 // =============================================================
-                // SECTION 3 & SECTION 17: AI WELLNESS COACH & DAILY MOTIVATION
+                // SECTION 3 & SECTION 17: WELLNESS COACH & DAILY MOTIVATION
                 // =============================================================
                 Container(key: _aiCoachKey),
-                _buildSectionTitleBadge('3 & 17', 'AI Wellness Coach & Daily Motivation', 'Personal Guidance & Mindset'),
+                _buildSectionTitleBadge('3 & 17', 'Wellness Coach & Daily Motivation', 'Personal Guidance & Mindset'),
                 _buildAiCoachCard(),
                 const SizedBox(height: 12),
                 _buildDailyMotivationCard(),
@@ -644,35 +644,6 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                 // =============================================================
                 _buildSectionTitleBadge('4', 'Mood Timeline', 'Visual Emotional Tracking'),
                 _buildMoodTimelineCard(),
-                const SizedBox(height: 20),
-
-                // =============================================================
-                // SECTION 9 & SECTION 15: RISK BREAKDOWN & EXPLAINABLE AI
-                // =============================================================
-                Container(key: _readinessKey),
-                _buildSectionTitleBadge('9 & 15', 'Risk Breakdown & Explainable AI', 'Transparent Root Causes'),
-                _buildRiskBreakdownCard(),
-                const SizedBox(height: 12),
-                _buildExplainableAiCard(),
-                const SizedBox(height: 14),
-
-                // Weak Signal Breakdown Card (Jury Feedback Item 1.3)
-                _buildWeakSignalBreakdownCard(),
-                const SizedBox(height: 14),
-
-                // Risk Evolution Timeline (Jury Feedback Item 2.1)
-                _buildRiskEvolutionTimelineCard(),
-                const SizedBox(height: 14),
-
-                // Closed-Loop Recovery Monitoring (Jury Feedback Item 2.2)
-                _buildRecoveryMonitoringCard(),
-                const SizedBox(height: 20),
-
-                // =============================================================
-                // SECTION 8: MISSION READINESS GAUGE
-                // =============================================================
-                _buildSectionTitleBadge('8', 'Mission Readiness', 'Operational Capability Index'),
-                _buildMissionReadinessCard(),
                 const SizedBox(height: 20),
 
                 // =============================================================
@@ -812,13 +783,11 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
         children: [
           _buildNavPill(0, loc.t('overview', 'Overview'), Icons.home_filled, () => _scrollToKey(_overviewKey, 0)),
           const SizedBox(width: 6),
-          _buildNavPill(1, loc.t('ai_coach', 'AI Coach'), Icons.psychology, () => _scrollToKey(_aiCoachKey, 1)),
+          _buildNavPill(1, loc.t('ai_coach', 'Wellness Coach'), Icons.psychology, () => _scrollToKey(_aiCoachKey, 1)),
           const SizedBox(width: 6),
-          _buildNavPill(2, loc.t('readiness_risk', 'Readiness & Risk'), Icons.shield_outlined, () => _scrollToKey(_readinessKey, 2)),
+          _buildNavPill(2, loc.t('health_sleep', 'Sleep & Recovery'), Icons.bedtime_outlined, () => _scrollToKey(_healthKey, 2)),
           const SizedBox(width: 6),
-          _buildNavPill(3, loc.t('health_sleep', 'Sleep & Recovery'), Icons.bedtime_outlined, () => _scrollToKey(_healthKey, 3)),
-          const SizedBox(width: 6),
-          _buildNavPill(4, loc.t('support', 'Support & SOS'), Icons.health_and_safety_outlined, () => _scrollToKey(_supportKey, 4)),
+          _buildNavPill(3, loc.t('support', 'Support & SOS'), Icons.health_and_safety_outlined, () => _scrollToKey(_supportKey, 3)),
         ],
       ),
     );
@@ -1086,7 +1055,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                       runSpacing: 4,
                       children: [
                         Text(
-                          loc.t('ai_wellness_score', 'AI Wellness Score'),
+                          loc.t('ai_wellness_score', 'Wellness Score'),
                           style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w700),
                         ),
                         Container(
@@ -1132,7 +1101,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    loc.t('welfare_companion_sub', 'Your Personal AI Welfare Companion for the Indian Armed Forces'),
+                    loc.t('welfare_companion_sub', 'Your Personal Welfare Companion for the Indian Armed Forces'),
                     style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 9.5, fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -1167,7 +1136,7 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
             children: [
               Expanded(
                 child: Text(
-                  loc.t("TODAY'S AI SUMMARY", "TODAY'S AI SUMMARY"),
+                  loc.t('today_ai_summary', "TODAY'S SUMMARY"),
                   style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.secondary, letterSpacing: 0.4),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -1220,6 +1189,8 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
   // SECTION 3 & SECTION 17: AI WELLNESS COACH & MOTIVATION
   // ---------------------------------------------------------------------------
   Widget _buildAiCoachCard() {
+    final loc = Provider.of<LocalizationService>(context, listen: false);
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -1245,13 +1216,13 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                 child: const Icon(Icons.psychology_alt, color: AppColors.accent, size: 20),
               ),
               const SizedBox(width: 10),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'AI Coach',
-                      style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w900),
+                      loc.t('ai_coach', 'Wellness Coach'),
+                      style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w900),
                     ),
                     Text(
                       'Clinical Behavioral Recovery Engine',
@@ -1810,209 +1781,6 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
                 ),
               );
             }),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ---------------------------------------------------------------------------
-  // SECTION 9 & SECTION 15: RISK BREAKDOWN & EXPLAINABLE AI
-  // ---------------------------------------------------------------------------
-  Widget _buildRiskBreakdownCard() {
-    final factors = [
-      {'name': 'Stress Level', 'pct': 18, 'status': 'Low Risk', 'color': AppColors.emerald},
-      {'name': 'Sleep Quality', 'pct': 92, 'status': 'Optimal', 'color': AppColors.emerald},
-      {'name': 'Fatigue Index', 'pct': 24, 'status': 'Low Risk', 'color': AppColors.emerald},
-      {'name': 'Hydration Target', 'pct': 81, 'status': 'Needs Attention', 'color': AppColors.amber},
-      {'name': 'Mental Wellness', 'pct': 89, 'status': 'Strong', 'color': AppColors.emerald},
-    ];
-
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.cardBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'RISK & HEALTH FACTOR BREAKDOWN',
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.secondary, letterSpacing: 0.5),
-          ),
-          const SizedBox(height: 12),
-          // Top 1% Principle #3: Stress Velocity & Momentum Indicator
-          Container(
-            padding: const EdgeInsets.all(12),
-            margin: const EdgeInsets.only(bottom: 14),
-            decoration: BoxDecoration(
-              color: AppColors.emeraldLight,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.emerald.withValues(alpha: 0.3)),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.emerald,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.trending_down, color: Colors.white, size: 20),
-                ),
-                const SizedBox(width: 10),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'STRESS VELOCITY: d(Stress)/dt',
-                            style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w900, color: AppColors.emerald, letterSpacing: 0.5),
-                          ),
-                          Text(
-                            '-1.2 pts/day',
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.emerald),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        'Restorative baseline • Allostatic regulation stable',
-                        style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          ...factors.map((f) {
-            final pct = f['pct'] as int;
-            final color = f['color'] as Color;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(f['name'] as String, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-                      Text('$pct% • ${f['status']}', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: color)),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: pct / 100.0,
-                      minHeight: 6,
-                      backgroundColor: AppColors.background,
-                      valueColor: AlwaysStoppedAnimation<Color>(color),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildExplainableAiCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.secondaryLight,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.secondary.withValues(alpha: 0.25)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
-            children: [
-              Icon(Icons.help_outline, color: AppColors.secondary, size: 16),
-              SizedBox(width: 8),
-              Text(
-                'WHY? (AI Prediction Explanation)',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.secondary, letterSpacing: 0.4),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            '• Sleep quality decreased slightly on Wednesday due to late patrol duty.\n• Duty hours increased (+2.5h tactical field drill).\n• Hydration below normal (1.4L recorded vs 2.5L tactical recommendation).',
-            style: TextStyle(fontSize: 11, height: 1.45, color: AppColors.textPrimary, fontWeight: FontWeight.w600),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ---------------------------------------------------------------------------
-  // SECTION 8: MISSION READINESS GAUGE
-  // ---------------------------------------------------------------------------
-  Widget _buildMissionReadinessCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.cardBorder),
-      ),
-      child: Row(
-        children: [
-          // Circular Dial
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: 96,
-                height: 96,
-                child: CircularProgressIndicator(
-                  value: 0.92,
-                  strokeWidth: 10,
-                  backgroundColor: AppColors.cardBorder,
-                  valueColor: const AlwaysStoppedAnimation<Color>(AppColors.emerald),
-                ),
-              ),
-              const Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('92%', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.secondary)),
-                  Text('READINESS', style: TextStyle(fontSize: 7, fontWeight: FontWeight.w800, color: AppColors.textSecondary)),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(width: 18),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'MISSION READY',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.emerald, letterSpacing: 0.6),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Optimal Combat & Tactical Fitness.',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'All psychological resilience thresholds and endurance vitals nominal for high-altitude deployment.',
-                  style: TextStyle(fontSize: 9.5, color: AppColors.textSecondary, height: 1.3),
-                ),
-              ],
-            ),
           ),
         ],
       ),
@@ -3199,376 +2967,5 @@ class _SoldierDashboardScreenState extends State<SoldierDashboardScreen> {
       ),
     );
   }
-
-  // ---------------------------------------------------------------------------
-  // JURY FIX 1.3: WEAK SIGNAL BREAKDOWN CARD (Explainable Operational Factors)
-  // ---------------------------------------------------------------------------
-  Widget _buildWeakSignalBreakdownCard() {
-    final factors = [
-      {
-        'title': '3 Consecutive Night Patrols',
-        'sub': 'Continuous forward observation shift without circadian reset',
-        'impact': '+28% Weight',
-        'color': AppColors.rose,
-        'icon': Icons.nights_stay_outlined,
-      },
-      {
-        'title': 'Denied Family Leave / 2x Deferrals',
-        'sub': 'Operational hold on casual furlough backlog accumulates cognitive debt',
-        'impact': '+24% Weight',
-        'color': AppColors.amber,
-        'icon': Icons.event_busy_outlined,
-      },
-      {
-        'title': 'Recent High-Altitude Unit Transfer',
-        'sub': 'Relocated to Forward LOC sector within last 30 days',
-        'impact': '+22% Weight',
-        'color': AppColors.primary,
-        'icon': Icons.terrain_outlined,
-      },
-      {
-        'title': '18% Sleep Drop (<4.2h Average)',
-        'sub': 'Wearable telemetry and check-ins indicate restorative deficit',
-        'impact': '+16% Weight',
-        'color': AppColors.secondary,
-        'icon': Icons.bedtime_outlined,
-      },
-    ];
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.cardBorder),
-        boxShadow: const [
-          BoxShadow(color: Color(0x0A000000), blurRadius: 6, offset: Offset(0, 2)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: AppColors.secondary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.analytics_outlined, color: AppColors.secondary, size: 16),
-              ),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'WEAK SIGNAL BREAKDOWN & ROOT CAUSES',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.secondary, letterSpacing: 0.5),
-                    ),
-                    Text(
-                      'Exact contributing operational factors behind stress trajectory',
-                      style: TextStyle(fontSize: 9.5, color: AppColors.textSecondary),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppColors.emeraldLight,
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: AppColors.emerald.withValues(alpha: 0.3)),
-                ),
-                child: const Text(
-                  'XAI Verified',
-                  style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w900, color: AppColors.emerald),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          ...factors.map((f) {
-            final Color col = f['color'] as Color;
-            return Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.cardBorder),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: col.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(f['icon'] as IconData, color: col, size: 16),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          f['title'] as String,
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
-                        ),
-                        Text(
-                          f['sub'] as String,
-                          style: const TextStyle(fontSize: 9, color: AppColors.textSecondary),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: col.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      f['impact'] as String,
-                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: col),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
-        ],
-      ),
-    );
-  }
-
-  // ---------------------------------------------------------------------------
-  // JURY FIX 2.1: RISK EVOLUTION & LONGITUDINAL TREND TIMELINE (30/60/90 Days)
-  // ---------------------------------------------------------------------------
-  Widget _buildRiskEvolutionTimelineCard() {
-    final milestones = [
-      {'day': 'Day 0', 'score': '32%', 'event': 'Deployment to Forward Sector', 'color': AppColors.emerald},
-      {'day': 'Day 14', 'score': '48%', 'event': 'Shift to High-Tempo Night Patrols', 'color': AppColors.primary},
-      {'day': 'Day 28', 'score': '64%', 'event': 'Casual Leave Request Deferred', 'color': AppColors.amber},
-      {'day': 'Day 45', 'score': '76%', 'event': 'Consecutive Watch Hours Increase', 'color': AppColors.rose},
-      {'day': 'Day 60', 'score': '52%', 'event': 'Post-Rest Recovery & Intervention', 'color': AppColors.emerald},
-    ];
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
-        boxShadow: const [
-          BoxShadow(color: Color(0x1F000000), blurRadius: 8, offset: Offset(0, 3)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Expanded(
-                child: Row(
-                  children: [
-                    Icon(Icons.timeline, color: Colors.amberAccent, size: 16),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'RISK EVOLUTION & MILESTONE TIMELINE',
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 0.5),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: const Text('60-Day Trajectory', style: TextStyle(color: Colors.amberAccent, fontSize: 8.5, fontWeight: FontWeight.w900)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'Progression of allostatic stress linked to operational duty events',
-            style: TextStyle(fontSize: 9.5, color: Colors.white70),
-          ),
-          const SizedBox(height: 14),
-
-          // Horizontal milestone stepper
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: milestones.map((m) {
-                final Color col = m['color'] as Color;
-                return Container(
-                  margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.all(10),
-                  width: 130,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.06),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(m['day'] as String, style: const TextStyle(fontSize: 9, color: Colors.white60, fontWeight: FontWeight.w700)),
-                          Text(
-                            m['score'] as String,
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: col, fontFamily: 'monospace'),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        m['event'] as String,
-                        style: const TextStyle(fontSize: 9.5, color: Colors.white, fontWeight: FontWeight.w600, height: 1.2),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ---------------------------------------------------------------------------
-  // JURY FIX 2.2: CLOSED-LOOP RECOVERY MONITORING (Pre vs Post Intervention)
-  // ---------------------------------------------------------------------------
-  Widget _buildRecoveryMonitoringCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.4)),
-        boxShadow: const [
-          BoxShadow(color: Color(0x0A000000), blurRadius: 6, offset: Offset(0, 2)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.published_with_changes, color: Color(0xFF10B981), size: 16),
-              ),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'CLOSED-LOOP RECOVERY MONITORING',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.secondary, letterSpacing: 0.5),
-                    ),
-                    Text(
-                      'Evaluates intervention effectiveness over 30–60 days post-counseling',
-                      style: TextStyle(fontSize: 9.5, color: AppColors.textSecondary),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: const Text(
-                  'RECOVERING',
-                  style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w900, color: Color(0xFF059669)),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // Side-by-side pre vs post delta
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.background,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.cardBorder),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Column(
-                  children: const [
-                    Text('BASELINE STRESS', style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
-                    SizedBox(height: 2),
-                    Text('84 / 100', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AppColors.rose, fontFamily: 'monospace')),
-                    Text('Pre-Intervention', style: TextStyle(fontSize: 8, color: AppColors.textMuted)),
-                  ],
-                ),
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF10B981).withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.arrow_forward, color: Color(0xFF10B981), size: 14),
-                ),
-                Column(
-                  children: const [
-                    Text('CURRENT STRESS', style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
-                    SizedBox(height: 2),
-                    Text('52 / 100', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF059669), fontFamily: 'monospace')),
-                    Text('Post-Rest Rotation', style: TextStyle(fontSize: 8, color: AppColors.textMuted)),
-                  ],
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF10B981),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Column(
-                    children: [
-                      Text('-32 pts', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Colors.white)),
-                      Text('38% Drop', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w700, color: Colors.white)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Protocol Applied: 48-hour mandatory sleep cycle + 5-day casual leave grant. Next clinical review scheduled in 6 days.',
-            style: TextStyle(fontSize: 9.5, color: AppColors.textSecondary, height: 1.3),
-          ),
-        ],
-      ),
-    );
-  }
 }
+

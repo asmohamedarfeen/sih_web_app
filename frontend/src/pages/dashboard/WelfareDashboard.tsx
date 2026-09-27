@@ -845,9 +845,8 @@ export const WelfareDashboard: React.FC = () => {
                         <div
                           key={p.id}
                           onClick={() => handleSelectPersonnel(p)}
-                          className={`p-3.5 hover:bg-slate-50 flex items-center justify-between gap-4 cursor-pointer transition-colors ${
-                            isCurrentlyActive ? 'bg-primary-50/70 border-l-4 border-primary' : ''
-                          }`}
+                          className={`p-3.5 hover:bg-slate-50 flex items-center justify-between gap-4 cursor-pointer transition-colors ${isCurrentlyActive ? 'bg-primary-50/70 border-l-4 border-primary' : ''
+                            }`}
                         >
                           <div className="flex items-center gap-3 min-w-0">
                             <img
@@ -876,15 +875,14 @@ export const WelfareDashboard: React.FC = () => {
                                   <div className="flex items-center gap-1 text-[10px]">
                                     <span className="text-[9px] uppercase font-bold text-slate-400">Current:</span>
                                     <span
-                                      className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                                        p.riskTier === 'Critical'
+                                      className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${p.riskTier === 'Critical'
                                           ? 'bg-rose-100 text-rose-700'
                                           : p.riskTier === 'High'
-                                          ? 'bg-orange-100 text-orange-700'
-                                          : p.riskTier === 'Moderate'
-                                          ? 'bg-amber-100 text-amber-700'
-                                          : 'bg-emerald-100 text-emerald-700'
-                                      }`}
+                                            ? 'bg-orange-100 text-orange-700'
+                                            : p.riskTier === 'Moderate'
+                                              ? 'bg-amber-100 text-amber-700'
+                                              : 'bg-emerald-100 text-emerald-700'
+                                        }`}
                                     >
                                       {p.riskTier}
                                     </span>
@@ -893,15 +891,14 @@ export const WelfareDashboard: React.FC = () => {
                                   <div className="flex items-center gap-1 text-[10px]">
                                     <span className="text-[9px] uppercase font-bold text-indigo-600">30d ML:</span>
                                     <span
-                                      className={`px-1.5 py-0.5 rounded text-[10px] font-black border ${
-                                        fc.predicted_30d_risk_tier === 'Critical'
+                                      className={`px-1.5 py-0.5 rounded text-[10px] font-black border ${fc.predicted_30d_risk_tier === 'Critical'
                                           ? 'bg-rose-50 text-rose-700 border-rose-200'
                                           : fc.predicted_30d_risk_tier === 'High'
-                                          ? 'bg-orange-50 text-orange-700 border-orange-200'
-                                          : fc.predicted_30d_risk_tier === 'Moderate'
-                                          ? 'bg-amber-50 text-amber-700 border-amber-200'
-                                          : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                      }`}
+                                            ? 'bg-orange-50 text-orange-700 border-orange-200'
+                                            : fc.predicted_30d_risk_tier === 'Moderate'
+                                              ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                              : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                        }`}
                                     >
                                       {fc.predicted_30d_risk_tier} ({fc.predicted_30d_score}%) ↗
                                     </span>
@@ -929,11 +926,10 @@ export const WelfareDashboard: React.FC = () => {
                 <button
                   key={tier}
                   onClick={() => setSelectedTierFilter(tier)}
-                  className={`px-3.5 py-2 rounded-xl font-bold transition-all cursor-pointer shrink-0 ${
-                    isSelected
+                  className={`px-3.5 py-2 rounded-xl font-bold transition-all cursor-pointer shrink-0 ${isSelected
                       ? 'bg-primary text-white shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
+                    }`}
                 >
                   {label}
                 </button>
@@ -1064,22 +1060,20 @@ export const WelfareDashboard: React.FC = () => {
             <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <div
-                  className={`w-3 h-3 rounded-full animate-ping ${
-                    selectedPersonnel.riskTier === 'Critical'
+                  className={`w-3 h-3 rounded-full animate-ping ${selectedPersonnel.riskTier === 'Critical'
                       ? 'bg-rose-600'
                       : selectedPersonnel.riskTier === 'High'
-                      ? 'bg-orange-500'
-                      : 'bg-amber-500'
-                  }`}
+                        ? 'bg-orange-500'
+                        : 'bg-amber-500'
+                    }`}
                 />
                 <div
-                  className={`flex items-center gap-1.5 font-black text-sm tracking-wide ${
-                    selectedPersonnel.riskTier === 'Critical'
+                  className={`flex items-center gap-1.5 font-black text-sm tracking-wide ${selectedPersonnel.riskTier === 'Critical'
                       ? 'text-rose-700'
                       : selectedPersonnel.riskTier === 'High'
-                      ? 'text-orange-700'
-                      : 'text-amber-700'
-                  }`}
+                        ? 'text-orange-700'
+                        : 'text-amber-700'
+                    }`}
                 >
                   <Shield className="w-4 h-4" />
                   <span>
@@ -1090,15 +1084,14 @@ export const WelfareDashboard: React.FC = () => {
                 </div>
               </div>
               <span
-                className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-white shadow-xs ${
-                  selectedPersonnel.riskTier === 'Critical'
+                className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-white shadow-xs ${selectedPersonnel.riskTier === 'Critical'
                     ? 'bg-rose-600'
                     : selectedPersonnel.riskTier === 'High'
-                    ? 'bg-orange-500'
-                    : selectedPersonnel.riskTier === 'Moderate'
-                    ? 'bg-amber-500'
-                    : 'bg-emerald-600'
-                }`}
+                      ? 'bg-orange-500'
+                      : selectedPersonnel.riskTier === 'Moderate'
+                        ? 'bg-amber-500'
+                        : 'bg-emerald-600'
+                  }`}
               >
                 {selectedPersonnel.riskTier === 'Critical' ? t('HIGH PRIORITY') : selectedPersonnel.riskTier.toUpperCase()}
               </span>
@@ -1145,10 +1138,10 @@ export const WelfareDashboard: React.FC = () => {
                         selectedPersonnel.riskTier === 'Critical'
                           ? '#DC2626'
                           : selectedPersonnel.riskTier === 'High'
-                          ? '#EA580C'
-                          : selectedPersonnel.riskTier === 'Moderate'
-                          ? '#F59E0B'
-                          : '#10B981'
+                            ? '#EA580C'
+                            : selectedPersonnel.riskTier === 'Moderate'
+                              ? '#F59E0B'
+                              : '#10B981'
                       }
                       strokeWidth="12"
                       strokeDasharray={2 * Math.PI * 48}
@@ -1168,15 +1161,14 @@ export const WelfareDashboard: React.FC = () => {
                   </div>
                 </div>
                 <span
-                  className={`mt-1 px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider text-white ${
-                    selectedPersonnel.riskTier === 'Critical'
+                  className={`mt-1 px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider text-white ${selectedPersonnel.riskTier === 'Critical'
                       ? 'bg-rose-600'
                       : selectedPersonnel.riskTier === 'High'
-                      ? 'bg-orange-500'
-                      : selectedPersonnel.riskTier === 'Moderate'
-                      ? 'bg-amber-500'
-                      : 'bg-emerald-600'
-                  }`}
+                        ? 'bg-orange-500'
+                        : selectedPersonnel.riskTier === 'Moderate'
+                          ? 'bg-amber-500'
+                          : 'bg-emerald-600'
+                    }`}
                 >
                   {selectedPersonnel.riskTier.toUpperCase()}
                 </span>
@@ -1187,9 +1179,8 @@ export const WelfareDashboard: React.FC = () => {
                 <div>
                   <div className="text-[10px] uppercase font-extrabold text-slate-500 tracking-wider">{t('Trend (Last 3 Months)')}</div>
                   <div
-                    className={`text-base font-black flex items-center gap-1 mt-0.5 ${
-                      selectedPersonnel.trend.startsWith('+') ? 'text-rose-600' : 'text-emerald-600'
-                    }`}
+                    className={`text-base font-black flex items-center gap-1 mt-0.5 ${selectedPersonnel.trend.startsWith('+') ? 'text-rose-600' : 'text-emerald-600'
+                      }`}
                   >
                     <TrendingUp className="w-4 h-4" />
                     <span>{selectedPersonnel.trend}</span>
@@ -1387,15 +1378,14 @@ export const WelfareDashboard: React.FC = () => {
                               key={idx}
                               type="button"
                               onClick={() => setSelectedDisasterMilestone(idx)}
-                              className={`text-left p-2 rounded-xl border transition-all relative cursor-pointer ${
-                                isSelected
+                              className={`text-left p-2 rounded-xl border transition-all relative cursor-pointer ${isSelected
                                   ? isThreshold
                                     ? 'bg-rose-50/90 border-rose-400 ring-2 ring-rose-400/40 shadow-xs'
                                     : 'bg-white border-[#2F4F3E] ring-2 ring-[#2F4F3E]/30 shadow-xs'
                                   : isThreshold
-                                  ? 'bg-rose-50/50 border-rose-200 hover:border-rose-300'
-                                  : 'bg-white/75 border-slate-200/90 hover:bg-white hover:border-slate-300'
-                              }`}
+                                    ? 'bg-rose-50/50 border-rose-200 hover:border-rose-300'
+                                    : 'bg-white/75 border-slate-200/90 hover:bg-white hover:border-slate-300'
+                                }`}
                             >
                               {isThreshold && (
                                 <span className="absolute -top-2 right-1 text-[8px] font-black uppercase tracking-wider bg-rose-600 text-white px-1 py-0.2 rounded shadow-2xs">
@@ -1408,15 +1398,14 @@ export const WelfareDashboard: React.FC = () => {
                                   {m.label}
                                 </span>
                                 <span
-                                  className={`text-[8px] font-bold uppercase px-1 py-0.2 rounded ${
-                                    m.severity === 'nominal'
+                                  className={`text-[8px] font-bold uppercase px-1 py-0.2 rounded ${m.severity === 'nominal'
                                       ? 'bg-emerald-100 text-emerald-700'
                                       : m.severity === 'warning'
-                                      ? 'bg-amber-100 text-amber-700'
-                                      : m.severity === 'danger'
-                                      ? 'bg-orange-100 text-orange-700'
-                                      : 'bg-rose-100 text-rose-700'
-                                  }`}
+                                        ? 'bg-amber-100 text-amber-700'
+                                        : m.severity === 'danger'
+                                          ? 'bg-orange-100 text-orange-700'
+                                          : 'bg-rose-100 text-rose-700'
+                                    }`}
                                 >
                                   {m.riskScore}%
                                 </span>
@@ -1428,13 +1417,12 @@ export const WelfareDashboard: React.FC = () => {
 
                               <div className="flex items-center gap-1 mt-1">
                                 <span
-                                  className={`text-[8px] font-extrabold uppercase px-1 rounded ${
-                                    isThreshold
+                                  className={`text-[8px] font-extrabold uppercase px-1 rounded ${isThreshold
                                       ? 'bg-rose-100 text-rose-700'
                                       : m.severity === 'critical'
-                                      ? 'bg-purple-100 text-purple-700'
-                                      : 'bg-slate-100 text-slate-600'
-                                  }`}
+                                        ? 'bg-purple-100 text-purple-700'
+                                        : 'bg-slate-100 text-slate-600'
+                                    }`}
                                 >
                                   {m.severity}
                                 </span>
@@ -1512,11 +1500,10 @@ export const WelfareDashboard: React.FC = () => {
                             key={rec.id}
                             type="button"
                             onClick={() => setActiveDirectiveTab(idx)}
-                            className={`py-1.5 px-1 rounded-lg text-center transition-all cursor-pointer truncate ${
-                              isActive
+                            className={`py-1.5 px-1 rounded-lg text-center transition-all cursor-pointer truncate ${isActive
                                 ? 'bg-white text-slate-950 font-black shadow-2xs ring-1 ring-slate-300'
                                 : 'text-slate-600 hover:text-slate-900 font-bold hover:bg-white/50'
-                            }`}
+                              }`}
                           >
                             <span className="text-[9px] font-mono mr-1 opacity-70">#{idx + 1}</span>
                             <span className="text-[10px]">{rec.category.split('&')[0].trim()}</span>
@@ -1648,33 +1635,30 @@ export const WelfareDashboard: React.FC = () => {
                           Behavior Change Score
                         </div>
                         <div className="flex items-baseline gap-2.5 mt-2">
-                          <span className={`text-4xl sm:text-5xl font-black font-mono tracking-tight ${
-                            isSevere ? 'text-rose-600' : isModerate ? 'text-amber-600' : 'text-emerald-600'
-                          }`}>
+                          <span className={`text-4xl sm:text-5xl font-black font-mono tracking-tight ${isSevere ? 'text-rose-600' : isModerate ? 'text-amber-600' : 'text-emerald-600'
+                            }`}>
                             {bc.behavior_change_score}
                           </span>
                           <span className="text-sm font-mono text-slate-500 font-semibold">/ 100</span>
                         </div>
                         <div className="mt-2">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-black uppercase border ${
-                            isSevere
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-black uppercase border ${isSevere
                               ? 'bg-rose-50 text-rose-700 border-rose-200'
                               : isModerate
-                              ? 'bg-amber-50 text-amber-700 border-amber-200'
-                              : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                          }`}>
+                                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            }`}>
                             {bc.severity_tier}
                           </span>
                         </div>
                         <div className="w-full bg-slate-200 rounded-full h-2 mt-3 overflow-hidden">
                           <div
-                            className={`h-2 rounded-full ${
-                              isSevere
+                            className={`h-2 rounded-full ${isSevere
                                 ? 'bg-rose-600'
                                 : isModerate
-                                ? 'bg-amber-500'
-                                : 'bg-emerald-500'
-                            }`}
+                                  ? 'bg-amber-500'
+                                  : 'bg-emerald-500'
+                              }`}
                             style={{ width: `${bc.behavior_change_score}%` }}
                           />
                         </div>
@@ -1730,18 +1714,16 @@ export const WelfareDashboard: React.FC = () => {
                                     {f.current_behavior}
                                   </td>
                                   <td className="py-2 text-center whitespace-nowrap">
-                                    <span className={`font-mono font-bold text-[11px] ${
-                                      f.change_pct > 0 ? 'text-rose-600' : 'text-amber-600'
-                                    }`}>
+                                    <span className={`font-mono font-bold text-[11px] ${f.change_pct > 0 ? 'text-rose-600' : 'text-amber-600'
+                                      }`}>
                                       {f.change_pct > 0 ? `+${f.change_pct}%` : `${f.change_pct}%`}
                                     </span>
                                   </td>
                                   <td className="py-2 text-right whitespace-nowrap">
-                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                      isHighShift
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${isHighShift
                                         ? 'bg-rose-50 text-rose-700 border border-rose-200'
                                         : 'bg-slate-100 text-slate-700 border border-slate-200'
-                                    }`}>
+                                      }`}>
                                       {f.flag}
                                     </span>
                                   </td>
@@ -1809,15 +1791,14 @@ export const WelfareDashboard: React.FC = () => {
                           {t('Current Risk')}
                         </div>
                         <div className="flex items-baseline gap-2 mt-1">
-                          <span className={`text-2xl font-black ${
-                            forecast.current_risk_tier === 'Critical'
+                          <span className={`text-2xl font-black ${forecast.current_risk_tier === 'Critical'
                               ? 'text-rose-600'
                               : forecast.current_risk_tier === 'High'
-                              ? 'text-orange-600'
-                              : forecast.current_risk_tier === 'Moderate'
-                              ? 'text-amber-600'
-                              : 'text-emerald-600'
-                          }`}>
+                                ? 'text-orange-600'
+                                : forecast.current_risk_tier === 'Moderate'
+                                  ? 'text-amber-600'
+                                  : 'text-emerald-600'
+                            }`}>
                             {forecast.current_risk_tier}
                           </span>
                           <span className="text-sm font-bold text-slate-500 font-mono">
@@ -1832,11 +1813,10 @@ export const WelfareDashboard: React.FC = () => {
 
                     {/* Transition Vector Arrow */}
                     <div className="sm:col-span-2 flex flex-col items-center justify-center py-2 sm:py-0">
-                      <div className={`flex items-center gap-1 font-black text-xs px-2.5 py-1 rounded-full border ${
-                        isEscalating
+                      <div className={`flex items-center gap-1 font-black text-xs px-2.5 py-1 rounded-full border ${isEscalating
                           ? 'bg-rose-50 text-rose-700 border-rose-200'
                           : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                      }`}>
+                        }`}>
                         <TrendingUp className="w-3.5 h-3.5" />
                         <span>{isEscalating ? `+${forecast.delta_score}%` : `${forecast.delta_score}%`}</span>
                       </div>
@@ -1846,13 +1826,12 @@ export const WelfareDashboard: React.FC = () => {
                     </div>
 
                     {/* Predicted in 30 Days Box */}
-                    <div className={`sm:col-span-5 p-4 rounded-2xl border flex flex-col justify-between ${
-                      forecast.predicted_30d_risk_tier === 'Critical'
+                    <div className={`sm:col-span-5 p-4 rounded-2xl border flex flex-col justify-between ${forecast.predicted_30d_risk_tier === 'Critical'
                         ? 'bg-rose-50/80 border-rose-200'
                         : forecast.predicted_30d_risk_tier === 'High'
-                        ? 'bg-orange-50/80 border-orange-200'
-                        : 'bg-amber-50/80 border-amber-200'
-                    }`}>
+                          ? 'bg-orange-50/80 border-orange-200'
+                          : 'bg-amber-50/80 border-amber-200'
+                      }`}>
                       <div>
                         <div className="flex items-center justify-between">
                           <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-700">
@@ -1861,15 +1840,14 @@ export const WelfareDashboard: React.FC = () => {
                           <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
                         </div>
                         <div className="flex items-baseline gap-2 mt-1">
-                          <span className={`text-2xl font-black ${
-                            forecast.predicted_30d_risk_tier === 'Critical'
+                          <span className={`text-2xl font-black ${forecast.predicted_30d_risk_tier === 'Critical'
                               ? 'text-rose-700'
                               : forecast.predicted_30d_risk_tier === 'High'
-                              ? 'text-orange-700'
-                              : forecast.predicted_30d_risk_tier === 'Moderate'
-                              ? 'text-amber-700'
-                              : 'text-emerald-700'
-                          }`}>
+                                ? 'text-orange-700'
+                                : forecast.predicted_30d_risk_tier === 'Moderate'
+                                  ? 'text-amber-700'
+                                  : 'text-emerald-700'
+                            }`}>
                             {forecast.predicted_30d_risk_tier}
                           </span>
                           <span className="text-sm font-bold text-slate-700 font-mono">
@@ -1895,11 +1873,10 @@ export const WelfareDashboard: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setIsForecastGraphView(!isForecastGraphView)}
-                        className={`px-3 py-1 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 border ${
-                          isForecastGraphView
+                        className={`px-3 py-1 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 border ${isForecastGraphView
                             ? 'bg-[#2F4F3E] hover:bg-[#233d30] text-white border-[#2F4F3E] shadow-2xs'
                             : 'bg-[#D4A017] hover:bg-[#b88a14] text-slate-950 border-[#D4A017] shadow-xs'
-                        }`}
+                          }`}
                         title={isForecastGraphView ? "Switch back to milestone cards" : "Visualize 30-day forecasting trajectory as an interactive graph"}
                       >
                         {isForecastGraphView ? (
@@ -1924,25 +1901,23 @@ export const WelfareDashboard: React.FC = () => {
                           return (
                             <div
                               key={point.day}
-                              className={`p-2 rounded-xl text-center border transition-all ${
-                                isEnd
+                              className={`p-2 rounded-xl text-center border transition-all ${isEnd
                                   ? 'bg-rose-50 border-rose-300 ring-1 ring-rose-200'
                                   : idx === 0
-                                  ? 'bg-white border-slate-300 shadow-2xs'
-                                  : 'bg-white border-slate-200/80'
-                              }`}
+                                    ? 'bg-white border-slate-300 shadow-2xs'
+                                    : 'bg-white border-slate-200/80'
+                                }`}
                             >
                               <div className="text-[9px] font-extrabold uppercase text-slate-400">{point.label}</div>
                               <div className="text-xs font-black text-slate-900 font-mono mt-0.5">{point.score}%</div>
-                              <div className={`text-[8px] font-extrabold uppercase mt-0.5 ${
-                                point.risk_tier === 'Critical'
+                              <div className={`text-[8px] font-extrabold uppercase mt-0.5 ${point.risk_tier === 'Critical'
                                   ? 'text-rose-600'
                                   : point.risk_tier === 'High'
-                                  ? 'text-orange-600'
-                                  : point.risk_tier === 'Moderate'
-                                  ? 'text-amber-600'
-                                  : 'text-emerald-600'
-                              }`}>
+                                    ? 'text-orange-600'
+                                    : point.risk_tier === 'Moderate'
+                                      ? 'text-amber-600'
+                                      : 'text-emerald-600'
+                                }`}>
                                 {point.risk_tier}
                               </div>
                             </div>
@@ -1966,9 +1941,8 @@ export const WelfareDashboard: React.FC = () => {
                           </div>
                           <div className="text-[10px] font-bold text-slate-600 flex items-center gap-1">
                             <span>Trajectory Shift:</span>
-                            <span className={`font-mono font-black ${
-                              forecast.trend_direction === 'ESCALATING' ? 'text-rose-600' : 'text-emerald-600'
-                            }`}>
+                            <span className={`font-mono font-black ${forecast.trend_direction === 'ESCALATING' ? 'text-rose-600' : 'text-emerald-600'
+                              }`}>
                               {forecast.delta_score > 0 ? `+${forecast.delta_score}%` : `${forecast.delta_score}%`}
                             </span>
                           </div>
@@ -2103,10 +2077,10 @@ export const WelfareDashboard: React.FC = () => {
                                     pt.risk_tier === 'Critical'
                                       ? '#e11d48'
                                       : pt.risk_tier === 'High'
-                                      ? '#ea580c'
-                                      : pt.risk_tier === 'Moderate'
-                                      ? '#d97706'
-                                      : '#059669';
+                                        ? '#ea580c'
+                                        : pt.risk_tier === 'Moderate'
+                                          ? '#d97706'
+                                          : '#059669';
 
                                   return (
                                     <g
@@ -2177,13 +2151,12 @@ export const WelfareDashboard: React.FC = () => {
                                   <span className="font-mono font-black text-amber-300">
                                     {pts[hoveredTrajectoryIndex].score}%
                                   </span>
-                                  <span className={`text-[8px] font-black uppercase px-1 rounded ${
-                                    pts[hoveredTrajectoryIndex].risk_tier === 'Critical'
+                                  <span className={`text-[8px] font-black uppercase px-1 rounded ${pts[hoveredTrajectoryIndex].risk_tier === 'Critical'
                                       ? 'bg-rose-600'
                                       : pts[hoveredTrajectoryIndex].risk_tier === 'High'
-                                      ? 'bg-orange-500'
-                                      : 'bg-amber-500'
-                                  }`}>
+                                        ? 'bg-orange-500'
+                                        : 'bg-amber-500'
+                                    }`}>
                                     {pts[hoveredTrajectoryIndex].risk_tier}
                                   </span>
                                 </div>
@@ -2489,13 +2462,12 @@ export const WelfareDashboard: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <span className="font-black text-slate-900">{factor.pct}%</span>
                       <span
-                        className={`text-[10px] font-bold ${
-                          factor.impact === 'High'
+                        className={`text-[10px] font-bold ${factor.impact === 'High'
                             ? 'text-rose-600'
                             : factor.impact === 'Medium'
-                            ? 'text-amber-600'
-                            : 'text-emerald-600'
-                        }`}
+                              ? 'text-amber-600'
+                              : 'text-emerald-600'
+                          }`}
                       >
                         {factor.impact} impact
                       </span>
@@ -2761,9 +2733,8 @@ export const WelfareDashboard: React.FC = () => {
                       <tr
                         key={p.id}
                         onClick={() => handleSelectPersonnel(p)}
-                        className={`hover:bg-slate-50/80 transition-colors cursor-pointer ${
-                          isSelected ? 'bg-primary-50/60 border-l-2 border-primary' : ''
-                        }`}
+                        className={`hover:bg-slate-50/80 transition-colors cursor-pointer ${isSelected ? 'bg-primary-50/60 border-l-2 border-primary' : ''
+                          }`}
                       >
                         <td className="py-2.5 font-bold text-slate-500">{idx + 1}</td>
                         <td className="py-2.5">
@@ -2778,11 +2749,10 @@ export const WelfareDashboard: React.FC = () => {
                               ESI: {getPersonnelEmotionalStability(p).score}% {getPersonnelEmotionalStability(p).status}
                             </span>
                             <span className="text-slate-300">&bull;</span>
-                            <span className={`font-semibold px-1 rounded border ${
-                              getPersonnelBehavioralChange(p).behavior_change_score >= 70
+                            <span className={`font-semibold px-1 rounded border ${getPersonnelBehavioralChange(p).behavior_change_score >= 70
                                 ? 'text-rose-700 bg-rose-50 border-rose-200/60'
                                 : 'text-indigo-700 bg-indigo-50 border-indigo-200/60'
-                            }`}>
+                              }`}>
                               BCS: {getPersonnelBehavioralChange(p).behavior_change_score}/100
                             </span>
                           </div>
@@ -2790,15 +2760,14 @@ export const WelfareDashboard: React.FC = () => {
                         <td className="py-2.5 font-medium text-slate-700">{p.unit.replace('Field Unit - ', '')}</td>
                         <td className="py-2.5">
                           <span
-                            className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${
-                              p.riskTier === 'Critical'
+                            className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${p.riskTier === 'Critical'
                                 ? 'bg-rose-100 text-rose-700'
                                 : p.riskTier === 'High'
-                                ? 'bg-orange-100 text-orange-700'
-                                : p.riskTier === 'Moderate'
-                                ? 'bg-amber-100 text-amber-700'
-                                : 'bg-emerald-100 text-emerald-700'
-                            }`}
+                                  ? 'bg-orange-100 text-orange-700'
+                                  : p.riskTier === 'Moderate'
+                                    ? 'bg-amber-100 text-amber-700'
+                                    : 'bg-emerald-100 text-emerald-700'
+                              }`}
                           >
                             {p.riskScore}% {p.riskTier}
                           </span>
@@ -2806,15 +2775,14 @@ export const WelfareDashboard: React.FC = () => {
                         <td className="py-2.5">
                           <div className="flex items-center gap-1.5">
                             <span
-                              className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase border ${
-                                fc.predicted_30d_risk_tier === 'Critical'
+                              className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase border ${fc.predicted_30d_risk_tier === 'Critical'
                                   ? 'bg-rose-50 text-rose-700 border-rose-200'
                                   : fc.predicted_30d_risk_tier === 'High'
-                                  ? 'bg-orange-50 text-orange-700 border-orange-200'
-                                  : fc.predicted_30d_risk_tier === 'Moderate'
-                                  ? 'bg-amber-50 text-amber-700 border-amber-200'
-                                  : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                              }`}
+                                    ? 'bg-orange-50 text-orange-700 border-orange-200'
+                                    : fc.predicted_30d_risk_tier === 'Moderate'
+                                      ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                      : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                }`}
                             >
                               {fc.predicted_30d_score}% {fc.predicted_30d_risk_tier}
                             </span>
@@ -2838,11 +2806,10 @@ export const WelfareDashboard: React.FC = () => {
                               e.stopPropagation();
                               handleSelectPersonnel(p);
                             }}
-                            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                              isSelected
+                            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${isSelected
                                 ? 'bg-primary text-white shadow-xs'
                                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                            }`}
+                              }`}
                           >
                             {isSelected ? 'Active' : 'Inspect'}
                           </button>

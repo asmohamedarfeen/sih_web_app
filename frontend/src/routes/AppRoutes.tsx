@@ -12,6 +12,12 @@ import { AlertsPage } from '../pages/alerts';
 import { AnalyticsPage } from '../pages/analytics';
 import { ReportsPage } from '../pages/reports';
 import { OrganizationPage } from '../pages/organization';
+import { SecurityPage } from '../pages/security';
+import { MissionPlannerPage } from '../pages/mission-planner';
+import { UnitTwinPage } from '../pages/unit-twin';
+import { MissionImpactPage } from '../pages/mission-impact';
+import { PolicyDiscoveryPage } from '../pages/policy-discovery';
+import { ForceBalancingPage } from '../pages/force-balancing';
 import { useAuthStore, getRoleDashboardRoute } from '../store/authStore';
 
 export const AppRoutes: React.FC = () => {
@@ -67,7 +73,7 @@ export const AppRoutes: React.FC = () => {
           <Route
             element={
               <RoleProtectedRoute
-                allowedRoles={['WELFARE_OFFICER', 'MEDICAL_OFFICER', 'SUPER_ADMIN', 'ADMIN']}
+                allowedRoles={['WELFARE_OFFICER', 'MEDICAL_OFFICER', 'COMMANDER', 'SUPER_ADMIN', 'ADMIN']}
               />
             }
           >
@@ -106,6 +112,12 @@ export const AppRoutes: React.FC = () => {
           <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/organization" element={<OrganizationPage />} />
+          <Route path="/security" element={<SecurityPage />} />
+          <Route path="/mission-planner" element={<MissionPlannerPage />} />
+          <Route path="/unit-twin" element={<UnitTwinPage />} />
+          <Route path="/mission-impact" element={<MissionImpactPage />} />
+          <Route path="/policy-discovery" element={<PolicyDiscoveryPage />} />
+          <Route path="/force-balancing" element={<ForceBalancingPage />} />
         </Route>
       </Route>
 

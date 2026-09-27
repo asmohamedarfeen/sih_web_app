@@ -337,7 +337,7 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
-          loc.assessmentUi('assessment_title', 'AI Self-Assessment'),
+          loc.assessmentUi('assessment_title', 'Confidential Self-Assessment'),
           style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
         ),
         elevation: 0,
@@ -836,10 +836,10 @@ class _SelfAssessmentScreenState extends State<SelfAssessmentScreen> {
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.smart_toy_outlined, color: AppColors.accent, size: 18),
+                    Icon(Icons.health_and_safety_outlined, color: AppColors.accent, size: 18),
                     SizedBox(width: 8),
                     Text(
-                      'AI Clinical Directive',
+                      'Clinical Directive',
                       style: TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 13,
