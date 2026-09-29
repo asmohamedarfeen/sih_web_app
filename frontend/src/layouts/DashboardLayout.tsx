@@ -379,7 +379,7 @@ export const DashboardLayout: React.FC = () => {
           {/* Date & Time display */}
           <div className="hidden xl:flex items-center gap-1.5 text-xs text-slate-300 font-mono border-l border-white/10 pl-3">
             <Clock className="w-3.5 h-3.5 text-[#D4A017]" />
-            <span>Mon, 8 Sep 2025 | 10:24 AM</span>
+            <span>Mon, 8 Sep 2026 | 10:24 AM</span>
           </div>
         </div>
       </header>

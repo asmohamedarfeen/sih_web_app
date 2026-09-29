@@ -355,7 +355,7 @@ export const ALL_PERSONNEL_DATABASE: PriorityPersonnel[] = [
     riskTier: 'Critical',
     trend: '+18%',
     confidence: 94,
-    lastUpdated: '8 Sep 2025',
+    lastUpdated: '8 Sep 2026',
     avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80',
     summary:
       'This personnel has shown a steady increase in burnout risk over the last 45 days. Key contributors include prolonged deployment, reduced leave utilization, increased workload, and declining wellness self-assessment.',
@@ -389,7 +389,7 @@ export const ALL_PERSONNEL_DATABASE: PriorityPersonnel[] = [
     riskTier: 'Critical',
     trend: '+14%',
     confidence: 92,
-    lastUpdated: '7 Sep 2025',
+    lastUpdated: '7 Sep 2026',
     avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80',
     summary:
       'Acute fatigue markers triggered by persistent forward deployment shifts. Physical strain index elevated with recurring musculoskeletal fatigue and irregular telemetry logs.',
@@ -422,7 +422,7 @@ export const ALL_PERSONNEL_DATABASE: PriorityPersonnel[] = [
     riskTier: 'High',
     trend: '+8%',
     confidence: 89,
-    lastUpdated: '6 Sep 2025',
+    lastUpdated: '6 Sep 2026',
     avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&auto=format&fit=crop&q=80',
     summary:
       'Elevated psychosocial strain due to prolonged separation and family welfare concerns. Moderate fatigue with stabilizing biometric indicators after rotation.',
@@ -455,7 +455,7 @@ export const ALL_PERSONNEL_DATABASE: PriorityPersonnel[] = [
     riskTier: 'Critical',
     trend: '+16%',
     confidence: 96,
-    lastUpdated: '8 Sep 2025',
+    lastUpdated: '8 Sep 2026',
     avatarUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=300&auto=format&fit=crop&q=80',
     summary:
       'Hypoxia-induced psychological strain detected under continuous sub-zero forward post rotations. Overtime duty hours exceed 48h over past 5 days with chronic sleep debt.',
@@ -488,7 +488,7 @@ export const ALL_PERSONNEL_DATABASE: PriorityPersonnel[] = [
     riskTier: 'Critical',
     trend: '+11%',
     confidence: 93,
-    lastUpdated: '8 Sep 2025',
+    lastUpdated: '8 Sep 2026',
     avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&auto=format&fit=crop&q=80',
     summary:
       'Caregiver distress combined with high operational artillery command load. Compassionate grant approved; tele-counselling session in progress.',
@@ -521,7 +521,7 @@ export const ALL_PERSONNEL_DATABASE: PriorityPersonnel[] = [
     riskTier: 'High',
     trend: '+9%',
     confidence: 90,
-    lastUpdated: '7 Sep 2025',
+    lastUpdated: '7 Sep 2026',
     avatarUrl: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=300&auto=format&fit=crop&q=80',
     summary:
       'Circadian rhythm disruption due to continuous nocturnal telemetry watch shifts under extreme thermal desert environments.',
@@ -554,7 +554,7 @@ export const ALL_PERSONNEL_DATABASE: PriorityPersonnel[] = [
     riskTier: 'Moderate',
     trend: '-3%',
     confidence: 95,
-    lastUpdated: '8 Sep 2025',
+    lastUpdated: '8 Sep 2026',
     avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80',
     summary:
       'High physical exertion balanced by elite conditioning. Mild cumulative sleep deficit recovering rapidly following scheduled stand-down.',
@@ -587,7 +587,7 @@ export const ALL_PERSONNEL_DATABASE: PriorityPersonnel[] = [
     riskTier: 'High',
     trend: '+12%',
     confidence: 91,
-    lastUpdated: '8 Sep 2025',
+    lastUpdated: '8 Sep 2026',
     avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80',
     summary:
       'Prolonged night watch responsibilities combined with heavy operational duty coordination. Sleep debt accumulating past 8.5 hours over the week.',
@@ -620,7 +620,7 @@ export const ALL_PERSONNEL_DATABASE: PriorityPersonnel[] = [
     riskTier: 'Nominal',
     trend: '-6%',
     confidence: 97,
-    lastUpdated: '7 Sep 2025',
+    lastUpdated: '7 Sep 2026',
     avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&auto=format&fit=crop&q=80',
     summary:
       'Optimal physiological and psychological baseline. Restorative sleep indicators verified above 92% with regular leave cycles.',
@@ -779,7 +779,7 @@ export const WelfareDashboard: React.FC = () => {
               <div className="hidden sm:flex flex-col text-right text-[11px] font-mono text-slate-300 bg-black/20 px-3 py-2 rounded-2xl border border-white/10">
                 <span className="flex items-center gap-1 font-semibold text-white">
                   <Calendar className="w-3.5 h-3.5 text-[#D4A017]" />
-                  Mon, 8 Sep 2025
+                  Mon, 8 Sep 2026
                 </span>
                 <span className="flex items-center gap-1 text-[10px] text-slate-400">
                   <Clock className="w-3 h-3 text-[#D4A017]" />
@@ -2515,7 +2515,7 @@ export const WelfareDashboard: React.FC = () => {
                 <TrendingUp className="w-5 h-5 text-primary" />
                 <h3 className="text-sm font-black text-gray-900">{t('Risk Trend (Last 6 Months)')}</h3>
               </div>
-              <span className="text-xs font-bold text-slate-500">Jan &ndash; Jun 2025</span>
+              <span className="text-xs font-bold text-slate-500">Jan &ndash; Jun 2026</span>
             </div>
             <p className="text-xs text-slate-500 font-medium mb-4">
               Longitudinal risk trajectory leading to current triage

@@ -233,7 +233,7 @@ export const FeatureDetailModal: React.FC<FeatureDetailModalProps> = ({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 font-black text-slate-900 text-xs uppercase tracking-wider">
                     <TrendingUp className="w-4 h-4 text-primary" />
-                    <span>6-Month Force-Wide Trend Trajectory (Jan &ndash; Jun 2025)</span>
+                    <span>6-Month Force-Wide Trend Trajectory (Jan &ndash; Jun 2026)</span>
                   </div>
                   <span className="text-[11px] font-bold text-slate-500">Northern Sector Cohort</span>
                 </div>
