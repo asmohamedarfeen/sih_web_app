@@ -5,6 +5,7 @@ from backend.app.models.intervention import Intervention
 from backend.app.models.alert import SystemAlert
 from backend.app.models.assessment import Assessment
 from backend.app.models.ai_prediction import AIPrediction
+from backend.app.models.consent import ConsentPreference, ConsentAuditTrail
 from backend.app.security.passwords import get_password_hash
 
 

@@ -4,6 +4,7 @@ import logging
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 import numpy as np
+from backend.app.services.missing_data_engine import MissingDataEngine
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,7 @@ class AIRiskEngine:
     def __init__(self):
         self.booster = None
         self.model_loaded = False
+        self.missing_engine = MissingDataEngine()
         self._load_xgboost_model()
 
     def _load_xgboost_model(self):
@@ -273,6 +275,73 @@ class AIRiskEngine:
             "engine_type": "CALIBRATED_ML_MODEL",
             "features_evaluated": 24
         }
+
+    def assess_risk_robust(
+        self,
+        sleep_hours: Optional[float] = None,
+        fatigue_level: Optional[int] = None,
+        mood_score: Optional[int] = None,
+        workload_pressure: Optional[int] = None,
+        physical_strain: Optional[int] = None,
+        consecutive_duty_days: Optional[int] = None,
+        deployment_zone: str = "High Altitude (Siachen/Ladakh)",
+        personnel_history: Optional[Dict[str, float]] = None,
+        days_since_last_record: int = 1
+    ) -> Dict[str, Any]:
+        """
+        Production-grade missingness-resilient risk assessment.
+        Passes raw telemetry through MissingDataEngine to impute missing indicators
+        and compute bounded confidence intervals under data sparsity.
+        """
+        raw_telemetry = {
+            "sleep_hours": sleep_hours,
+            "fatigue_level": fatigue_level,
+            "mood_score": mood_score,
+            "workload_pressure": workload_pressure,
+            "physical_strain": physical_strain,
+            "consecutive_duty_days": consecutive_duty_days
+        }
+
+        imputation_result = self.missing_engine.impute_and_mask(
+            telemetry=raw_telemetry,
+            deployment_zone=deployment_zone,
+            personnel_history=personnel_history,
+            days_since_last_record=days_since_last_record
+        )
+
+        imputed = imputation_result["imputed_features"]
+
+        # Run primary evaluation with imputed inputs
+        eval_result = self.evaluate_risk(
+            sleep_hours=float(imputed["sleep_hours"]),
+            fatigue_level=int(round(imputed["fatigue_level"])),
+            mood_score=int(round(imputed["mood_score"])),
+            workload_pressure=int(round(imputed["workload_pressure"])),
+            physical_strain=int(round(imputed["physical_strain"])),
+            consecutive_duty_days=int(round(imputed["consecutive_duty_days"])),
+            deployment_zone=deployment_zone
+        )
+
+        # Apply uncertainty interval based on sparsity
+        stress = eval_result["stress_score"]
+        delta = imputation_result["uncertainty_delta"]
+        lower_bound = round(max(0.0, stress * (1.0 - delta)), 1)
+        upper_bound = round(min(100.0, stress * (1.0 + delta)), 1)
+
+        eval_result["missing_data_telemetry"] = {
+            "sparsity_ratio": imputation_result["sparsity_ratio"],
+            "missing_count": imputation_result["missing_count"],
+            "missing_mask": imputation_result["missing_mask"],
+            "uncertainty_range": [lower_bound, upper_bound],
+            "imputation_audit": imputation_result["imputation_audit"],
+            "resilience_status": "SPARSE_TELEMETRY_IMPUTED" if imputation_result["sparsity_ratio"] > 0 else "FULL_FIDELITY"
+        }
+
+        # Adjust confidence score inversely with data sparsity
+        original_conf = eval_result.get("confidence_score", 0.92)
+        eval_result["confidence_score"] = round(max(0.60, original_conf - (delta * 0.8)), 2)
+
+        return eval_result
 
     @staticmethod
     def predict_burnout_from_8_parameters(

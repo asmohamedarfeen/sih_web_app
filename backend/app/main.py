@@ -17,6 +17,8 @@ from backend.app.api.unit_twin.routes import router as unit_twin_router
 from backend.app.api.mission_impact.routes import router as mission_impact_router
 from backend.app.api.policy_discovery.routes import router as policy_discovery_router
 from backend.app.api.force_balancing.routes import router as force_balancing_router
+from backend.app.api.consent.routes import router as consent_router
+from backend.app.api.monitoring.routes import router as monitoring_router
 from backend.app.middleware.security_headers import SecurityHeadersMiddleware
 from backend.app.middleware.rate_limiter import RateLimiterMiddleware
 
@@ -65,6 +67,8 @@ app.include_router(unit_twin_router, prefix=settings.API_V1_STR)
 app.include_router(mission_impact_router, prefix=settings.API_V1_STR)
 app.include_router(policy_discovery_router, prefix=settings.API_V1_STR)
 app.include_router(force_balancing_router, prefix=settings.API_V1_STR)
+app.include_router(consent_router, prefix=settings.API_V1_STR)
+app.include_router(monitoring_router, prefix=settings.API_V1_STR)
 
 
 

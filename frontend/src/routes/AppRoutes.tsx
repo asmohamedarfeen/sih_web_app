@@ -18,6 +18,7 @@ import { UnitTwinPage } from '../pages/unit-twin';
 import { MissionImpactPage } from '../pages/mission-impact';
 import { PolicyDiscoveryPage } from '../pages/policy-discovery';
 import { ForceBalancingPage } from '../pages/force-balancing';
+import { MonitoringPage } from '../pages/monitoring';
 import { useAuthStore, getRoleDashboardRoute } from '../store/authStore';
 
 export const AppRoutes: React.FC = () => {
@@ -109,6 +110,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="/ai-risk" element={<AIRiskPage />} />
           <Route path="/interventions" element={<InterventionsPage />} />
           <Route path="/alerts" element={<AlertsPage />} />
+          <Route path="/monitoring" element={<MonitoringPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/organization" element={<OrganizationPage />} />

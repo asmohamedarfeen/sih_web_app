@@ -11,11 +11,11 @@ class ApiConstants {
 
   /// Candidate hosts to automatically test in order of priority
   static List<String> get candidateHosts => [
-    '127.0.0.1:8000',      // USB Reverse Port Forwarding (adb reverse - works offline/any network)
-    '10.12.29.184:8000',   // Current Mac IP
-    '10.191.200.180:8000', // Previous Hotspot IP
-    '10.214.234.51:8000',  // Wi-Fi Mac IP
-    defaultLocalHost,
+    '192.168.29.205:8000',      // Current Mac Wi-Fi IP
+    'As-MacBook-Pro.local:8000', // Mac Bonjour hostname (native iOS mDNS)
+    '172.20.10.1:8000',         // iPhone USB Tethering / Personal Hotspot Mac IP
+    '172.20.10.2:8000',         // iPhone USB Tethering alternative IP
+    '127.0.0.1:8000',          // Localhost / Android adb reverse
     if (!kIsWeb && Platform.isAndroid) '10.0.2.2:8000', // Android Studio Emulator
   ];
 
@@ -79,7 +79,9 @@ class ApiConstants {
     }
     if (kIsWeb) {
       return '127.0.0.1:8000';
-    } else if (Platform.isAndroid || Platform.isIOS) {
+    } else if (Platform.isIOS) {
+      return '192.168.29.205:8000';
+    } else if (Platform.isAndroid) {
       return defaultLocalHost;
     } else {
       return '127.0.0.1:8000';

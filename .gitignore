@@ -153,3 +153,7 @@ Thumbs.db
 *.avi
 *.mkv
 recordings/
+
+output/
+tmp/
+*.pdf

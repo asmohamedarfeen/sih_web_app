@@ -157,6 +157,7 @@ export const DashboardLayout: React.FC = () => {
         { name: 'Unit Hierarchy', path: '/organization', icon: GitFork },
         { name: 'Unit Analysis', path: '/analytics', icon: BarChart3 },
         { name: 'Risk & Alerts', path: '/alerts', icon: AlertTriangle, badge: '4' },
+        { name: 'Model Monitoring ⭐', path: '/monitoring', icon: Activity, badge: 'ML' },
         { name: 'AI Insights', path: '/ai-risk', icon: Brain },
         { name: 'Welfare Actions', path: '/interventions', icon: HandHeart },
         { name: 'Privacy & Security', path: '/security', icon: ShieldCheck },
@@ -171,6 +172,7 @@ export const DashboardLayout: React.FC = () => {
         { name: 'Unit Hierarchy', path: '/organization', icon: GitFork },
         { name: 'Personnel Overview', path: '/personnel', icon: Users },
         { name: 'Risk Analysis', path: '/analytics', icon: Activity },
+        { name: 'Model Monitoring ⭐', path: '/monitoring', icon: Activity, badge: 'ML' },
         { name: 'AI Predictions', path: '/ai-risk', icon: Brain },
         { name: 'Welfare Actions', path: '/interventions', icon: HandHeart },
         { name: 'Reports & Analytics', path: '/reports', icon: FileText },
@@ -194,6 +196,7 @@ export const DashboardLayout: React.FC = () => {
       { name: 'Welfare Interventions', path: '/interventions', icon: HandHeart },
       { name: 'Tactical Alerts', path: '/alerts', icon: AlertTriangle },
       { name: 'Analytics Center', path: '/analytics', icon: BarChart3 },
+      { name: 'Model Monitoring ⭐', path: '/monitoring', icon: Activity, badge: 'ML' },
       { name: 'Dossier Reports', path: '/reports', icon: FileText },
       { name: 'Privacy & Security', path: '/security', icon: ShieldCheck },
     ];
